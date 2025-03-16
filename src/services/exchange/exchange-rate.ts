@@ -2,12 +2,12 @@ import * as Agent from "@dfinity/agent"
 import BigNumber from "bignumber.js"
 
 import { actorBuilder } from "../actors"
-import { idlFactory as IDL } from "./idl/ExchangeRate"
-import { _SERVICE as Service, ExchangeRate__1 } from "./idl/ExchangeRate"
-import { idlFactory as IDL_ICRC1_NODE } from "./idl/NodeIndex"
-import { _SERVICE as ServiceNode } from "./idl/NodeIndex"
-import { idlFactory as IDL_TOKEN } from "./idl/Token"
-import { _SERVICE as ServiceToken, PublicTokenOverview } from "./idl/Token"
+import { idlFactory as IDL } from "./idl/exchange-rate-idl"
+import { _SERVICE as Service, ExchangeRate__1 } from "./idl/exchange-rate"
+import { idlFactory as IDL_ICRC1_NODE } from "./idl/node-index-idl"
+import { _SERVICE as ServiceNode } from "./idl/node-index"
+import { idlFactory as IDL_TOKEN } from "./idl/token-idl"
+import { _SERVICE as ServiceToken, PublicTokenOverview } from "./idl/token"
 
 const EXCHANGE_RATE_CANISTER = "2ixw4-taaaa-aaaag-qcpdq-cai"
 type NumberType = string | number | bigint | BigNumber

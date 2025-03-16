@@ -1,7 +1,7 @@
 import * as Agent from "@dfinity/agent";
 import { Agent as DfinityAgent } from "@dfinity/agent";
 
-import { idlFactory as icrc1IDL } from "../../../idl/icrc1";
+import { idlFactory as icrc1IDL } from "../../../idl/icrc1_idl";
 import {
   _SERVICE as ICRC1Service,
   Icrc1TransferResult,

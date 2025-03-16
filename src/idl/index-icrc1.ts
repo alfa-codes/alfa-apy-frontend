@@ -1,124 +1,121 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const idlFactory = ({ IDL }: any) => {
-  const Value = IDL.Rec()
-  const BlockIndex = IDL.Nat
-  const SubAccount = IDL.Vec(IDL.Nat8)
-  const Account = IDL.Record({
-    owner: IDL.Principal,
-    subaccount: IDL.Opt(SubAccount),
-  })
-  const GetAccountTransactionsArgs = IDL.Record({
-    max_results: IDL.Nat,
-    start: IDL.Opt(BlockIndex),
-    account: Account,
-  })
-  const Tokens = IDL.Nat
-  const Burn = IDL.Record({
-    from: Account,
-    memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    created_at_time: IDL.Opt(IDL.Nat64),
-    amount: IDL.Nat,
-    spender: IDL.Opt(Account),
-  })
-  const Mint = IDL.Record({
-    to: Account,
-    memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    created_at_time: IDL.Opt(IDL.Nat64),
-    amount: IDL.Nat,
-  })
-  const Approve = IDL.Record({
-    fee: IDL.Opt(IDL.Nat),
-    from: Account,
-    memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    created_at_time: IDL.Opt(IDL.Nat64),
-    amount: IDL.Nat,
-    expected_allowance: IDL.Opt(IDL.Nat),
-    expires_at: IDL.Opt(IDL.Nat64),
-    spender: Account,
-  })
-  const Transfer = IDL.Record({
-    to: Account,
-    fee: IDL.Opt(IDL.Nat),
-    from: Account,
-    memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    created_at_time: IDL.Opt(IDL.Nat64),
-    amount: IDL.Nat,
-    spender: IDL.Opt(Account),
-  })
-  const Transaction = IDL.Record({
-    burn: IDL.Opt(Burn),
-    kind: IDL.Text,
-    mint: IDL.Opt(Mint),
-    approve: IDL.Opt(Approve),
-    timestamp: IDL.Nat64,
-    transfer: IDL.Opt(Transfer),
-  })
-  const TransactionWithId = IDL.Record({
-    id: BlockIndex,
-    transaction: Transaction,
-  })
-  const GetTransactions = IDL.Record({
-    balance: Tokens,
-    transactions: IDL.Vec(TransactionWithId),
-    oldest_tx_id: IDL.Opt(BlockIndex),
-  })
-  const GetTransactionsErr = IDL.Record({ message: IDL.Text })
-  const GetTransactionsResult = IDL.Variant({
-    Ok: GetTransactions,
-    Err: GetTransactionsErr,
-  })
-  const GetBlocksRequest = IDL.Record({
-    start: IDL.Nat,
-    length: IDL.Nat,
-  })
-  const Map = IDL.Vec(IDL.Tuple(IDL.Text, Value))
-  Value.fill(
-    IDL.Variant({
-      Int: IDL.Int,
-      Map: Map,
-      Nat: IDL.Nat,
-      Nat64: IDL.Nat64,
-      Blob: IDL.Vec(IDL.Nat8),
-      Text: IDL.Text,
-      Array: IDL.Vec(Value),
-    }),
-  )
-  const Block = Value
-  const GetBlocksResponse = IDL.Record({
-    blocks: IDL.Vec(Block),
-    chain_length: IDL.Nat64,
-  })
-  const FeeCollectorRanges = IDL.Record({
-    ranges: IDL.Vec(
-      IDL.Tuple(Account, IDL.Vec(IDL.Tuple(BlockIndex, BlockIndex))),
-    ),
-  })
-  const ListSubaccountsArgs = IDL.Record({
-    owner: IDL.Principal,
-    start: IDL.Opt(SubAccount),
-  })
-  const Status = IDL.Record({ num_blocks_synced: BlockIndex })
-  return IDL.Service({
-    get_account_transactions: IDL.Func(
-      [GetAccountTransactionsArgs],
-      [GetTransactionsResult],
-      ["query"],
-    ),
-    get_blocks: IDL.Func([GetBlocksRequest], [GetBlocksResponse], ["query"]),
-    get_fee_collectors_ranges: IDL.Func([], [FeeCollectorRanges], ["query"]),
-    icrc1_balance_of: IDL.Func([Account], [Tokens], ["query"]),
-    ledger_id: IDL.Func([], [IDL.Principal], ["query"]),
-    list_subaccounts: IDL.Func(
-      [ListSubaccountsArgs],
-      [IDL.Vec(SubAccount)],
-      ["query"],
-    ),
-    status: IDL.Func([], [Status], ["query"]),
-  })
+import type { ActorMethod } from "@dfinity/agent"
+import type { IDL } from "@dfinity/candid"
+import type { Principal } from "@dfinity/principal"
+
+export interface Account {
+  owner: Principal
+  subaccount: [] | [SubAccount]
 }
-export const init = ({ IDL }: any) => {
-  const UpgradeArg = IDL.Record({ ledger_id: IDL.Opt(IDL.Principal) })
-  const InitArg = IDL.Record({ ledger_id: IDL.Principal })
-  const IndexArg = IDL.Variant({ Upgrade: UpgradeArg, Init: InitArg })
-  return [IDL.Opt(IndexArg)]
+export interface Approve {
+  fee: [] | [bigint]
+  from: Account
+  memo: [] | [Uint8Array | number[]]
+  created_at_time: [] | [bigint]
+  amount: bigint
+  expected_allowance: [] | [bigint]
+  expires_at: [] | [bigint]
+  spender: Account
 }
+export type Block = Value
+export type BlockIndex = bigint
+export interface Burn {
+  from: Account
+  memo: [] | [Uint8Array | number[]]
+  created_at_time: [] | [bigint]
+  amount: bigint
+  spender: [] | [Account]
+}
+export interface FeeCollectorRanges {
+  ranges: Array<[Account, Array<[BlockIndex, BlockIndex]>]>
+}
+export interface GetAccountTransactionsArgs {
+  max_results: bigint
+  start: [] | [BlockIndex]
+  account: Account
+}
+export interface GetBlocksRequest {
+  start: bigint
+  length: bigint
+}
+export interface GetBlocksResponse {
+  blocks: Array<Block>
+  chain_length: bigint
+}
+export interface GetTransactions {
+  balance: Tokens
+  transactions: Array<TransactionWithId>
+  oldest_tx_id: [] | [BlockIndex]
+}
+export interface GetTransactionsErr {
+  message: string
+}
+export type GetTransactionsResult =
+  | { Ok: GetTransactions }
+  | { Err: GetTransactionsErr }
+export type IndexArg = { Upgrade: UpgradeArg } | { Init: InitArg }
+export interface InitArg {
+  ledger_id: Principal
+}
+export interface ListSubaccountsArgs {
+  owner: Principal
+  start: [] | [SubAccount]
+}
+export type Map = Array<[string, Value]>
+export interface Mint {
+  to: Account
+  memo: [] | [Uint8Array | number[]]
+  created_at_time: [] | [bigint]
+  amount: bigint
+}
+export interface Status {
+  num_blocks_synced: BlockIndex
+}
+export type SubAccount = Uint8Array | number[]
+export type Tokens = bigint
+export interface Transaction {
+  burn: [] | [Burn]
+  kind: string
+  mint: [] | [Mint]
+  approve: [] | [Approve]
+  timestamp: bigint
+  transfer: [] | [Transfer]
+}
+export interface TransactionWithId {
+  id: BlockIndex
+  transaction: Transaction
+}
+export interface Transfer {
+  to: Account
+  fee: [] | [bigint]
+  from: Account
+  memo: [] | [Uint8Array | number[]]
+  created_at_time: [] | [bigint]
+  amount: bigint
+  spender: [] | [Account]
+}
+export interface UpgradeArg {
+  ledger_id: [] | [Principal]
+}
+export type Value =
+  | { Int: bigint }
+  | { Map: Map }
+  | { Nat: bigint }
+  | { Nat64: bigint }
+  | { Blob: Uint8Array | number[] }
+  | { Text: string }
+  | { Array: Array<Value> }
+export interface _SERVICE {
+  get_account_transactions: ActorMethod<
+    [GetAccountTransactionsArgs],
+    GetTransactionsResult
+  >
+  get_blocks: ActorMethod<[GetBlocksRequest], GetBlocksResponse>
+  get_fee_collectors_ranges: ActorMethod<[], FeeCollectorRanges>
+  icrc1_balance_of: ActorMethod<[Account], Tokens>
+  ledger_id: ActorMethod<[], Principal>
+  list_subaccounts: ActorMethod<[ListSubaccountsArgs], Array<SubAccount>>
+  status: ActorMethod<[], Status>
+}
+export declare const idlFactory: IDL.InterfaceFactory
+export declare const init: ({ IDL }: any) => IDL.Type[]

@@ -1,5 +1,5 @@
 import { ICRC1 } from "../../../../idl/icrc1_oracle";
-import { idlFactory as iCRC1OracleIDL } from "../../../../idl/icrc1_oracle";
+import { idlFactory as iCRC1OracleIDL } from "../../../../idl/icrc1_oracle_idl";
 import { _SERVICE as ICRC1Oracle } from "../../../../idl/icrc1_oracle";
 import { createActor } from "../../../../utils";
 import { Principal } from "@dfinity/principal";

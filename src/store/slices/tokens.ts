@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { icrc1OracleService } from "../../services";
 import { Status } from "../types";
+import { ICRC1 } from "../../idl/icrc1_oracle";
 
 export const fetchTokens = createAsyncThunk("tokens/fetchTokens", async () => {
   const response = await icrc1OracleService.getICRC1Canisters();
@@ -13,7 +14,7 @@ const tokensSlice = createSlice({
     tokens: [],
     status: Status.IDLE,
   } as {
-    tokens: Awaited<ReturnType<typeof icrc1OracleService.getICRC1Canisters>>;
+    tokens: ICRC1[];
     status: Status;
     error?: string;
   },

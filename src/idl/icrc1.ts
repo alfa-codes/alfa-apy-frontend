@@ -1,256 +1,274 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export const idlFactory = ({ IDL }: any) => {
-  const AccountIdentifier = IDL.Vec(IDL.Nat8)
-  const AccountBalanceArgs = IDL.Record({ account: AccountIdentifier })
-  const Tokens = IDL.Record({ e8s: IDL.Nat64 })
-  const TextAccountIdentifier = IDL.Text
-  const AccountBalanceArgsDfx = IDL.Record({
-    account: TextAccountIdentifier,
-  })
-  const Archive = IDL.Record({ canister_id: IDL.Principal })
-  const Archives = IDL.Record({ archives: IDL.Vec(Archive) })
-  const SubAccount = IDL.Vec(IDL.Nat8)
-  const Account = IDL.Record({
-    owner: IDL.Principal,
-    subaccount: IDL.Opt(SubAccount),
-  })
-  const Icrc1Tokens = IDL.Nat
-  const Value = IDL.Variant({
-    Int: IDL.Int,
-    Nat: IDL.Nat,
-    Blob: IDL.Vec(IDL.Nat8),
-    Text: IDL.Text,
-  })
-  const Icrc1Timestamp = IDL.Nat64
-  const TransferArg = IDL.Record({
-    to: Account,
-    fee: IDL.Opt(Icrc1Tokens),
-    memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    from_subaccount: IDL.Opt(SubAccount),
-    created_at_time: IDL.Opt(Icrc1Timestamp),
-    amount: Icrc1Tokens,
-  })
-  const Icrc1BlockIndex = IDL.Nat
-  const Icrc1TransferError = IDL.Variant({
-    GenericError: IDL.Record({
-      message: IDL.Text,
-      error_code: IDL.Nat,
-    }),
-    TemporarilyUnavailable: IDL.Null,
-    BadBurn: IDL.Record({ min_burn_amount: Icrc1Tokens }),
-    Duplicate: IDL.Record({ duplicate_of: Icrc1BlockIndex }),
-    BadFee: IDL.Record({ expected_fee: Icrc1Tokens }),
-    CreatedInFuture: IDL.Record({ ledger_time: IDL.Nat64 }),
-    TooOld: IDL.Null,
-    InsufficientFunds: IDL.Record({ balance: Icrc1Tokens }),
-  })
-  const Icrc1TransferResult = IDL.Variant({
-    Ok: Icrc1BlockIndex,
-    Err: Icrc1TransferError,
-  })
-  const AllowanceArgs = IDL.Record({
-    account: Account,
-    spender: Account,
-  })
-  const TimeStamp = IDL.Record({ timestamp_nanos: IDL.Nat64 })
-  const Allowance = IDL.Record({
-    allowance: Icrc1Tokens,
-    expires_at: IDL.Opt(TimeStamp),
-  })
-  const ApproveArgs = IDL.Record({
-    fee: IDL.Opt(Icrc1Tokens),
-    memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    from_subaccount: IDL.Opt(SubAccount),
-    created_at_time: IDL.Opt(TimeStamp),
-    amount: Icrc1Tokens,
-    expected_allowance: IDL.Opt(Icrc1Tokens),
-    expires_at: IDL.Opt(TimeStamp),
-    spender: Account,
-  })
-  const ApproveError = IDL.Variant({
-    GenericError: IDL.Record({
-      message: IDL.Text,
-      error_code: IDL.Nat,
-    }),
-    TemporarilyUnavailable: IDL.Null,
-    Duplicate: IDL.Record({ duplicate_of: Icrc1BlockIndex }),
-    BadFee: IDL.Record({ expected_fee: Icrc1Tokens }),
-    AllowanceChanged: IDL.Record({ current_allowance: Icrc1Tokens }),
-    CreatedInFuture: IDL.Record({ ledger_time: IDL.Nat64 }),
-    TooOld: IDL.Null,
-    Expired: IDL.Record({ ledger_time: IDL.Nat64 }),
-    InsufficientFunds: IDL.Record({ balance: Icrc1Tokens }),
-  })
-  const ApproveResult = IDL.Variant({
-    Ok: Icrc1BlockIndex,
-    Err: ApproveError,
-  })
-  const BlockIndex = IDL.Nat64
-  const GetBlocksArgs = IDL.Record({
-    start: BlockIndex,
-    length: IDL.Nat64,
-  })
-  const Memo = IDL.Nat64
-  const Operation = IDL.Variant({
-    Approve: IDL.Record({
-      fee: Tokens,
-      from: AccountIdentifier,
-      allowance_e8s: IDL.Int,
-      allowance: Tokens,
-      expires_at: IDL.Opt(TimeStamp),
-      spender: AccountIdentifier,
-    }),
-    Burn: IDL.Record({
-      from: AccountIdentifier,
-      amount: Tokens,
-      spender: IDL.Opt(AccountIdentifier),
-    }),
-    Mint: IDL.Record({ to: AccountIdentifier, amount: Tokens }),
-    Transfer: IDL.Record({
-      to: AccountIdentifier,
-      fee: Tokens,
-      from: AccountIdentifier,
-      amount: Tokens,
-    }),
-    TransferFrom: IDL.Record({
-      to: AccountIdentifier,
-      fee: Tokens,
-      from: AccountIdentifier,
-      amount: Tokens,
-      spender: AccountIdentifier,
-    }),
-  })
-  const Transaction = IDL.Record({
-    memo: Memo,
-    icrc1_memo: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    operation: IDL.Opt(Operation),
-    created_at_time: TimeStamp,
-  })
-  const Block = IDL.Record({
-    transaction: Transaction,
-    timestamp: TimeStamp,
-    parent_hash: IDL.Opt(IDL.Vec(IDL.Nat8)),
-  })
-  const BlockRange = IDL.Record({ blocks: IDL.Vec(Block) })
-  const QueryArchiveError = IDL.Variant({
-    BadFirstBlockIndex: IDL.Record({
-      requested_index: BlockIndex,
-      first_valid_index: BlockIndex,
-    }),
-    Other: IDL.Record({
-      error_message: IDL.Text,
-      error_code: IDL.Nat64,
-    }),
-  })
-  const QueryArchiveResult = IDL.Variant({
-    Ok: BlockRange,
-    Err: QueryArchiveError,
-  })
-  const QueryArchiveFn = IDL.Func(
-    [GetBlocksArgs],
-    [QueryArchiveResult],
-    ["query"],
-  )
-  const ArchivedBlocksRange = IDL.Record({
-    callback: QueryArchiveFn,
-    start: BlockIndex,
-    length: IDL.Nat64,
-  })
-  const QueryBlocksResponse = IDL.Record({
-    certificate: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    blocks: IDL.Vec(Block),
-    chain_length: IDL.Nat64,
-    first_block_index: BlockIndex,
-    archived_blocks: IDL.Vec(ArchivedBlocksRange),
-  })
-  const ArchivedEncodedBlocksRange = IDL.Record({
-    callback: IDL.Func(
-      [GetBlocksArgs],
-      [
-        IDL.Variant({
-          Ok: IDL.Vec(IDL.Vec(IDL.Nat8)),
-          Err: QueryArchiveError,
-        }),
-      ],
-      ["query"],
-    ),
-    start: IDL.Nat64,
-    length: IDL.Nat64,
-  })
-  const QueryEncodedBlocksResponse = IDL.Record({
-    certificate: IDL.Opt(IDL.Vec(IDL.Nat8)),
-    blocks: IDL.Vec(IDL.Vec(IDL.Nat8)),
-    chain_length: IDL.Nat64,
-    first_block_index: IDL.Nat64,
-    archived_blocks: IDL.Vec(ArchivedEncodedBlocksRange),
-  })
-  const SendArgs = IDL.Record({
-    to: TextAccountIdentifier,
-    fee: Tokens,
-    memo: Memo,
-    from_subaccount: IDL.Opt(SubAccount),
-    created_at_time: IDL.Opt(TimeStamp),
-    amount: Tokens,
-  })
-  const TransferArgs = IDL.Record({
-    to: AccountIdentifier,
-    fee: Tokens,
-    memo: Memo,
-    from_subaccount: IDL.Opt(SubAccount),
-    created_at_time: IDL.Opt(TimeStamp),
-    amount: Tokens,
-  })
-  const TransferError = IDL.Variant({
-    TxTooOld: IDL.Record({ allowed_window_nanos: IDL.Nat64 }),
-    BadFee: IDL.Record({ expected_fee: Tokens }),
-    TxDuplicate: IDL.Record({ duplicate_of: BlockIndex }),
-    TxCreatedInFuture: IDL.Null,
-    InsufficientFunds: IDL.Record({ balance: Tokens }),
-  })
-  const TransferResult = IDL.Variant({
-    Ok: BlockIndex,
-    Err: TransferError,
-  })
-  const TransferFeeArg = IDL.Record({})
-  const TransferFee = IDL.Record({ transfer_fee: Tokens })
-  return IDL.Service({
-    account_balance: IDL.Func([AccountBalanceArgs], [Tokens], ["query"]),
-    account_balance_dfx: IDL.Func([AccountBalanceArgsDfx], [Tokens], ["query"]),
-    archives: IDL.Func([], [Archives], ["query"]),
-    decimals: IDL.Func([], [IDL.Record({ decimals: IDL.Nat32 })], ["query"]),
-    icrc1_balance_of: IDL.Func([Account], [Icrc1Tokens], ["query"]),
-    icrc1_decimals: IDL.Func([], [IDL.Nat8], ["query"]),
-    icrc1_fee: IDL.Func([], [Icrc1Tokens], ["query"]),
-    icrc1_metadata: IDL.Func(
-      [],
-      [IDL.Vec(IDL.Tuple(IDL.Text, Value))],
-      ["query"],
-    ),
-    icrc1_minting_account: IDL.Func([], [IDL.Opt(Account)], ["query"]),
-    icrc1_name: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_supported_standards: IDL.Func(
-      [],
-      [IDL.Vec(IDL.Record({ url: IDL.Text, name: IDL.Text }))],
-      ["query"],
-    ),
-    icrc1_symbol: IDL.Func([], [IDL.Text], ["query"]),
-    icrc1_total_supply: IDL.Func([], [Icrc1Tokens], ["query"]),
-    icrc1_transfer: IDL.Func([TransferArg], [Icrc1TransferResult], []),
-    icrc2_allowance: IDL.Func([AllowanceArgs], [Allowance], ["query"]),
-    icrc2_approve: IDL.Func([ApproveArgs], [ApproveResult], []),
-    name: IDL.Func([], [IDL.Record({ name: IDL.Text })], ["query"]),
-    query_blocks: IDL.Func([GetBlocksArgs], [QueryBlocksResponse], ["query"]),
-    query_encoded_blocks: IDL.Func(
-      [GetBlocksArgs],
-      [QueryEncodedBlocksResponse],
-      ["query"],
-    ),
-    send_dfx: IDL.Func([SendArgs], [BlockIndex], []),
-    symbol: IDL.Func([], [IDL.Record({ symbol: IDL.Text })], ["query"]),
-    transfer: IDL.Func([TransferArgs], [TransferResult], []),
-    transfer_fee: IDL.Func([TransferFeeArg], [TransferFee], ["query"]),
-  })
+import type { ActorMethod } from "@dfinity/agent"
+import type { Principal } from "@dfinity/principal"
+
+export interface Account {
+  owner: Principal
+  subaccount: [] | [SubAccount]
 }
-export const init = () => {
-  return []
+export interface AccountBalanceArgs {
+  account: AccountIdentifier
+}
+export interface AccountBalanceArgsDfx {
+  account: TextAccountIdentifier
+}
+export type AccountIdentifier = Uint8Array | number[]
+export interface Allowance {
+  allowance: Icrc1Tokens
+  expires_at: [] | [TimeStamp]
+}
+export interface AllowanceArgs {
+  account: Account
+  spender: Account
+}
+export interface ApproveArgs {
+  fee: [] | [Icrc1Tokens]
+  memo: [] | [Uint8Array | number[]]
+  from_subaccount: [] | [SubAccount]
+  created_at_time: [] | [TimeStamp]
+  amount: Icrc1Tokens
+  expected_allowance: [] | [Icrc1Tokens]
+  expires_at: [] | [TimeStamp]
+  spender: Account
+}
+export type ApproveError =
+  | {
+      GenericError: { message: string; error_code: bigint }
+    }
+  | { TemporarilyUnavailable: null }
+  | { Duplicate: { duplicate_of: Icrc1BlockIndex } }
+  | { BadFee: { expected_fee: Icrc1Tokens } }
+  | { AllowanceChanged: { current_allowance: Icrc1Tokens } }
+  | { CreatedInFuture: { ledger_time: bigint } }
+  | { TooOld: null }
+  | { Expired: { ledger_time: bigint } }
+  | { InsufficientFunds: { balance: Icrc1Tokens } }
+export type ApproveResult = { Ok: Icrc1BlockIndex } | { Err: ApproveError }
+export interface Archive {
+  canister_id: Principal
+}
+export interface ArchiveOptions {
+  num_blocks_to_archive: bigint
+  trigger_threshold: bigint
+  max_message_size_bytes: [] | [bigint]
+  cycles_for_archive_creation: [] | [bigint]
+  node_max_memory_size_bytes: [] | [bigint]
+  controller_id: Principal
+}
+export interface ArchivedBlocksRange {
+  callback: QueryArchiveFn
+  start: BlockIndex
+  length: bigint
+}
+export interface ArchivedEncodedBlocksRange {
+  callback: [Principal, string]
+  start: bigint
+  length: bigint
+}
+export interface Archives {
+  archives: Array<Archive>
+}
+export interface Block {
+  transaction: Transaction
+  timestamp: TimeStamp
+  parent_hash: [] | [Uint8Array | number[]]
+}
+export type BlockIndex = bigint
+export interface BlockRange {
+  blocks: Array<Block>
+}
+export interface Duration {
+  secs: bigint
+  nanos: number
+}
+export interface FeatureFlags {
+  icrc2: boolean
+}
+export interface GetBlocksArgs {
+  start: BlockIndex
+  length: bigint
+}
+export type Icrc1BlockIndex = bigint
+export type Icrc1Timestamp = bigint
+export type Icrc1Tokens = bigint
+export type Icrc1TransferError =
+  | {
+      GenericError: { message: string; error_code: bigint }
+    }
+  | { TemporarilyUnavailable: null }
+  | { BadBurn: { min_burn_amount: Icrc1Tokens } }
+  | { Duplicate: { duplicate_of: Icrc1BlockIndex } }
+  | { BadFee: { expected_fee: Icrc1Tokens } }
+  | { CreatedInFuture: { ledger_time: bigint } }
+  | { TooOld: null }
+  | { InsufficientFunds: { balance: Icrc1Tokens } }
+export type Icrc1TransferResult =
+  | { Ok: Icrc1BlockIndex }
+  | { Err: Icrc1TransferError }
+export interface InitArgs {
+  send_whitelist: Array<Principal>
+  token_symbol: [] | [string]
+  transfer_fee: [] | [Tokens]
+  minting_account: TextAccountIdentifier
+  maximum_number_of_accounts: [] | [bigint]
+  accounts_overflow_trim_quantity: [] | [bigint]
+  transaction_window: [] | [Duration]
+  max_message_size_bytes: [] | [bigint]
+  icrc1_minting_account: [] | [Account]
+  archive_options: [] | [ArchiveOptions]
+  initial_values: Array<[TextAccountIdentifier, Tokens]>
+  token_name: [] | [string]
+  feature_flags: [] | [FeatureFlags]
+}
+export type LedgerCanisterPayload =
+  | { Upgrade: [] | [UpgradeArgs] }
+  | { Init: InitArgs }
+export type Memo = bigint
+export type Operation =
+  | {
+      Approve: {
+        fee: Tokens
+        from: AccountIdentifier
+        allowance_e8s: bigint
+        allowance: Tokens
+        expires_at: [] | [TimeStamp]
+        spender: AccountIdentifier
+      }
+    }
+  | {
+      Burn: {
+        from: AccountIdentifier
+        amount: Tokens
+        spender: [] | [AccountIdentifier]
+      }
+    }
+  | { Mint: { to: AccountIdentifier; amount: Tokens } }
+  | {
+      Transfer: {
+        to: AccountIdentifier
+        fee: Tokens
+        from: AccountIdentifier
+        amount: Tokens
+      }
+    }
+  | {
+      TransferFrom: {
+        to: AccountIdentifier
+        fee: Tokens
+        from: AccountIdentifier
+        amount: Tokens
+        spender: AccountIdentifier
+      }
+    }
+export type QueryArchiveError =
+  | {
+      BadFirstBlockIndex: {
+        requested_index: BlockIndex
+        first_valid_index: BlockIndex
+      }
+    }
+  | { Other: { error_message: string; error_code: bigint } }
+export type QueryArchiveFn = ActorMethod<[GetBlocksArgs], QueryArchiveResult>
+export type QueryArchiveResult = { Ok: BlockRange } | { Err: QueryArchiveError }
+export interface QueryBlocksResponse {
+  certificate: [] | [Uint8Array | number[]]
+  blocks: Array<Block>
+  chain_length: bigint
+  first_block_index: BlockIndex
+  archived_blocks: Array<ArchivedBlocksRange>
+}
+export interface QueryEncodedBlocksResponse {
+  certificate: [] | [Uint8Array | number[]]
+  blocks: Array<Uint8Array | number[]>
+  chain_length: bigint
+  first_block_index: bigint
+  archived_blocks: Array<ArchivedEncodedBlocksRange>
+}
+export interface SendArgs {
+  to: TextAccountIdentifier
+  fee: Tokens
+  memo: Memo
+  from_subaccount: [] | [SubAccount]
+  created_at_time: [] | [TimeStamp]
+  amount: Tokens
+}
+export type SubAccount = Uint8Array | number[]
+export type TextAccountIdentifier = string
+export interface TimeStamp {
+  timestamp_nanos: bigint
+}
+export interface Tokens {
+  e8s: bigint
+}
+export interface Transaction {
+  memo: Memo
+  icrc1_memo: [] | [Uint8Array | number[]]
+  operation: [] | [Operation]
+  created_at_time: TimeStamp
+}
+export interface TransferArg {
+  to: Account
+  fee: [] | [Icrc1Tokens]
+  memo: [] | [Uint8Array | number[]]
+  from_subaccount: [] | [SubAccount]
+  created_at_time: [] | [Icrc1Timestamp]
+  amount: Icrc1Tokens
+}
+export interface TransferArgs {
+  to: AccountIdentifier
+  fee: Tokens
+  memo: Memo
+  from_subaccount: [] | [SubAccount]
+  created_at_time: [] | [TimeStamp]
+  amount: Tokens
+}
+export type TransferError =
+  | {
+      TxTooOld: { allowed_window_nanos: bigint }
+    }
+  | { BadFee: { expected_fee: Tokens } }
+  | { TxDuplicate: { duplicate_of: BlockIndex } }
+  | { TxCreatedInFuture: null }
+  | { InsufficientFunds: { balance: Tokens } }
+export interface TransferFee {
+  transfer_fee: Tokens
+}
+export type TransferFeeArg = {}
+export type TransferResult = { Ok: BlockIndex } | { Err: TransferError }
+export interface UpgradeArgs {
+  maximum_number_of_accounts: [] | [bigint]
+  icrc1_minting_account: [] | [Account]
+  feature_flags: [] | [FeatureFlags]
+}
+export type Value =
+  | { Int: bigint }
+  | { Nat: bigint }
+  | { Blob: Uint8Array | number[] }
+  | { Text: string }
+export interface _SERVICE {
+  account_balance: ActorMethod<[AccountBalanceArgs], Tokens>
+  account_balance_dfx: ActorMethod<[AccountBalanceArgsDfx], Tokens>
+  archives: ActorMethod<[], Archives>
+  decimals: ActorMethod<[], { decimals: number }>
+  icrc1_balance_of: ActorMethod<[Account], Icrc1Tokens>
+  icrc1_decimals: ActorMethod<[], number>
+  icrc1_fee: ActorMethod<[], Icrc1Tokens>
+  icrc1_metadata: ActorMethod<[], Array<[string, Value]>>
+  icrc1_minting_account: ActorMethod<[], [] | [Account]>
+  icrc1_name: ActorMethod<[], string>
+  icrc1_supported_standards: ActorMethod<
+    [],
+    Array<{ url: string; name: string }>
+  >
+  icrc1_symbol: ActorMethod<[], string>
+  icrc1_total_supply: ActorMethod<[], Icrc1Tokens>
+  icrc1_transfer: ActorMethod<[TransferArg], Icrc1TransferResult>
+  icrc2_allowance: ActorMethod<[AllowanceArgs], Allowance>
+  icrc2_approve: ActorMethod<[ApproveArgs], ApproveResult>
+  name: ActorMethod<[], { name: string }>
+  query_blocks: ActorMethod<[GetBlocksArgs], QueryBlocksResponse>
+  query_encoded_blocks: ActorMethod<[GetBlocksArgs], QueryEncodedBlocksResponse>
+  send_dfx: ActorMethod<[SendArgs], BlockIndex>
+  symbol: ActorMethod<[], { symbol: string }>
+  transfer: ActorMethod<[TransferArgs], TransferResult>
+  transfer_fee: ActorMethod<[TransferFeeArg], TransferFee>
 }

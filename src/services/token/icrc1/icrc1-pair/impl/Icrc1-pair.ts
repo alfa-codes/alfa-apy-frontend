@@ -4,9 +4,9 @@ import { Principal } from "@dfinity/principal"
 
 import { IIcrc1Pair } from "../i-icrc-pair"
 
-import { idlFactory as icrc1IDL } from "../../../../../idl/icrc1"
+import { idlFactory as icrc1IDL } from "../../../../../idl/icrc1_idl"
 import { _SERVICE as ICRC1ServiceIDL } from "../../../../../idl/icrc1"
-import { idlFactory as icrc1IndexIDL } from "../../../../../idl/index-icrc1"
+import { idlFactory as icrc1IndexIDL } from "../../../../../idl/index-icrc1_idl"
 import { _SERVICE as ICRCIndex } from "../../../../../idl/index-icrc1"
 import { ICRC1Data, ICRC1Error } from "../../types"
 import { agentBaseConfig } from "../../../../actors"
