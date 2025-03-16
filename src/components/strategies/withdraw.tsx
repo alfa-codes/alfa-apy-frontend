@@ -27,10 +27,12 @@ export function Withdraw({
   const [value, setValue] = useState("");
   const isZeroAvailbale = BigNumber(available).eq(0);
 
-  const percent = BigNumber(value || 0)
-    .div(available)
-    .multipliedBy(100)
-    .toString();
+  const percent = isZeroAvailbale
+    ? "0"
+    : BigNumber(value || 0)
+        .div(available)
+        .multipliedBy(100)
+        .toString();
 
   return (
     <>
@@ -94,12 +96,12 @@ export function Withdraw({
               type="number"
               min={0}
             />
+            {inputError && (
+              <span className="h-4 mt-[10px] text-xs leading-4 text-red-600">
+                {inputError}
+              </span>
+            )}
           </div>
-          {inputError && (
-            <span className="h-4 mt-[10px] text-xs leading-4 text-red-600">
-              {inputError}
-            </span>
-          )}
           <Button
             disabled={isZeroAvailbale || disabled}
             className="sm:ml-[20px] sm:h-[40px] w-full sm:w-auto sm:h-[42px] mt-[25px] sm:mt-0"

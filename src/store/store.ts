@@ -3,7 +3,6 @@ import {
   tokensReducer,
   balancesReducer,
   balanceReducer,
-  swapReducer,
   strategiesReducer,
   strategyReducer,
 } from "./slices";
@@ -13,7 +12,6 @@ export const store = configureStore({
     tokens: tokensReducer,
     balances: balancesReducer,
     balance: balanceReducer,
-    swap: swapReducer,
     strategies: strategiesReducer,
     strategy: strategyReducer,
   },
