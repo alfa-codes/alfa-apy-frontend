@@ -103,7 +103,7 @@ export function Withdraw({
             )}
           </div>
           <Button
-            disabled={isZeroAvailbale || disabled}
+            disabled={isZeroAvailbale || disabled || !value}
             className="sm:ml-[20px] sm:h-[40px] w-full sm:w-auto sm:h-[42px] mt-[25px] sm:mt-0"
             onClick={() => onWithdraw(percent)}
           >
