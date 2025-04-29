@@ -11,7 +11,7 @@ export function Deposit({
   onClick,
   balance,
   tokenSymbol,
-  disabled
+  loading,
 }: {
   className?: string;
   isOpen?: boolean;
@@ -20,14 +20,14 @@ export function Deposit({
   onClick: () => unknown;
   balance: string;
   tokenSymbol: string;
-  disabled?: boolean
+  loading?: boolean;
 }) {
   const [value, setValue] = useState("");
   const [inputError, setInputError] = useState("");
   return (
     <>
       <Button onClick={onClick} className={className}>
-        <span className="text-[20px]">📥</span> Deposit
+        <span className="text-[20px] block mr-[5px]">📥</span> Deposit
       </Button>
       <Popup
         isOpen={!!isOpen}
@@ -69,7 +69,8 @@ export function Deposit({
             )}
           </div>
           <Button
-            disabled={!!inputError || !value || disabled}
+            disabled={!!inputError || !value}
+            loading={loading}
             className="sm:ml-[20px] sm:h-[40px] w-full sm:w-auto sm:h-[42px] mt-[25px] sm:mt-0"
             onClick={() => onDeposit(value)}
           >

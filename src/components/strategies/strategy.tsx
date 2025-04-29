@@ -119,7 +119,7 @@ export function Strategy({
             </div>
             <div className="flex flex-col sm:flex-row mx-auto mt-[35px] w-full justify-center">
               <Deposit
-                disabled={isDepositing}
+                loading={isDepositing}
                 onClick={() => setDepositOpen(true)}
                 className="sm:mr-[30px] mb-[20px] sm:mb-0 w-full sm:w-[140px]"
                 isOpen={depositOpen}
@@ -168,10 +168,10 @@ export function Strategy({
                 }}
                 available={available}
                 tokenSymbol={token?.symbol ?? ""}
-                disabled={isWithdrawing}
+                loading={isWithdrawing}
               />
               <Button disabled className="w-full sm:w-[140px]">
-                <span className="text-[20px]">🔄</span> Swap
+                <span className="text-[20px] block mr-[5px]">🔄</span> Swap
               </Button>
             </div>
           </>

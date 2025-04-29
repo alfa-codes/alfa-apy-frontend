@@ -3,8 +3,13 @@ import {
   _SERVICE as VaultType,
   DepositResponse,
   StrategyResponse,
+  PoolReply,
 } from "./idl/vault.ts";
-import { _SERVICE as Kong, PoolsReply, PoolsResult } from "./idl/kong_backend.ts";
+import {
+  _SERVICE as Kong,
+  PoolsReply,
+  PoolsResult,
+} from "./idl/kong_backend.ts";
 import {
   Actor,
   ActorSubclass,
@@ -25,9 +30,7 @@ export const kongCanister = "2ipq2-uqaaa-aaaar-qailq-cai";
 export class StrategiesService {
   private actor: ActorSubclass<VaultType>;
 
-  protected constructor(
-    actor: ActorSubclass<VaultType>,
-  ) {
+  protected constructor(actor: ActorSubclass<VaultType>) {
     this.actor = actor;
   }
 
@@ -47,15 +50,21 @@ export class StrategiesService {
       annonymousAgent,
       idlFactory
     );
-    return anonymousActor.get_strategies();
+    const strategies = await anonymousActor.get_strategies();
+    return Promise.all(
+      strategies.map(async (s) => {
+        const strategyPools = await StrategiesService.get_pool_data(s.pools);
+        console.log(s.name, strategyPools);
+        const bestPool = strategyPools.sort(
+          (p1, p2) => p2.rolling_24h_apy - p1.rolling_24h_apy
+        )[0];
+        return { ...s, current_pool: bestPool ? [bestPool] : [] };
+      })
+    );
   }
 
   //todo accept identity-kit actor
-  public async withdraw(
-    strategy_id: number,
-    ledger: string,
-    amount: bigint,
-  ) {
+  public async withdraw(strategy_id: number, ledger: string, amount: bigint) {
     return this.actor.withdraw({
       strategy_id,
       ledger: Principal.fromText(ledger),
@@ -87,7 +96,7 @@ export class StrategiesService {
 
   public static async get_pool_data(
     pools_symbols: Array<string>
-  ): Promise<any> {
+  ): Promise<PoolReply[]> {
     const annonymousAgent = await HttpAgent.create({ host: "https://ic0.app" });
     const anonymousActor = await getTypedActor<Kong>(
       kongCanister,
@@ -104,6 +113,7 @@ export class StrategiesService {
       })
       .catch((e) => {
         console.error(e);
+        throw e;
       });
   }
 
@@ -136,7 +146,7 @@ export class StrategiesService {
         (userBalances as any).Ok.forEach((balance: any) => {
           userStrategies.forEach((strategy) => {
             const lpPosition = balance.LP;
-            console.log("lpPosition", lpPosition)
+            console.log("lpPosition", lpPosition);
             // Select balances that match user's strategy and have non-zero total shares
             if (
               strategy.strategy_current_pool === lpPosition.symbol &&

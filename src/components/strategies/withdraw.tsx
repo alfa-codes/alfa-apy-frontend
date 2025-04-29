@@ -11,7 +11,7 @@ export function Withdraw({
   onClick,
   available,
   tokenSymbol,
-  disabled,
+  loading,
 }: {
   className?: string;
   isOpen?: boolean;
@@ -20,7 +20,7 @@ export function Withdraw({
   onClick: () => unknown;
   available: string;
   tokenSymbol: string;
-  disabled?: boolean;
+  loading?: boolean;
 }) {
   const [inputFocused, setInputFocused] = useState(false);
   const [inputError, setInputError] = useState("");
@@ -37,7 +37,7 @@ export function Withdraw({
   return (
     <>
       <Button onClick={onClick} className={className}>
-        <span className="text-[20px]">📤</span> Withdraw
+        <span className="text-[20px] block mr-[5px]">📤</span> Withdraw
       </Button>
       <Popup
         isOpen={!!isOpen}
@@ -103,7 +103,8 @@ export function Withdraw({
             )}
           </div>
           <Button
-            disabled={isZeroAvailbale || disabled || !value}
+            disabled={isZeroAvailbale || !value}
+            loading={loading}
             className="sm:ml-[20px] sm:h-[40px] w-full sm:w-auto sm:h-[42px] mt-[25px] sm:mt-0"
             onClick={() => onWithdraw(percent)}
           >
