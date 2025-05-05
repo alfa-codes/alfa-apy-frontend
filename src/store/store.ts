@@ -5,6 +5,7 @@ import {
   balanceReducer,
   strategiesReducer,
   strategyReducer,
+  swapReducer,
 } from "./slices";
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     balance: balanceReducer,
     strategies: strategiesReducer,
     strategy: strategyReducer,
+    swap: swapReducer,
   },
 });
 

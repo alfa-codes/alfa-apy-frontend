@@ -11,7 +11,7 @@ import { useAgent } from "@nfid/identitykit/react";
 
 export function useStrategies(user?: string) {
   const dispatch = useDispatch();
-  const agent = useAgent();
+  const agent = useAgent({host: "https://ic0.app"});
 
   const {
     strategies: { data, status },

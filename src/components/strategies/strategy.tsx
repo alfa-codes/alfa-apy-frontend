@@ -36,7 +36,7 @@ export function Strategy({
   };
 }) {
   const { user } = useAuth();
-  const agent = useAgent();
+  const agent = useAgent({host: "https://ic0.app"});
   const { tokens } = useTokens();
   const logos = tokens ? getStrategyTokenLogos(value, tokens) : [];
   const { pools, resetPools } = usePools(value.pools);

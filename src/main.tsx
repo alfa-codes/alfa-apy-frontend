@@ -14,7 +14,7 @@ createRoot(document.getElementById("root")!).render(
     <ToastContainer />
     <Provider store={store}>
       <IdentityKitProvider
-        signerClientOptions={{ targets: ["hx54w-raaaa-aaaaa-qafla-cai"] }}
+        signerClientOptions={{ targets: ["do25a-dyaaa-aaaak-qifua-cai"] }}
       >
         <App />
       </IdentityKitProvider>
