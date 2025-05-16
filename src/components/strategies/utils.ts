@@ -23,7 +23,7 @@ export type ProfitLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'Hot';
 export function getProfitLevel(strategy: StrategyResponse): ProfitLevel {
   // Example logic: mark id 1 as 'Hot', otherwise use TVL for profit level
   if (strategy.id === 1) return 'Hot';
-  const tvl = Number(strategy.current_pool[0]?.tvl || 0);
+  const tvl = Number((strategy.current_pool as unknown as Array<{tvl: string}>)[0]?.tvl || 0);
   if (tvl > 1000000) return 'LOW';
   if (tvl > 100000) return 'MEDIUM';
   return 'HIGH';

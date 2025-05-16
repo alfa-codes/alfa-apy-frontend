@@ -9,7 +9,6 @@ import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
-import { LineChart } from "../charts/line-chart";
 
 interface PlatformStats {
   totalTvl: number;
@@ -20,29 +19,6 @@ interface PlatformStats {
   dailyYield: number;
 }
 
-// Mock data generator for chart
-const generateMockData = (period: "24h" | "1m" | "1y" | "all") => {
-  type PeriodKey = "24h" | "1m" | "1y" | "all";
-  const now = Date.now();
-  const periods: Record<PeriodKey, { length: number; interval: number }> = {
-    "24h": { length: 24, interval: 60 * 60 * 1000 },
-    "1m": { length: 30, interval: 24 * 60 * 60 * 1000 },
-    "1y": { length: 12, interval: 30 * 24 * 60 * 60 * 1000 },
-    all: { length: 24, interval: 30 * 24 * 60 * 60 * 1000 },
-  };
-  const safePeriod: PeriodKey = period in periods ? period : "24h";
-  const { length, interval } = periods[safePeriod];
-  const icpSwap = Array.from({ length }, (_, i) => ({
-    x: now - (length - 1 - i) * interval,
-    y: 1000000 + Math.random() * 500000,
-  }));
-  const kongSwap = Array.from({ length }, (_, i) => ({
-    x: now - (length - 1 - i) * interval,
-    y: 800000 + Math.random() * 400000,
-  }));
-  return { icpSwap, kongSwap };
-};
-
 export function Strategies() {
   const { user } = useAuth();
   const { strategies, balances } = useStrategies(user?.principal.toString());
@@ -51,8 +27,6 @@ export function Strategies() {
     number | undefined
   >();
   const [searchTerm, setSearchTerm] = useState("");
-  const [period, setPeriod] = useState<"24h" | "1m" | "1y" | "all">("24h");
-  const { icpSwap, kongSwap } = generateMockData(period);
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
@@ -199,10 +173,10 @@ export function Strategies() {
       {/* Search and Filters */}
       <div className="flex flex-col items-center md:items-end md:flex-row justify-between justify-end md:justify-between mb-[10px]">
         <div className="flex items-center mb-[20px] md:mb-0 gap-4">
-          {(["All", "Saved", "My positions"] as const).map((p, i) => (
+          {(["All", "Saved", "My strategies"] as const).map((p, i) => (
             <Button
               key={p}
-              onClick={() => setPeriod(p)}
+              onClick={() => {}}
               className="!h-[24px] !min-w-[40px] !px-2 text-xs"
               bg={!i ? "#fbbf24" : "#fef3c7"}
             >

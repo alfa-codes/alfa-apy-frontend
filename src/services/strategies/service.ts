@@ -7,7 +7,6 @@ import {
 } from "./idl/vault.ts";
 import {
   _SERVICE as Kong,
-  PoolsReply,
   PoolsResult,
 } from "./idl/kong_backend.ts";
 import {
@@ -53,12 +52,15 @@ export class StrategiesService {
     const strategies = await anonymousActor.get_strategies();
     return Promise.all(
       strategies.map(async (s) => {
-        const strategyPools = await StrategiesService.get_pool_data(s.pools);
+        const strategyPools = await StrategiesService.get_pool_data(
+          s.pools as unknown as string[]
+        );
         console.log(s.name, strategyPools);
         const bestPool = strategyPools.sort(
           (p1, p2) => p2.rolling_24h_apy - p1.rolling_24h_apy
         )[0];
-        return { ...s, current_pool: bestPool ? [bestPool] : [] };
+        // TODO should not be 0 here, needs to be undefined
+        return { ...s, current_pool: bestPool ? bestPool.pool_id : 0 };
       })
     );
   }
@@ -106,8 +108,9 @@ export class StrategiesService {
     return anonymousActor
       .pools([])
       .then((result: PoolsResult) => {
-        const pools: PoolsReply = (result as any).Ok;
-        return pools.pools.filter((pool) =>
+        // TODO pools any because no last harvest yet
+        const pools: any = (result as any).Ok;
+        return pools.pools.filter((pool: any) =>
           pools_symbols.includes(pool.symbol)
         );
       })

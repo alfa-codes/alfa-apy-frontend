@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { StrategiesService } from "../../services/strategies/service";
 import { StrategyResponse } from "../../services/strategies/idl/vault";
 import { Status } from "../types";
+import { Agent } from "@dfinity/agent";
 
 // Mock data for strategies
 const MOCK_STRATEGIES: StrategyResponse[] = [
@@ -166,7 +167,8 @@ export const fetchStrategies = createAsyncThunk(
 
 export const fetchStrategiesBalances = createAsyncThunk(
   "strategies/fetchBalances",
-  async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  async (_params: any) => {
     // TODO: Uncomment when KongSwap is fixed
     // try {
     //   const balances = await StrategiesService.get_user_strategies(
@@ -188,7 +190,8 @@ export const fetchStrategiesBalances = createAsyncThunk(
   }
 );
 
-export const initStrategies = createAsyncThunk("strategies/init", async () => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const initStrategies = createAsyncThunk("strategies/init", async (_agent?: Agent) => {
   // TODO: Uncomment when KongSwap is fixed
   // const response = await StrategiesService.build(agent);
   // return response;
