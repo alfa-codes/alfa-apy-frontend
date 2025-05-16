@@ -18,7 +18,7 @@ export function Button({
     <PixelButton
       {...props}
       className={clsx(
-        "m-0 cursor-pointer transition-all duration-200 ease-in-out",
+        "m-0 cursor-pointer transition-all duration-200 ease-in-out flex items-center",
         { "cursor-disabled": isDisabled },
         className
       )}

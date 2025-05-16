@@ -22,6 +22,8 @@
     "blockies-react-svg": "^0.0.13",
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.10",
+    "highcharts": "^12.2.0",
+    "highcharts-react-official": "^3.2.2",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "pixel-retroui": "^2.0.0",

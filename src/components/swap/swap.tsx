@@ -21,7 +21,6 @@ export function Swap({ className }: { className?: string }) {
   const [amount, setAmount] = useState("");
   const throttledSetAmount = useRef(
     debounce((value: string) => {
-      console.log("set amount")
       setAmount(value); // Throttled update
     }, 1000)
   ).current;

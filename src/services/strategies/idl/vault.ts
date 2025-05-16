@@ -57,6 +57,8 @@ export interface PoolReply {
     'symbol' : string,
     'rolling_24h_lp_fee' : bigint,
     'lp_fee_bps' : number,
+    'lastHarvest': number,
+    'provider'?: string
 }
 export interface PoolsReply {
     'total_24h_lp_fee' : bigint,
@@ -71,9 +73,15 @@ export interface StrategyResponse {
     'description' : string,
     'total_shares' : bigint,
     'user_shares' : Array<[Principal, bigint]>,
-    'current_pool' : [] | [PoolReply],
-    'pools' : Array<string>,
+    'current_pool' : number,
+    'pools' : PoolReply[],
+    'tokens' : Array<string>,
     'initial_deposit' : Array<[Principal, bigint]>,
+    'protocol': string,
+    'strategyType': string,
+    'depositToken': string,
+    'rewardToken': string,
+    'created_at'?: number
 }
 export interface SupportedStandard { 'url' : string, 'name' : string }
 export type UserBalancesReply = { 'LP' : LPReply };

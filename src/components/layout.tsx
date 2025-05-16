@@ -20,7 +20,7 @@ export function Layout({ children }: PropsWithChildren) {
         {location.pathname === "/swap" && (
           <Card className="w-fit mb-[30px] mx-auto grid grid-cols-3 gap-5 p-[5px]">
             <Button bg={colors.amber[500]} className="text-[16px]">
-              <span className="text-[20px]">🔄</span> Swap
+              <span className="text-[20px] mr-2">🔄</span> Swap
             </Button>
             <Button
               onClick={() => {
@@ -29,7 +29,7 @@ export function Layout({ children }: PropsWithChildren) {
               bg={colors.amber[400]}
               className="text-[16px]"
             >
-              <span className="text-[20px]">🏊</span> Pools
+              <span className="text-[20px] mr-2">🏊</span> Pools
             </Button>
             <Button
               bg={colors.amber[400]}
@@ -38,7 +38,7 @@ export function Layout({ children }: PropsWithChildren) {
                 navigate("/lending");
               }}
             >
-              <span className="text-[20px]">💸</span> Lending
+              <span className="text-[20px] mr-2">💸</span> Lending
             </Button>
           </Card>
         )}
