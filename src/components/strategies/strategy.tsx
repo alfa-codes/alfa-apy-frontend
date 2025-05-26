@@ -21,6 +21,7 @@ import { Tabs } from "../ui/tabs";
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 import { ConnectWallet } from "../connect-wallet";
+import { PaymentsCard } from "../payments";
 
 interface APYBreakdown {
   vaultApr: number;
@@ -564,80 +565,7 @@ export function Strategy({
             </div>
           )}
         </Card>
-
-        {/* Transactions Card */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold mb-4">🧾 Transactions</h3>
-            <a href="#" className="hover:underline text-sm">
-              More →
-            </a>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr>
-                  <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    Type
-                  </th>
-                  <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    Amount
-                  </th>
-                  <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    Pair
-                  </th>
-                  <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    Date
-                  </th>
-                  <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    From
-                  </th>
-                  <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    To
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Mock data for now */}
-                {[
-                  {
-                    type: "Rebalance",
-                    amount: "1,000",
-                    token: "ICP/CHAT",
-                    date: "2024-06-01",
-                    from: "IcpSwap pool #1",
-                    to: "KongSwap pool #2",
-                  },
-                  {
-                    type: "Withdraw",
-                    amount: "500",
-                    token: "ICP",
-                    date: "2024-05-28",
-                    from: "KongSwap pool #2",
-                    to: "address",
-                  },
-                  {
-                    type: "Deposit",
-                    amount: "2,000",
-                    token: "ICP",
-                    date: "2024-05-20",
-                    from: "address",
-                    to: "KongSwap pool #1",
-                  },
-                ].map((tx, i) => (
-                  <tr key={i} className="border-t border-amber-600/10">
-                    <td className="py-2 px-2">{tx.type}</td>
-                    <td className="py-2 px-2">{tx.amount}</td>
-                    <td className="py-2 px-2">{tx.token}</td>
-                    <td className="py-2 px-2">{tx.date}</td>
-                    <td className="py-2 px-2">{tx.from}</td>
-                    <td className="py-2 px-2">{tx.to}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <PaymentsCard />
       </div>
     </motion.div>
   );

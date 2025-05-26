@@ -21,7 +21,7 @@ export function Header() {
         >
           <h2 className="mb-0 font-bold">$0.00</h2>
           <h2 className="mb-0 flex items-center">
-            <span className="!text-[25px] mr-[4px]">🔄</span>Swap
+            <span className="!text-[18px] mr-[4px]">🔄</span>Swap
           </h2>
         </div>
         <div
@@ -29,7 +29,7 @@ export function Header() {
           className="flex items-center justify-between cursor-pointer"
         >
           <h2 className="mb-0">
-            <span className="!text-[25px] mr-[4px]">👤</span>Profile
+            <span className="!text-[18px] mr-[4px]">👤</span>Profile
           </h2>
         </div>
         <ConnectWallet />
