@@ -1,7 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { StrategiesService } from "../../services/strategies/strategy-service";
+import {
+  strategiesService,
+  StrategiesService,
+} from "../../services/strategies/strategy-service";
 import { Status } from "../types";
 import { Agent } from "@dfinity/agent";
+import { StrategyResponse } from "../../idl/vault";
+import {
+  poolStatsService,
+  PoolStatsService,
+} from "../../services/strategies/pool-stats.service";
+import { GetPoolMetricsArgs } from "../../idl/pool_stats";
+import { Principal } from "@dfinity/principal";
 
 // Mock data for strategies
 const MOCK_STRATEGIES: StrategyResponse[] = [
@@ -151,16 +161,26 @@ const mockService = {
 export const fetchStrategies = createAsyncThunk(
   "strategies/fetch",
   async () => {
-    // TODO: Uncomment when KongSwap is fixed
-    // try {
-    //   const response = await StrategiesService.get_strategies();
-    //   return response;
-    // } catch (e) {
-    //   console.error(e);
-    // }
+    try {
+      const response = await strategiesService.get_strategies();
+      console.log("strategies", response);
+      return response;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+);
 
-    // Using mock data for now
-    return MOCK_STRATEGIES;
+export const fetchUserStrategies = createAsyncThunk(
+  "strategies/fetchUser",
+  async (user: Principal) => {
+    try {
+      const response = await strategiesService.get_user_strategies(user);
+      console.log("strategies", response);
+      return response;
+    } catch (e) {
+      console.error(e);
+    }
   }
 );
 
@@ -190,19 +210,25 @@ export const fetchStrategiesBalances = createAsyncThunk(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const initStrategies = createAsyncThunk("strategies/init", async (_agent?: Agent) => {
-  // TODO: Uncomment when KongSwap is fixed
-  // const response = await StrategiesService.build(agent);
-  // return response;
+export const initStrategies = createAsyncThunk(
+  "strategies/init",
+  async (_agent?: Agent) => {
+    // TODO: Uncomment when KongSwap is fixed
+    // const response = await StrategiesService.build(agent);
+    // return response;
 
-  // Return mock service for now
-  return mockService;
-});
+    // Return mock service for now
+    return mockService;
+  }
+);
 
 const strategiesSlice = createSlice({
   name: "strategies",
   initialState: {
     strategies: {
+      status: Status.IDLE,
+    },
+    userStrategies: {
       status: Status.IDLE,
     },
     service: {
@@ -214,6 +240,11 @@ const strategiesSlice = createSlice({
     },
   } as {
     strategies: {
+      data?: Array<StrategyResponse>;
+      status: Status;
+      error?: string;
+    };
+    userStrategies: {
       data?: Array<StrategyResponse>;
       status: Status;
       error?: string;
@@ -263,6 +294,17 @@ const strategiesSlice = createSlice({
       .addCase(fetchStrategies.rejected, (state, action) => {
         state.strategies.status = Status.FAILED;
         state.strategies.error = action.error.message;
+      })
+      .addCase(fetchUserStrategies.pending, (state) => {
+        state.userStrategies.status = Status.LOADING;
+      })
+      .addCase(fetchUserStrategies.fulfilled, (state, action) => {
+        state.userStrategies.status = Status.SUCCEEDED;
+        state.userStrategies.data = action.payload;
+      })
+      .addCase(fetchUserStrategies.rejected, (state, action) => {
+        state.userStrategies.status = Status.FAILED;
+        state.userStrategies.error = action.error.message;
       })
       .addCase(fetchStrategiesBalances.pending, (state) => {
         state.balances.status = Status.LOADING;

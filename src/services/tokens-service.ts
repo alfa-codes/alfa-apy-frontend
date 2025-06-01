@@ -28,6 +28,11 @@ export class TokensService {
       ).then((res) => res.flat());
     });
   }
+
+  public async get_token_ledger(symbol: string) {
+    const allTokens = await this.getAll();
+    return allTokens.find((token) => token.symbol === symbol)?.ledger;
+  }
 }
 
 export const tokensService = new TokensService();

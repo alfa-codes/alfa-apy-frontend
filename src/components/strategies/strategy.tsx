@@ -370,13 +370,7 @@ export function Strategy({
               </p>
             </div>
             <div>
-              <p className="text-gray-600">Daily APY</p>
-              <p className="text-lg font-medium">
-                {(apyBreakdown.totalApy / 365).toFixed(3)}%
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-600">APR</p>
+              <p className="text-gray-600">APY</p>
               <p className="text-lg font-medium">
                 {(apyBreakdown.totalApy * 100).toFixed(2)}%
               </p>
@@ -397,9 +391,6 @@ export function Strategy({
                   </th>
                   <th className="text-left py-2 text-gray-600 font-medium">
                     Provider
-                  </th>
-                  <th className="text-left py-2 text-gray-600 font-medium">
-                    Price
                   </th>
                   <th className="text-left py-2 text-gray-600 font-medium">
                     TVL
@@ -446,7 +437,6 @@ export function Strategy({
                     <td className="py-4">
                       <span className="font-medium">{(p as any).provider}</span>
                     </td>
-                    <td className="py-4">${Number(p.price).toFixed(2)}</td>
                     <td className="py-4">${Number(p.tvl).toLocaleString()}</td>
                     <td
                       className={clsx("py-4 font-medium", {

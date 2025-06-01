@@ -72,7 +72,7 @@ export function Profile() {
           </div>
         </div>
       </Card>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* TVL Chart */}
         <Card className="overflow-hidden">
           <div className="flex flex-row items-center justify-between px-4 pt-2 pb-0 mb-0">

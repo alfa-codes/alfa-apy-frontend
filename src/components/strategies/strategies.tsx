@@ -3,7 +3,7 @@ import { useStrategies } from "../../hooks/strategies";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { Button, Card, Input } from "../ui";
 import { useTokens } from "../../hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Strategy } from "./strategy";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
@@ -21,12 +21,23 @@ interface PlatformStats {
 
 export function Strategies() {
   const { user } = useAuth();
-  const { strategies, balances } = useStrategies(user?.principal.toString());
+  const {
+    strategies,
+    fetchUserStrategies,
+    filterUserStrategies,
+    balances,
+    filterStrategies,
+  } = useStrategies(user?.principal.toString());
   const { tokens } = useTokens();
   const [selectedStrategy, setSelectedStrategy] = useState<
     number | undefined
   >();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showUserStrategies, setShowUserStrategies] = useState(false);
+
+  useEffect(() => {
+    if (user) fetchUserStrategies(user.principal);
+  }, [showUserStrategies, user, fetchUserStrategies]);
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
@@ -85,11 +96,8 @@ export function Strategies() {
     );
   }
 
-  const filteredStrategies = strategies.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.tokens.some((t) => t.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredStrategies = filterStrategies(searchTerm);
+  const filteredUserStrategies = filterUserStrategies(searchTerm);
 
   return (
     <motion.div
@@ -101,7 +109,7 @@ export function Strategies() {
       transition={{ duration: 0.3 }}
     >
       <Card className="p-[20px]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div>
             <h3 className="text-gray-600 text-sm">DEPOSITED</h3>
             <p className="text-2xl font-bold">
@@ -109,19 +117,13 @@ export function Strategies() {
             </p>
           </div>
           <div>
-            <h3 className="text-gray-600 text-sm">MONTHLY YIELD</h3>
+            <h3 className="text-gray-600 text-sm">TOTAL USERS</h3>
             <p className="text-2xl font-bold">
               ${platformStats?.monthlyYield.toLocaleString() ?? "0"}
             </p>
           </div>
           <div>
-            <h3 className="text-gray-600 text-sm">DAILY YIELD</h3>
-            <p className="text-2xl font-bold">
-              ${platformStats?.dailyYield.toLocaleString() ?? "0"}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-gray-600 text-sm">AVG. APY</h3>
+            <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
             <p className="text-2xl font-bold">
               {(platformStats?.avgApy ?? 0).toFixed(2)}%
             </p>
@@ -173,10 +175,13 @@ export function Strategies() {
       {/* Search and Filters */}
       <div className="flex flex-col items-center md:items-end md:flex-row justify-between justify-end md:justify-between mb-[10px]">
         <div className="flex items-center mb-[20px] md:mb-0 gap-4">
-          {(["All", "Saved", "My strategies"] as const).map((p, i) => (
+          {(user ? ["All", "My strategies"] : ([] as const)).map((p, i) => (
             <Button
               key={p}
-              onClick={() => {}}
+              onClick={() => {
+                if (p === "My strategies") setShowUserStrategies(true);
+                else setShowUserStrategies(false);
+              }}
               className="!h-[24px] !min-w-[40px] !px-2 text-xs"
               bg={!i ? "#fbbf24" : "#fef3c7"}
             >
@@ -195,10 +200,13 @@ export function Strategies() {
 
       {/* Strategies List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-[35px] gap-8">
-        {filteredStrategies.map((s) => {
-          const logos = getStrategyTokenLogos(s, tokens);
-          const currentPool = s.pools.find((p) => p.pool_id === s.current_pool);
-          const isDisabled = !currentPool;
+        {(showUserStrategies ? filteredUserStrategies : filteredStrategies)?.map(
+          (s) => {
+            const logos = getStrategyTokenLogos(s, tokens);
+            const currentPool = s.pools.find(
+              (p) => p.pool_id === s.current_pool
+            );
+            const isDisabled = !currentPool;
 
           return (
             <Card

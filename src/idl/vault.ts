@@ -61,7 +61,7 @@ export interface StrategyResponse {
   'initial_deposit' : Array<[Principal, bigint]>,
   'user_shares' : Array<[Principal, bigint]>,
   'current_pool' : [] | [Pool],
-  'pools' : Array<PoolResponse>,
+  'pools' : Array<PoolResponse>
 }
 export interface SupportedStandard { 'url' : string, 'name' : string }
 export interface SystemEvent {
