@@ -5,7 +5,7 @@ import {
   useTokens,
   useWithdraw,
 } from "../../hooks";
-import { StrategyResponse } from "../../services/strategies/idl/vault";
+import { StrategyResponse } from "../../idl/vault_idl";
 import { Card } from "../ui";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getTokenLogo } from "./utils";

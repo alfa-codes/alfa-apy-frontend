@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { StrategiesService } from "../../services/strategies/service";
-import { StrategyResponse } from "../../services/strategies/idl/vault";
+import { StrategiesService } from "../../services/strategies/strategy-service";
 import { Status } from "../types";
 import { Agent } from "@dfinity/agent";
 

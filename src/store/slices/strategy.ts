@@ -1,7 +1,7 @@
 import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Status } from "../types";
-import { PoolReply } from "../../services/strategies/idl/vault";
-import { StrategiesService } from "../../services/strategies/service";
+import { PoolReply } from "../../idl/vault_idl";
+import { StrategiesService } from "../../services/strategies/strategy-service";
 import { RootState } from "../store";
 import { Principal } from "@dfinity/principal";
 import { Agent } from "@dfinity/agent";
