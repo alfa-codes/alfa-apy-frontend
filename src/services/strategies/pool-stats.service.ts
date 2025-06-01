@@ -1,7 +1,7 @@
 import {
   _SERVICE,
-  GetPoolMetricsArgs,
   Pool,
+  PoolByTokens,
   PoolMetrics,
 } from "../../idl/pool_stats";
 import { idlFactory } from "../../idl/pool_stats_idl";
@@ -19,15 +19,13 @@ export class PoolStatsService {
   }
 
   public async get_pool_metrics(
-    metricsRequest: GetPoolMetricsArgs[]
-  ): Promise<Array<PoolMetrics>> {
+    metricsRequest: Array<PoolByTokens>
+  ): Promise<Array<[PoolByTokens, PoolMetrics]>> {
     const anonymousActor = await getAnonActor<_SERVICE>(
       poolsDataCanister,
       idlFactory
     );
-    return await anonymousActor
-      .get_pool_metrics(metricsRequest)
-      .then((metrics) => metrics.flat());
+    return await anonymousActor.get_pool_metrics(metricsRequest);
   }
 }
 

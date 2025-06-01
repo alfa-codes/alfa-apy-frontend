@@ -1,4 +1,4 @@
-import { Profile as ProfileCard } from "../profile";
+import { Profile as ProfileCard } from "../profile/profile";
 
 export function Profile() {
   return (

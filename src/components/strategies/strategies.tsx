@@ -9,6 +9,9 @@ import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
+import { UserStats } from "../profile";
+import clsx from "clsx";
+import { getPoolId } from "../../utils";
 
 interface PlatformStats {
   totalTvl: number;
@@ -108,40 +111,49 @@ export function Strategies() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="p-[20px]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-          <div>
-            <h3 className="text-gray-600 text-sm">DEPOSITED</h3>
-            <p className="text-2xl font-bold">
-              ${platformStats?.deposited.toLocaleString() ?? "0"}
-            </p>
+      {user && (
+        <>
+          <h3 className="text-lg font-bold">Your Stats</h3>
+          <UserStats />
+        </>
+      )}
+      <>
+        <h3 className="text-lg font-bold">Platform Stats</h3>
+        <Card className="p-[20px]" light={!!user}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+            <div>
+              <h3 className="text-gray-600 text-sm">DEPOSITED</h3>
+              <p className="text-2xl font-bold">
+                ${platformStats?.deposited.toLocaleString() ?? "0"}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-gray-600 text-sm">TOTAL USERS</h3>
+              <p className="text-2xl font-bold">
+                ${platformStats?.monthlyYield.toLocaleString() ?? "0"}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
+              <p className="text-2xl font-bold">
+                {(platformStats?.avgApy ?? 0).toFixed(2)}%
+              </p>
+            </div>
+            <div>
+              <h3 className="text-gray-600 text-sm">TVL</h3>
+              <p className="text-2xl font-bold">
+                ${platformStats?.totalTvl.toLocaleString() ?? "0"}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-gray-600 text-sm">STRATEGIES</h3>
+              <p className="text-2xl font-bold">
+                {platformStats?.totalStrategies ?? 0}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-gray-600 text-sm">TOTAL USERS</h3>
-            <p className="text-2xl font-bold">
-              ${platformStats?.monthlyYield.toLocaleString() ?? "0"}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
-            <p className="text-2xl font-bold">
-              {(platformStats?.avgApy ?? 0).toFixed(2)}%
-            </p>
-          </div>
-          <div>
-            <h3 className="text-gray-600 text-sm">TVL</h3>
-            <p className="text-2xl font-bold">
-              ${platformStats?.totalTvl.toLocaleString() ?? "0"}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-gray-600 text-sm">STRATEGIES</h3>
-            <p className="text-2xl font-bold">
-              {platformStats?.totalStrategies ?? 0}
-            </p>
-          </div>
-        </div>
-      </Card>
+        </Card>
+      </>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {/* Platform Stats */}
 
@@ -200,13 +212,13 @@ export function Strategies() {
 
       {/* Strategies List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-[35px] gap-8">
-        {(showUserStrategies ? filteredUserStrategies : filteredStrategies)?.map(
-          (s) => {
-            const logos = getStrategyTokenLogos(s, tokens);
-            const currentPool = s.pools.find(
-              (p) => p.pool_id === s.current_pool
-            );
-            const isDisabled = !currentPool;
+        {(showUserStrategies
+          ? filteredUserStrategies
+          : filteredStrategies
+        )?.map((s) => {
+          const logos = getStrategyTokenLogos(s, tokens);
+          const currentPool = s.current_pool[0]
+          const isDisabled = !currentPool;
 
           return (
             <Card
