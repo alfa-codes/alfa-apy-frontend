@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const idlFactory = ({ IDL } : any) => {
+export const idlFactory = ({ IDL }) => {
   const Conf = IDL.Record({ 'controllers' : IDL.Opt(IDL.Vec(IDL.Principal)) });
   const AcceptInvestmentArgs = IDL.Record({
     'strategy_id' : IDL.Nat16,
@@ -93,17 +93,17 @@ export const idlFactory = ({ IDL } : any) => {
   });
   const LPReply = IDL.Record({
     'ts' : IDL.Nat64,
-    'usd_balance' : IDL.Float64,
-    'balance' : IDL.Float64,
+    'usd_balance' : IDL.Nat,
+    'balance' : IDL.Nat,
     'name' : IDL.Text,
-    'amount_0' : IDL.Float64,
-    'amount_1' : IDL.Float64,
+    'amount_0' : IDL.Nat,
+    'amount_1' : IDL.Nat,
     'address_0' : IDL.Text,
     'address_1' : IDL.Text,
     'symbol_0' : IDL.Text,
     'symbol_1' : IDL.Text,
-    'usd_amount_0' : IDL.Float64,
-    'usd_amount_1' : IDL.Float64,
+    'usd_amount_0' : IDL.Nat,
+    'usd_amount_1' : IDL.Nat,
     'chain_0' : IDL.Text,
     'chain_1' : IDL.Text,
     'symbol' : IDL.Text,

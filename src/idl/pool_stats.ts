@@ -7,15 +7,10 @@ export interface AddLiquidityResponse {
   'token_0_amount' : bigint,
   'token_1_amount' : bigint,
 }
-export interface ApyValue { 'tokens_apy' : number, 'usd_apy' : number }
+export interface ApyValue { 'tokens_apy' : bigint, 'usd_apy' : bigint }
 export type ExchangeId = { 'Sonic' : null } |
   { 'KongSwap' : null } |
   { 'ICPSwap' : null };
-export interface GetPoolMetricsArgs {
-  'provider' : ExchangeId,
-  'token0' : TokenInfo,
-  'token1' : TokenInfo,
-}
 export interface Pool {
   'id' : string,
   'provider' : ExchangeId,
@@ -28,12 +23,13 @@ export interface PoolApy {
   'week' : ApyValue,
   'year' : ApyValue,
 }
-export interface PoolData { 'tvl' : bigint }
-export interface PoolMetrics {
-  'apy' : PoolApy,
-  'pool' : Pool,
-  'snapshots' : Array<PoolSnapshot>,
+export interface PoolByTokens {
+  'provider' : ExchangeId,
+  'token0' : TokenInfo,
+  'token1' : TokenInfo,
 }
+export interface PoolData { 'tvl' : bigint }
+export interface PoolMetrics { 'apy' : PoolApy, 'tvl' : bigint, 'pool' : Pool }
 export interface PoolSnapshot {
   'pool_data' : [] | [PoolData],
   'timestamp' : bigint,
@@ -63,17 +59,18 @@ export interface WithdrawFromPoolResponse {
 }
 export interface _SERVICE {
   'add_liquidity_to_pool' : ActorMethod<[string, bigint], Result>,
-  'add_pool' : ActorMethod<[TokenInfo, TokenInfo, ExchangeId], undefined>,
-  'delete_pool' : ActorMethod<[TokenInfo, TokenInfo, ExchangeId], undefined>,
-  'get_pool_by_tokens' : ActorMethod<
-    [TokenInfo, TokenInfo, ExchangeId],
-    [] | [Pool]
-  >,
+  'add_pool' : ActorMethod<[PoolByTokens], undefined>,
+  'delete_pool' : ActorMethod<[PoolByTokens], undefined>,
+  'get_pool_by_tokens' : ActorMethod<[PoolByTokens], [] | [Pool]>,
   'get_pool_metrics' : ActorMethod<
-    [Array<GetPoolMetricsArgs>],
-    Array<[] | [PoolMetrics]>
+    [Array<PoolByTokens>],
+    Array<[PoolByTokens, PoolMetrics]>
   >,
   'get_pools' : ActorMethod<[], Array<Pool>>,
+  'get_pools_snapshots' : ActorMethod<
+    [Array<PoolByTokens>],
+    Array<[PoolByTokens, Array<PoolSnapshot>]>
+  >,
   'remove_liquidity_from_pool' : ActorMethod<[string], Result_1>,
   'set_operator' : ActorMethod<[Principal], undefined>,
 }
