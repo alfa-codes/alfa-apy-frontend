@@ -29,7 +29,7 @@ export interface PoolByTokens {
   'token1' : TokenInfo,
 }
 export interface PoolData { 'tvl' : bigint }
-export interface PoolMetrics { 'apy' : PoolApy, 'tvl' : bigint, 'pool' : Pool }
+export interface PoolMetrics { 'apy' : PoolApy, 'tvl' : bigint }
 export interface PoolSnapshot {
   'pool_data' : [] | [PoolData],
   'timestamp' : bigint,

@@ -1,4 +1,8 @@
 import { Principal } from "@dfinity/principal";
+import { getAnonActor } from "../utils";
+import { VAULT_CANISTER_ID } from "../../constants";
+import { _SERVICE as VaultType, UserEvent, SystemEvent } from "../../idl/vault";
+import { idlFactory } from "../../idl/vault_idl";
 
 export type EventRecordType = "Rebalance" | "Withdrawal" | "Deposit";
 
@@ -10,61 +14,53 @@ export type EventRecord = {
   to: string;
   type: EventRecordType;
   token: string;
-  userPrincipal?: Principal
-  error?: []
-  fee?: string
+  userPrincipal?: Principal;
+  error?: [];
+  fee?: string;
 };
 
-export const eventRecordsService = {
-  getEventRecords: async (
+export class EventRecordsService {
+  async getEventRecords(
     filter: {
       user?: string;
       type?: EventRecordType;
       from?: string;
       to?: string;
     } = {}
-  ): Promise<Array<EventRecord>> => {
-    const mockEventRecords: Array<EventRecord> = [
-      {
-        id: 1,
-        type: "Rebalance",
-        amount: "1,000",
-        token: "ICP/CHAT",
-        date: "2024-06-01",
-        from: "IcpSwap pool #1",
-        to: "KongSwap pool #2"
-      },
-      {
-        id: 2,
-        type: "Withdrawal",
-        amount: "500",
-        token: "ICP",
-        date: "2024-05-28",
-        from: "KongSwap pool #2",
-        to: "address",
-        userPrincipal: Principal.from(""),
-      },
-      {
-        id: 3,
-        type: "Deposit",
-        amount: "2,000",
-        token: "ICP",
-        date: "2024-05-20",
-        from: "address",
-        to: "KongSwap pool #1",
-        userPrincipal: Principal.from(""),
-      },
-    ];
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(
-          mockEventRecords.filter((EventRecord) =>
-            Object.entries(filter).every(
-              ([key, value]) => EventRecord[key as keyof typeof EventRecord] === value
-            )
-          )
-        );
-      }, 1500);
+  ): Promise<Array<EventRecord>> {
+    const anonymousActor = await getAnonActor<VaultType>(
+      VAULT_CANISTER_ID,
+      idlFactory
+    );
+    const records = await Promise.all([
+      anonymousActor.get_system_events(BigInt(0), BigInt(100)),
+      anonymousActor.get_user_events(
+        Principal.anonymous(),
+        BigInt(0),
+        BigInt(100)
+      ),
+    ]).then((arr) => arr.flat());
+    // Map raw events to EventRecord shape
+    const mappedRecords: EventRecord[] = records.map((event: UserEvent | SystemEvent, i: number) => {
+      return {
+        id: i + 1,
+        amount: 'amount' in event && event.amount !== undefined ? String(event.amount) : "0",
+        date: 'date' in event && event.date !== undefined ? String(event.date) : "",
+        from: 'from' in event && typeof event.from === 'string' ? event.from : "",
+        to: 'to' in event && typeof event.to === 'string' ? event.to : "",
+        type: 'type' in event && typeof event.type === 'string' ? event.type as EventRecordType : "Deposit",
+        token: 'token' in event && typeof event.token === 'string' ? event.token : "",
+        userPrincipal: 'userPrincipal' in event && event.userPrincipal !== undefined ? event.userPrincipal as Principal : undefined,
+        error: 'error' in event && event.error !== undefined ? event.error as [] : undefined,
+        fee: 'fee' in event && event.fee !== undefined ? event.fee as string : undefined,
+      };
     });
-  },
-};
+    return mappedRecords.filter((EventRecord) =>
+      Object.entries(filter).every(
+        ([key, value]) => EventRecord[key as keyof EventRecord] === value
+      )
+    );
+  }
+}
+
+export const eventRecordsService = new EventRecordsService();

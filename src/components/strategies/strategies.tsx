@@ -232,7 +232,6 @@ export function Strategies() {
                 <div className="w-[100px]">
                   <TokensLogos logos={logos} />
                 </div>
-
                 <div className="flex flex-col flex-grow">
                   <div className="flex items-center gap-2">
                     <h3 className="text-[20px] font-semibold">{s.name}</h3>

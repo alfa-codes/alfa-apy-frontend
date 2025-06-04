@@ -40,8 +40,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const PoolMetrics = IDL.Record({
     'apy' : PoolApy,
-    'tvl' : IDL.Nat,
-    'pool' : Pool,
+    'tvl' : IDL.Nat
   });
   const PoolData = IDL.Record({ 'tvl' : IDL.Nat });
   const PositionData = IDL.Record({

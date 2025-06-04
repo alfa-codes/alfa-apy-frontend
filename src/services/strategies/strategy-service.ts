@@ -3,15 +3,14 @@ import {
   _SERVICE as VaultType,
   StrategyResponse,
   UserStrategyResponse,
-} from "../../idl/vault.ts";
-import { idlFactory } from "../../idl/vault_idl.ts";
+} from "../../idl/vault";
+import { idlFactory } from "../../idl/vault_idl";
 import { Principal } from "@dfinity/principal";
-import { getAnonActor } from "../utils.ts";
-import { poolStatsService } from "./pool-stats.service.ts";
-import { tokensService } from "../tokens-service.ts";
-import { getPoolId } from "../../utils/pools.ts";
-
-export const alfaACanister = "ownab-uaaaa-aaaap-qp2na-cai";
+import { getAnonActor } from "../utils";
+import { poolStatsService } from "./pool-stats.service";
+import { tokensService } from "../tokens-service";
+import { getPoolId } from "../../utils/pools";
+import { VAULT_CANISTER_ID } from "../../constants";
 
 export interface Strategy extends StrategyResponse {
   apy: number;
@@ -21,12 +20,10 @@ export interface Strategy extends StrategyResponse {
 export class StrategiesService {
   public async get_strategies(): Promise<Array<StrategyResponse>> {
     const anonymousActor = await getAnonActor<VaultType>(
-      alfaACanister,
+      VAULT_CANISTER_ID,
       idlFactory
     );
-    let strategies = await anonymousActor.get_strategies();
-    strategies = strategies.filter((s) => s.id === 4);
-    console.log("strategies", strategies);
+    const strategies = await anonymousActor.get_strategies();
     const poolMetricsArgs = await Promise.all(
       strategies.flatMap((strategy) =>
         strategy.pools.map(async (pool) => {
@@ -54,14 +51,13 @@ export class StrategiesService {
     const poolStats = await poolStatsService.get_pool_metrics(poolMetricsArgs);
     console.log("poolStats", poolStats);
     // Find the pool with the highest APY
-    const maxApyPoolStat = poolStats.reduce(
-      (max, ps) => (ps[1].apy > max[1].apy ? ps : max),
-      poolStats[0]
-    );
+    const maxApyPoolStat = poolStats.reduce((max, ps) => {
+      return ps[1].apy > max[1].apy ? ps : max;
+    }, poolStats[0]);
     const maxApyPoolId = getPoolId({
-      provider: maxApyPoolStat[1].pool.provider,
-      token0: maxApyPoolStat[1].pool.token0.symbol,
-      token1: maxApyPoolStat[1].pool.token1.symbol,
+      provider: maxApyPoolStat[0].provider,
+      token0: maxApyPoolStat[0].token0.symbol,
+      token1: maxApyPoolStat[0].token1.symbol,
     });
     return strategies.map((strategy) => ({
       ...strategy,
@@ -86,11 +82,15 @@ export class StrategiesService {
       apy:
         poolStats.find((pool) => {
           return strategy.current_pool.length
-            ? pool?.[1].pool?.id ===
+            ? getPoolId({
+                provider: maxApyPoolStat[0].provider,
+                token0: maxApyPoolStat[0].token0.symbol,
+                token1: maxApyPoolStat[0].token1.symbol,
+              }) ===
                 getPoolId({
-                  provider: pool[1].pool.provider,
-                  token0: pool[1].pool.token0.symbol,
-                  token1: pool[1].pool.token1.symbol,
+                  provider: pool[0].provider,
+                  token0: pool[0].token0.symbol,
+                  token1: pool[0].token1.symbol,
                 })
             : false;
         })?.[1].apy ?? 0,
@@ -101,7 +101,7 @@ export class StrategiesService {
     user: Principal
   ): Promise<Array<UserStrategyResponse>> {
     const anonymousActor = await getAnonActor<VaultType>(
-      alfaACanister,
+      VAULT_CANISTER_ID,
       idlFactory
     );
     const userStrategiesIds = (await anonymousActor.user_strategies(user)).map(
