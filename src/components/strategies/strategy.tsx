@@ -59,6 +59,8 @@ export function Strategy({
     : undefined;
   const { balances, refetchBalanceByCanister } = useBalances();
   const tokenBalance = token ? balances[token.ledger] : undefined;
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
 
   useEffect(() => {
     if (token && !tokenBalance) refetchBalanceByCanister(token);
@@ -258,9 +260,13 @@ export function Strategy({
                     <Deposit
                       className="md:w-[150px]"
                       loading={isDepositing}
-                      isOpen={false}
-                      onClose={() => {}}
-                      onClick={() => {}}
+                      isOpen={depositOpen}
+                      onClose={() => {
+                        setDepositOpen(false);
+                      }}
+                      onClick={() => {
+                        setDepositOpen(true);
+                      }}
                       onDeposit={(amount) => {
                         deposit({
                           amount: BigInt(
@@ -281,9 +287,13 @@ export function Strategy({
                     />
                     <Withdraw
                       className="md:w-[150px]"
-                      isOpen={false}
-                      onClose={() => {}}
-                      onClick={() => {}}
+                      isOpen={withdrawOpen}
+                      onClose={() => {
+                        setWithdrawOpen(false);
+                      }}
+                      onClick={() => {
+                        setWithdrawOpen(true);
+                      }}
                       onWithdraw={(percent) => {
                         withdraw({
                           amount:
