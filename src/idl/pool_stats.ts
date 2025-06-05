@@ -31,6 +31,13 @@ export interface PoolByTokens {
 export interface PoolData { 'tvl' : bigint }
 export interface PoolMetrics { 'apy' : PoolApy, 'tvl' : bigint }
 export interface PoolSnapshot {
+  'id' : string,
+  'pool_data' : [] | [PoolData],
+  'timestamp' : bigint,
+  'pool_id' : string,
+  'position_data' : [] | [PositionData],
+}
+export interface PoolSnapshotArgs {
   'pool_data' : [] | [PoolData],
   'timestamp' : bigint,
   'pool_id' : string,
@@ -60,7 +67,10 @@ export interface WithdrawFromPoolResponse {
 export interface _SERVICE {
   'add_liquidity_to_pool' : ActorMethod<[string, bigint], Result>,
   'add_pool' : ActorMethod<[PoolByTokens], undefined>,
+  'add_pool_snapshot' : ActorMethod<[PoolSnapshotArgs], undefined>,
   'delete_pool' : ActorMethod<[PoolByTokens], undefined>,
+  'delete_pool_snapshot' : ActorMethod<[string, string], undefined>,
+  'delete_pool_snapshots' : ActorMethod<[string], undefined>,
   'get_pool_by_tokens' : ActorMethod<[PoolByTokens], [] | [Pool]>,
   'get_pool_metrics' : ActorMethod<
     [Array<PoolByTokens>],

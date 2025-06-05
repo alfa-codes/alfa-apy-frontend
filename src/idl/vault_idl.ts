@@ -12,24 +12,19 @@ export const idlFactory = ({ IDL }) => {
     'shares' : IDL.Nat,
     'amount' : IDL.Nat,
   });
-  const TokenInfo = IDL.Record({
-    'ledger' : IDL.Principal,
-    'symbol' : IDL.Text,
-  });
   const ExchangeId = IDL.Variant({
     'Sonic' : IDL.Null,
     'KongSwap' : IDL.Null,
     'ICPSwap' : IDL.Null,
   });
+  const TokenInfo = IDL.Record({
+    'ledger' : IDL.Principal,
+    'symbol' : IDL.Text,
+  });
   const Pool = IDL.Record({
     'provider' : ExchangeId,
     'token0' : TokenInfo,
     'token1' : TokenInfo,
-  });
-  const PoolResponse = IDL.Record({
-    'provider' : ExchangeId,
-    'token0' : IDL.Text,
-    'token1' : IDL.Text,
   });
   const StrategyResponse = IDL.Record({
     'id' : IDL.Nat16,
@@ -39,7 +34,7 @@ export const idlFactory = ({ IDL }) => {
     'initial_deposit' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat)),
     'user_shares' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat)),
     'current_pool' : IDL.Opt(Pool),
-    'pools' : IDL.Vec(PoolResponse),
+    'pools' : IDL.Vec(Pool),
   });
   const SystemEventDetails = IDL.Variant({
     'Swap' : IDL.Null,
@@ -78,32 +73,23 @@ export const idlFactory = ({ IDL }) => {
     'details' : UserEventDetails,
     'event_type' : UserEventType,
   });
-  const AddLiquidityResponse = IDL.Record({
-    'request_id' : IDL.Nat64,
-    'token_0_amount' : IDL.Nat,
-    'token_1_amount' : IDL.Nat,
-  });
-  const WithdrawFromPoolResponse = IDL.Record({
-    'token_0_amount' : IDL.Nat,
-    'token_1_amount' : IDL.Nat,
-  });
   const SupportedStandard = IDL.Record({ 'url' : IDL.Text, 'name' : IDL.Text });
   const Icrc28TrustedOriginsResponse = IDL.Record({
     'trusted_origins' : IDL.Vec(IDL.Text),
   });
   const LPReply = IDL.Record({
     'ts' : IDL.Nat64,
-    'usd_balance' : IDL.Nat,
-    'balance' : IDL.Nat,
+    'usd_balance' : IDL.Float64,
+    'balance' : IDL.Float64,
     'name' : IDL.Text,
-    'amount_0' : IDL.Nat,
-    'amount_1' : IDL.Nat,
+    'amount_0' : IDL.Float64,
+    'amount_1' : IDL.Float64,
     'address_0' : IDL.Text,
     'address_1' : IDL.Text,
     'symbol_0' : IDL.Text,
     'symbol_1' : IDL.Text,
-    'usd_amount_0' : IDL.Nat,
-    'usd_amount_1' : IDL.Nat,
+    'usd_amount_0' : IDL.Float64,
+    'usd_amount_1' : IDL.Float64,
     'chain_0' : IDL.Text,
     'chain_1' : IDL.Text,
     'symbol' : IDL.Text,
@@ -111,7 +97,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const UserBalancesReply = IDL.Variant({ 'LP' : LPReply });
   const UserStrategyResponse = IDL.Record({
-    'strategy_current_pool' : PoolResponse,
+    'strategy_current_pool' : Pool,
     'total_shares' : IDL.Nat,
     'strategy_id' : IDL.Nat16,
     'initial_deposit' : IDL.Nat,
@@ -135,16 +121,6 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'get_config' : IDL.Func([], [Conf], ['query']),
-    'get_icpswap_quote' : IDL.Func(
-        [TokenInfo, TokenInfo, IDL.Nat],
-        [IDL.Nat],
-        [],
-      ),
-    'get_kongswap_quote' : IDL.Func(
-        [TokenInfo, TokenInfo, IDL.Nat],
-        [IDL.Nat],
-        [],
-      ),
     'get_strategies' : IDL.Func([], [IDL.Vec(StrategyResponse)], ['query']),
     'get_system_events' : IDL.Func(
         [IDL.Nat64, IDL.Nat64],
@@ -156,35 +132,13 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(UserEvent)],
         [],
       ),
-    'icpswap_add_liquidity' : IDL.Func(
-        [IDL.Nat, TokenInfo, TokenInfo],
-        [AddLiquidityResponse],
-        [],
-      ),
     'icpswap_withdraw' : IDL.Func([TokenInfo, IDL.Nat, IDL.Nat], [IDL.Nat], []),
-    'icpswap_withdraw_from_pool' : IDL.Func(
-        [IDL.Nat, IDL.Nat, TokenInfo, TokenInfo],
-        [WithdrawFromPoolResponse],
-        [],
-      ),
     'icrc10_supported_standards' : IDL.Func(
         [],
         [IDL.Vec(SupportedStandard)],
         ['query'],
       ),
     'icrc28_trusted_origins' : IDL.Func([], [Icrc28TrustedOriginsResponse], []),
-    'kong_add_liquidity' : IDL.Func(
-        [IDL.Nat, TokenInfo, TokenInfo],
-        [AddLiquidityResponse],
-        [],
-      ),
-    'kong_withdraw_from_pool' : IDL.Func(
-        [IDL.Nat, IDL.Nat, TokenInfo, TokenInfo],
-        [WithdrawFromPoolResponse],
-        [],
-      ),
-    'swap_icpswap' : IDL.Func([TokenInfo, TokenInfo, IDL.Nat], [IDL.Nat], []),
-    'swap_kongswap' : IDL.Func([TokenInfo, TokenInfo, IDL.Nat], [IDL.Nat], []),
     'user_balance_all' : IDL.Func([], [IDL.Vec(UserBalancesReply)], []),
     'user_strategies' : IDL.Func(
         [IDL.Principal],

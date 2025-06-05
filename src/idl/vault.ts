@@ -7,11 +7,6 @@ export interface AcceptInvestmentArgs {
   'ledger' : Principal,
   'amount' : bigint,
 }
-export interface AddLiquidityResponse {
-  'request_id' : bigint,
-  'token_0_amount' : bigint,
-  'token_1_amount' : bigint,
-}
 export interface Conf { 'controllers' : [] | [Array<Principal>] }
 export interface DepositResponse {
   'request_id' : bigint,
@@ -27,17 +22,17 @@ export interface Icrc28TrustedOriginsResponse {
 }
 export interface LPReply {
   'ts' : bigint,
-  'usd_balance' : bigint,
-  'balance' : bigint,
+  'usd_balance' : number,
+  'balance' : number,
   'name' : string,
-  'amount_0' : bigint,
-  'amount_1' : bigint,
+  'amount_0' : number,
+  'amount_1' : number,
   'address_0' : string,
   'address_1' : string,
   'symbol_0' : string,
   'symbol_1' : string,
-  'usd_amount_0' : bigint,
-  'usd_amount_1' : bigint,
+  'usd_amount_0' : number,
+  'usd_amount_1' : number,
   'chain_0' : string,
   'chain_1' : string,
   'symbol' : string,
@@ -48,11 +43,6 @@ export interface Pool {
   'token0' : TokenInfo,
   'token1' : TokenInfo,
 }
-export interface PoolResponse {
-  'provider' : ExchangeId,
-  'token0' : string,
-  'token1' : string,
-}
 export interface StrategyResponse {
   'id' : number,
   'name' : string,
@@ -61,7 +51,7 @@ export interface StrategyResponse {
   'initial_deposit' : Array<[Principal, bigint]>,
   'user_shares' : Array<[Principal, bigint]>,
   'current_pool' : [] | [Pool],
-  'pools' : Array<PoolResponse>
+  'pools' : Array<Pool>,
 }
 export interface SupportedStandard { 'url' : string, 'name' : string }
 export interface SystemEvent {
@@ -96,7 +86,7 @@ export type UserEventDetails = {
 export type UserEventType = { 'AddLiquidity' : null } |
   { 'RemoveLiquidity' : null };
 export interface UserStrategyResponse {
-  'strategy_current_pool' : PoolResponse,
+  'strategy_current_pool' : Pool,
   'total_shares' : bigint,
   'strategy_id' : number,
   'initial_deposit' : bigint,
@@ -109,10 +99,6 @@ export interface WithdrawArgs {
   'ledger' : Principal,
   'amount' : bigint,
 }
-export interface WithdrawFromPoolResponse {
-  'token_0_amount' : bigint,
-  'token_1_amount' : bigint,
-}
 export interface WithdrawResponse {
   'current_shares' : bigint,
   'amount' : bigint,
@@ -120,35 +106,15 @@ export interface WithdrawResponse {
 export interface _SERVICE {
   'accept_investment' : ActorMethod<[AcceptInvestmentArgs], DepositResponse>,
   'get_config' : ActorMethod<[], Conf>,
-  'get_icpswap_quote' : ActorMethod<[TokenInfo, TokenInfo, bigint], bigint>,
-  'get_kongswap_quote' : ActorMethod<[TokenInfo, TokenInfo, bigint], bigint>,
   'get_strategies' : ActorMethod<[], Array<StrategyResponse>>,
   'get_system_events' : ActorMethod<[bigint, bigint], Array<SystemEvent>>,
   'get_user_events' : ActorMethod<
     [Principal, bigint, bigint],
     Array<UserEvent>
   >,
-  'icpswap_add_liquidity' : ActorMethod<
-    [bigint, TokenInfo, TokenInfo],
-    AddLiquidityResponse
-  >,
   'icpswap_withdraw' : ActorMethod<[TokenInfo, bigint, bigint], bigint>,
-  'icpswap_withdraw_from_pool' : ActorMethod<
-    [bigint, bigint, TokenInfo, TokenInfo],
-    WithdrawFromPoolResponse
-  >,
   'icrc10_supported_standards' : ActorMethod<[], Array<SupportedStandard>>,
   'icrc28_trusted_origins' : ActorMethod<[], Icrc28TrustedOriginsResponse>,
-  'kong_add_liquidity' : ActorMethod<
-    [bigint, TokenInfo, TokenInfo],
-    AddLiquidityResponse
-  >,
-  'kong_withdraw_from_pool' : ActorMethod<
-    [bigint, bigint, TokenInfo, TokenInfo],
-    WithdrawFromPoolResponse
-  >,
-  'swap_icpswap' : ActorMethod<[TokenInfo, TokenInfo, bigint], bigint>,
-  'swap_kongswap' : ActorMethod<[TokenInfo, TokenInfo, bigint], bigint>,
   'user_balance_all' : ActorMethod<[], Array<UserBalancesReply>>,
   'user_strategies' : ActorMethod<[Principal], Array<UserStrategyResponse>>,
   'withdraw' : ActorMethod<[WithdrawArgs], WithdrawResponse>,
