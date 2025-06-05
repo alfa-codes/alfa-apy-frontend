@@ -19,10 +19,13 @@ export interface ICRC1Data {
 }
 
 export class TokensService {
+
+
+
   async getAll() {
-    return await icrc1OracleActor.count_icrc1_canisters().then((canisters) => {
+    return await icrc1OracleActor.count_icrc1_canisters().then(() => {
       return Promise.all(
-        Array.from({ length: Math.ceil(Number(canisters) / 25) }, (_, i) =>
+        Array.from({ length: Math.ceil(Number(25) / 25) }, (_, i) =>
           icrc1OracleActor.get_icrc1_paginated(i * 25, 25)
         )
       ).then((res) => res.flat());

@@ -8,7 +8,6 @@ import { idlFactory } from "../../idl/vault_idl";
 import { Principal } from "@dfinity/principal";
 import { getAnonActor } from "../utils";
 import { poolStatsService } from "./pool-stats.service";
-import { tokensService } from "../tokens-service";
 import { getPoolId } from "../../utils/pools";
 import { VAULT_CANISTER_ID } from "../../constants";
 
@@ -23,26 +22,16 @@ export class StrategiesService {
       VAULT_CANISTER_ID,
       idlFactory
     );
-    const strategies = await anonymousActor.get_strategies();
+    const strategies = await anonymousActor.get_strategies()
+    .then((strategies) => strategies.filter((strategy) => strategy.current_pool.length > 0));
     const poolMetricsArgs = await Promise.all(
       strategies.flatMap((strategy) =>
         strategy.pools.map(async (pool) => {
-          const token0Ledger = await tokensService.get_token_ledger(
-            pool.token0
-          );
-          const token1Ledger = await tokensService.get_token_ledger(
-            pool.token1
-          );
           return {
+            //TODO: fix this
             provider: pool.provider,
-            token0: {
-              ledger: Principal.fromText(token0Ledger ?? ""),
-              symbol: pool.token0,
-            },
-            token1: {
-              ledger: Principal.fromText(token1Ledger ?? ""),
-              symbol: pool.token1,
-            },
+            token0: strategy.current_pool[0]!.token0,
+            token1: strategy.current_pool[0]!.token1,
           };
         })
       )

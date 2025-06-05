@@ -10,8 +10,6 @@ import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
-import clsx from "clsx";
-import { getPoolId } from "../../utils";
 
 interface PlatformStats {
   totalTvl: number;

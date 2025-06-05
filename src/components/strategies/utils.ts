@@ -1,5 +1,5 @@
 import { ICRC1 } from "../../idl/icrc1_oracle";
-import { StrategyResponse } from "../../idl/vault_idl";
+import { StrategyResponse } from "../../idl/vault";
 
 export function getTokenLogo(symbol: string, tokens: ICRC1[]) {
   return tokens.find((token) => token.symbol === symbol)?.logo?.[0] ?? "";
