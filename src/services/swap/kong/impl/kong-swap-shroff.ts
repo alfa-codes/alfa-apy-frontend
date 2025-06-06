@@ -106,6 +106,7 @@ export class KongSwapShroffImpl extends ShroffAbstract {
   }
 
   async swap(): Promise<void> {
+    debugger;
     if (!this.requestedQuote) {
       throw new Error("Quote not set");
     }
@@ -225,6 +226,7 @@ export class KongShroffBuilder {
 
   //todo generify
   public async build(agent: DfinityAgent, principal: string): Promise<Shroff> {
+    debugger;
     if (!this.source) {
       throw new Error("Source is required");
     }
@@ -248,7 +250,6 @@ export class KongShroffBuilder {
       if (!this.sourceOracle || !this.targetOracle) {
         throw new Error("ICRC1 not found");
       }
-
       const buildShroff = this.buildShroff(agent, principal);
 
       const pools = await buildShroff.getPools(

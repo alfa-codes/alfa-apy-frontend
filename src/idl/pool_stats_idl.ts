@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const idlFactory = ({ IDL }) => {
+export const idlFactory = ({ IDL }: { IDL: any }) => {
   const AddLiquidityResponse = IDL.Record({
     'request_id' : IDL.Nat64,
     'token_0_amount' : IDL.Nat,

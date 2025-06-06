@@ -10,7 +10,7 @@ export function getStrategyTokenLogos(
   tokens: ICRC1[]
 ) {
   const tokenNames = strategy.pools
-    .flatMap((p) => [p.symbol_0, p.symbol_1])
+    .flatMap((p) => [p.token0.symbol, p.token1.symbol])
     .filter(function onlyUnique(value, index, array) {
       return array.indexOf(value) === index;
     });

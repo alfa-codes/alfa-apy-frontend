@@ -3,7 +3,7 @@ import { useStrategies } from "../../hooks/strategies";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { Button, Card, Input } from "../ui";
 import { useTokens } from "../../hooks";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { Strategy } from "./strategy";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
@@ -24,8 +24,6 @@ export function Strategies() {
   const { user } = useAuth();
   const {
     strategies,
-    fetchUserStrategies,
-    filterUserStrategies,
     balances,
     filterStrategies,
   } = useStrategies(user?.principal.toString());
@@ -36,19 +34,17 @@ export function Strategies() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserStrategies, setShowUserStrategies] = useState(false);
 
-  useEffect(() => {
-    if (user) fetchUserStrategies(user.principal);
-  }, [showUserStrategies, user, fetchUserStrategies]);
+  // useEffect(() => {
+  //   if (user) fetchUserStrategies(user.principal);
+  // }, [showUserStrategies, user, fetchUserStrategies]);
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
     (acc, strategy) => {
-      const currentPool = strategy.pools.find(
-        (p) => p.pool_id === strategy.current_pool
-      );
+      const currentPool = strategy.current_pool[0];
       if (currentPool) {
-        const tvl = Number(currentPool.tvl || 0);
-        const apy = Number(currentPool.rolling_24h_apy || 0);
+        const tvl = 0;
+        const apy = 0;
         return {
           ...acc,
           totalTvl: acc.totalTvl + tvl,
@@ -98,7 +94,7 @@ export function Strategies() {
   }
 
   const filteredStrategies = filterStrategies(searchTerm);
-  const filteredUserStrategies = filterUserStrategies(searchTerm);
+  const filteredUserStrategies =  filteredStrategies;
 
   return (
     <motion.div
@@ -252,7 +248,7 @@ export function Strategies() {
                 <div className="text-right">
                   <p className="text-sm text-gray-600">TVL</p>
                   <p className="text-lg font-medium">
-                    ${currentPool?.tvl?.toLocaleString() ?? "0"}
+                    ${"0"}
                   </p>
                 </div>
               </div>
@@ -261,9 +257,7 @@ export function Strategies() {
               <div className="flex justify-center items-center gap-20 mt-6 pt-6 border-t border-amber-600/20">
                 <div className="flex items-baseline gap-2">
                   <span className="gradient-text text-[30px] font-bold">
-                    {currentPool?.rolling_24h_apy
-                      ? (currentPool.rolling_24h_apy / 100).toFixed(2)
-                      : "0.00"}
+                    {"0.00"}
                     %
                   </span>
                   <span className="text-gray-600">APY</span>
@@ -295,7 +289,6 @@ export function Strategies() {
                     {Array.from(
                       new Set(s.pools.map((p) => p.provider).filter(Boolean))
                     ).join(", ") ||
-                      s.protocol ||
                       (s.name.toLowerCase().includes("kong")
                         ? "KongSwap"
                         : "IcpSwap")}
@@ -304,7 +297,7 @@ export function Strategies() {
                 <div>
                   <span className="text-gray-600 block">Deposit Token:</span>
                   <p className="font-medium">
-                    {s.depositToken || currentPool?.symbol_0 || "N/A"}
+                    {"N/A"}
                   </p>
                 </div>
                 {user && (

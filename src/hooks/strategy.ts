@@ -20,7 +20,7 @@ export function usePools(pools_symbols: string[]) {
 
   useEffect(() => {
     if (status === Status.IDLE && !pools.length)
-      dispatch(fetchPools(pools_symbols));
+      dispatch(fetchPools());
   }, [status, pools, dispatch, pools_symbols]);
 
   return {

@@ -8,6 +8,7 @@ import {
   swapReducer,
   paymentsReducer,
 } from "./slices";
+import { eventRecordsReducer } from "./slices/event-records";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     strategy: strategyReducer,
     swap: swapReducer,
     payments: paymentsReducer,
+    eventRecords: eventRecordsReducer,
   },
 });
 

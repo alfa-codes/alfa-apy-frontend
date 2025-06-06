@@ -5,7 +5,7 @@ import {
   useTokens,
   useWithdraw,
 } from "../../hooks";
-import { StrategyResponse } from "../../idl/vault_idl";
+import { StrategyResponse } from "../../idl/vault";
 import { Card } from "../ui";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getTokenLogo } from "./utils";
@@ -51,9 +51,9 @@ export function Strategy({
   const agent = useAgent({ host: "https://ic0.app" });
   const { tokens } = useTokens();
   const logos = tokens ? getStrategyTokenLogos(value, tokens) : [];
-  const { resetPools } = usePools(value.tokens);
-  const currentPool = value.pools.find((p) => p.pool_id === value.current_pool);
-  const tokenAddress = currentPool?.address_0 ?? "mxzaz-hqaaa-aaaar-qaada-cai";
+  const { resetPools } = usePools(value.pools.map((p) => p.token0.symbol));
+  const currentPool = value.current_pool[0];
+  const tokenAddress = currentPool?.token0.ledger.toText();
   const token = tokens.length
     ? tokens.find((t) => t.ledger === tokenAddress)!
     : undefined;
@@ -73,9 +73,10 @@ export function Strategy({
     ? BigNumber(balance.user_shares)
         .div(balance.total_shares)
         .multipliedBy(
-          BigNumber(balance.amount_1)
-            .multipliedBy(currentPool?.price ?? 0)
-            .plus(balance.amount_0)
+          // BigNumber(balance.amount_1)
+          //   .multipliedBy(currentPool?.price ?? 0)
+          //   .plus(balance.amount_0)  TODO: fix this
+          1
         )
         .toFixed(token!.decimals)
     : "0";
@@ -83,14 +84,10 @@ export function Strategy({
 
   // Calculate APY breakdown
   const apyBreakdown: APYBreakdown = {
-    vaultApr: currentPool?.rolling_24h_apy
-      ? currentPool.rolling_24h_apy / 100
-      : 0,
+    vaultApr: 0,
     tradingApr: 0.65, // Example value, replace with actual calculation
     boostApr: 0, // We don't have boost yet
-    totalApy: currentPool?.rolling_24h_apy
-      ? currentPool.rolling_24h_apy / 100
-      : 0,
+    totalApy: 0,
   };
 
   // Dropdown for chart label
@@ -275,7 +272,7 @@ export function Strategy({
                               .toString()
                           ),
                           strategyId: value.id,
-                          ledger: tokenAddress,
+                          ledger: tokenAddress as string,
                           principal: user!.principal,
                           agent: agent!,
                         }).catch((e) => {
@@ -299,7 +296,7 @@ export function Strategy({
                           amount:
                             (BigInt(shares) * BigInt(percent)) / BigInt(100),
                           strategyId: value.id,
-                          ledger: tokenAddress,
+                          ledger: tokenAddress as string,
                           principal: user!.principal,
                           agent: agent!,
                         }).catch((e) => {
@@ -360,12 +357,7 @@ export function Strategy({
             <div>
               <p className="text-gray-600">Strategy Age</p>
               <p className="text-lg font-medium">
-                {value.created_at
-                  ? `${Math.floor(
-                      (Date.now() - value.created_at) /
-                        (30 * 24 * 60 * 60 * 1000)
-                    )} months`
-                  : "N/A"}
+                {"N/A"}
               </p>
             </div>
           </div>
@@ -374,9 +366,7 @@ export function Strategy({
               <p className="text-gray-600">TVL</p>
               <p className="text-lg font-medium">
                 $
-                {currentPool?.tvl
-                  ? Number(currentPool.tvl).toLocaleString()
-                  : "0"}
+                { "0"}
               </p>
             </div>
             <div>
@@ -445,7 +435,7 @@ export function Strategy({
                       </span>
                     </td>
                     <td className="py-4">
-                      <span className="font-medium">{(p as any).provider}</span>
+                      <span className="font-medium">{(p).provider}</span>
                     </td>
                     <td className="py-4">${Number(p.tvl).toLocaleString()}</td>
                     <td
@@ -481,7 +471,7 @@ export function Strategy({
             <div className="flex flex-col md:flex-row gap-6">
               {logos.slice(0, 2).map((logo, idx) => {
                 const tokenSymbol =
-                  idx === 0 ? currentPool?.symbol_0 : currentPool?.symbol_1;
+                  idx === 0 ? currentPool?.token0.symbol : currentPool?.token1.symbol;
                 const tokenObj = tokens.find((t) => t.symbol === tokenSymbol);
                 // Hardcode prices for the two tokens
                 let hardcodedPrice = "N/A";
@@ -514,38 +504,30 @@ export function Strategy({
                 new Set(value.pools.map((p) => p.provider).filter(Boolean))
               ).map((provider) => (
                 <div
-                  key={provider}
+                  key={provider.toString()}
                   className="flex items-center gap-4 p-4 rounded-lg bg-white/40 shadow"
                 >
                   <span
                     className={
                       `flex items-center justify-center rounded-full w-10 h-10 text-2xl ` +
-                      (provider === "KongSwap"
-                        ? "bg-green-400"
-                        : provider === "IcpSwap"
-                        ? "bg-purple-400"
-                        : "bg-gray-300")
+                      ( "bg-gray-300")
                     }
                   >
-                    {provider === "KongSwap"
-                      ? "🦍"
-                      : provider === "IcpSwap"
-                      ? "🔄"
-                      : "❓"}
+                    {"❓"}
                   </span>
                   <div>
-                    <div className="font-bold text-lg">{provider}</div>
+                    <div className="font-bold text-lg">{provider.toString()}</div>
                     <div className="text-gray-600 text-sm mb-2">
-                      {provider === "KongSwap"
+                      {provider.toString() === "KongSwap"
                         ? "KongSwap is a decentralized AMM on ICP."
-                        : provider === "IcpSwap"
+                        : provider.toString() === "IcpSwap"
                         ? "IcpSwap is a leading DEX on ICP."
                         : "No description."}
                     </div>
                     <div className="flex gap-4">
                       <a
                         href={
-                          provider === "KongSwap"
+                          provider.toString() === "KongSwap"
                             ? "https://kongswap.com/"
                             : "https://icpswap.com/"
                         }

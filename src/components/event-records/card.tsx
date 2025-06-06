@@ -1,10 +1,10 @@
 import colors from "tailwindcss/colors";
-import { useEventRecords } from "../../hooks";
+import { useEventRecords } from "../../hooks/event-records";
 import { Card } from "../ui/card";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 
 export function EventRecordsCard() {
-  const { EventRecords } = useEventRecords();
+  const { eventRecords } = useEventRecords();
 
   return (
     <Card className="p-6">
@@ -41,7 +41,7 @@ export function EventRecordsCard() {
               </th>
             </tr>
           </thead>
-          {!EventRecords && (
+          {!eventRecords && (
             <tbody>
               <div className="flex justify-center items-center h-full">
                 <SquareLoader
@@ -54,7 +54,7 @@ export function EventRecordsCard() {
             </tbody>
           )}
           <tbody>
-            {EventRecords?.map((tx, i) => (
+            {eventRecords?.map((tx, i) => (
               <tr key={i} className="border-t border-amber-600/10">
                 <td className="py-2 px-2">#{tx.id}</td>
                 <td className="py-2 px-2">{tx.type}</td>

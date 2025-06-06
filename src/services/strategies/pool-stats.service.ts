@@ -16,6 +16,16 @@ export class PoolStatsService {
     return await anonymousActor.get_pools();
   }
 
+  public async get_all_pool_metrics(): Promise<Array<[PoolByTokens, PoolMetrics]>> {
+    const pools = await this.get_pools();
+    const poolMetrics = await this.get_pool_metrics(pools.map((p) => ({
+      provider: p.provider,
+      token0: p.token0,
+      token1: p.token1,
+    })));
+    return poolMetrics;
+  }
+
   public async get_pool_metrics(
     metricsRequest: Array<PoolByTokens>
   ): Promise<Array<[PoolByTokens, PoolMetrics]>> {

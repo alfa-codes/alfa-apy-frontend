@@ -25,3 +25,8 @@ export async function getAnonActor<T>(canisterId: string, idl: IDL.InterfaceFact
   const annonymousAgent = await HttpAgent.create({ host: "https://ic0.app" });
   return getTypedActor<T>(canisterId, annonymousAgent, idl);
 }
+
+
+export async function getDfinityActor<T>(agent: DfinityAgent, canisterId: string, idl: IDL.InterfaceFactory): Promise<Agent.ActorSubclass<T>> {
+  return getTypedActor<T>(canisterId, agent, idl);
+}

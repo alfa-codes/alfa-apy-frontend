@@ -12,7 +12,6 @@ import {
 import { Quote } from "../../quote";
 import { Shroff } from "../../shroff";
 import { ShroffAbstract } from "../../shroff/shroff-abstract";
-import { tokensService } from "../../../tokens-service";
 
 import {
   DepositError,
@@ -33,7 +32,7 @@ import {
 } from "../idl/SwapPool.d";
 import { SourceInputCalculator } from "../../calculator/calculator";
 import { TRIM_ZEROS } from "../../../token/constants";
-import { transferICRC1 } from "../../../token/icrc1";
+import { icrc1OracleService, transferICRC1 } from "../../../token/icrc1";
 import { ICRC1TypeOracle, TransferArg } from "../../../../idl";
 import { actorBuilder } from "../../../actors";
 import { hasOwnProperty } from "../../../utils";
@@ -159,7 +158,8 @@ export class ShroffIcpSwapImpl extends ShroffAbstract {
 
     if (icrc2supported) {
       // TODO ask Oleksii about root canister
-      await this.icrc2approve("");
+      const kong = "2ipq2-uqaaa-aaaar-qailq-cai"
+      await this.icrc2approve(kong);
       console.log("ICRC2 approve response", JSON.stringify(icrcTransferId));
     } else {
       try {
@@ -352,6 +352,7 @@ export class IcpSwapShroffBuilder {
   }
 
   public async build(agent: DfinityAgent, principal: string): Promise<Shroff> {
+    debugger;
     if (!this.source) {
       throw new Error("Source is required");
     }
@@ -364,7 +365,7 @@ export class IcpSwapShroffBuilder {
       const [poolData, icrc1canisters]: [PoolData, ICRC1TypeOracle[]] =
         await Promise.all([
           icpSwapService.getPoolFactory(this.source, this.target),
-          tokensService.getAll(),
+          icrc1OracleService.requestNetworkForCanisters(),
         ]);
 
       this.poolData = poolData;

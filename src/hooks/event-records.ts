@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "../store";
-import { fetchEventRecords } from "../store/slices";
+import { fetchEventRecords } from "../store/slices/event-records";
 import { useEffect } from "react";
 
 export const useEventRecords = () => {

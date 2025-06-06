@@ -39,7 +39,7 @@ export function useSwap({
   slippage: number;
   onSuccess: () => unknown;
 }) {
-  const agent = useAgent({ host: "https://ic0.app" });
+  const agent = useAgent();
   const { user } = useAuth();
   const [swapProviders, setSwapProviders] = useState<
     Map<SwapName, Shroff | undefined>
@@ -63,6 +63,7 @@ export function useSwap({
   const getProviders = useCallback(async () => {
     if (!agent || !user?.principal) return;
     try {
+      
       console.log("clear quote", fromToken, toToken);
       setQuote(undefined);
       setShroff(undefined);
@@ -75,6 +76,7 @@ export function useSwap({
         agent,
         user.principal.toString()
       );
+      console.log("providers", providers);
       setSwapProviders(providers);
     } catch (error) {
       if (error instanceof LiquidityError) {
@@ -95,7 +97,6 @@ export function useSwap({
     const getShroff = async () => {
       try {
         const shroff = await swapService.getBestShroff(swapProviders, amount);
-
         setShroff(shroff);
       } catch (error) {
         setShroff(undefined);
@@ -133,7 +134,7 @@ export function useSwap({
     refetchQuote();
   }, [refetchQuote]);
 
-  const quoteIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const quoteIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!quote) return;
@@ -170,15 +171,18 @@ export function useSwap({
 
   const swap = useCallback(async () => {
     const sourceAmount = quote?.getSourceAmountPrettifiedWithSymbol();
+    console.log("sourceAmount", sourceAmount);
     const targetAmount = quote?.getTargetAmountPrettifiedWithSymbol();
+    console.log("targetAmount", targetAmount);
     const sourceUsdAmount = quote?.getSourceAmountUSD();
+    console.log("sourceUsdAmount", sourceUsdAmount);
     const targetUsdAmount = quote?.getTargetAmountUSD();
+    console.log("targetUsdAmount", targetUsdAmount);
 
     if (!sourceAmount || !targetAmount || !sourceUsdAmount || !targetUsdAmount)
       return;
 
     if (!shroff) return;
-
     shroff
       .swap()
       .then(() => {

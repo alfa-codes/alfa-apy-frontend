@@ -2,13 +2,13 @@ import { LiquidityError, ServiceUnavailableError } from "../errors/types";
 import { Quote } from "../quote";
 import { IcpSwapShroffBuilder } from "../icpswap/impl/shroff-icp-swap-impl";
 import { SwapName } from "../types/enums";
-// import { KongShroffBuilder } from "../kong/impl/kong-swap-shroff";
 import { Shroff } from "../shroff";
 import { Agent } from "@dfinity/agent";
+import { KongShroffBuilder } from "../kong/impl/kong-swap-shroff";
 
 const PROVIDERS = [
   { builder: new IcpSwapShroffBuilder(), name: SwapName.ICPSwap },
-  // { builder: new KongShroffBuilder(), name: SwapName.Kongswap },
+  { builder: new KongShroffBuilder(), name: SwapName.Kongswap },
 ];
 
 export class SwapService {
@@ -19,7 +19,6 @@ export class SwapService {
     principal: string
   ): Promise<Map<SwapName, Shroff | undefined>> {
     let success = false;
-
     const map = new Map<SwapName, Shroff | undefined>();
 
     for (let i = 0; i < PROVIDERS.length; i++) {
@@ -51,11 +50,15 @@ export class SwapService {
     providers: Map<SwapName, Shroff | undefined>,
     amount?: string
   ): Promise<Shroff | undefined> {
+
+
+    console.log("providers", providers);
     if (!amount || !Number(amount)) return;
     const quotesWithShroffs = await Promise.all(
       [...providers.entries()].map(async ([, shroff]) => {
         if (!shroff) return;
         try {
+          console.log("shrofffff", shroff);
           const quote = await shroff.getQuote(amount);
 
           return { shroff, quote };

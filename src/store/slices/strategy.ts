@@ -1,16 +1,16 @@
 import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Status } from "../types";
-import { PoolReply } from "../../idl/vault_idl";
-import { StrategiesService } from "../../services/strategies/strategy-service";
 import { RootState } from "../store";
 import { Principal } from "@dfinity/principal";
 import { Agent } from "@dfinity/agent";
+import { poolStatsService } from "../../services";
+import { PoolByTokens, PoolMetrics } from "../../idl/pool_stats";
 
 export const fetchPools = createAsyncThunk(
   "strategy/fetchPools",
-  async (pools_symbols: string[]) => {
-    const response = await StrategiesService.get_pool_data(pools_symbols);
-    return response as PoolReply[];
+  async () => {
+    const response = await poolStatsService.get_all_pool_metrics();
+    return response ;
   }
 );
 
@@ -85,7 +85,7 @@ const strategySlice = createSlice({
     fetchPools: {
       status: Status;
       error?: string;
-      pools: PoolReply[];
+      pools: [PoolByTokens, PoolMetrics][];
     };
     deposit: {
       status: Status;

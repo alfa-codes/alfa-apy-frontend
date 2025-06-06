@@ -2,14 +2,12 @@ import { useEffect } from "react";
 import {
   fetchStrategies,
   fetchStrategiesBalances,
-  fetchUserStrategies,
   initStrategies,
   Status,
   useDispatch,
   useSelector,
 } from "../store";
 import { useAgent } from "@nfid/identitykit/react";
-import { Principal } from "@dfinity/principal";
 
 export function useStrategies(user?: string) {
   const dispatch = useDispatch();
@@ -17,7 +15,7 @@ export function useStrategies(user?: string) {
 
   const {
     strategies: { data, status },
-    userStrategies: { data: userStrategies },
+    // userStrategies: { data: userStrategies },
     balances: { data: balances, status: balancesStatus },
     service,
   } = useSelector((state) => state.strategies);
@@ -52,21 +50,21 @@ export function useStrategies(user?: string) {
           s.name.toLowerCase().includes(filter.toLowerCase()) ||
           s.description.toLowerCase().includes(filter.toLowerCase()) ||
           s.pools.some((p) =>
-            p.token0.toLowerCase().includes(filter.toLowerCase())
+            p.token0.symbol.toLowerCase().includes(filter.toLowerCase())
           )
       ),
-    filterUserStrategies: (filter: string) =>
-      userStrategies?.filter(
-        (s) =>
-          s.name.toLowerCase().includes(filter.toLowerCase()) ||
-          s.description.toLowerCase().includes(filter.toLowerCase()) ||
-          s.pools.some((p) =>
-            p.token0.toLowerCase().includes(filter.toLowerCase())
-          )
-      ),
-    fetchUserStrategies: (user: Principal) => {
-      if (!userStrategies) dispatch(fetchUserStrategies(user));
-    },
-    userStrategies,
+    // filterUserStrategies: (filter: string) =>
+    //   userStrategies?.filter(
+    //     (s) =>
+    //       s.name.toLowerCase().includes(filter.toLowerCase()) ||
+    //       s.description.toLowerCase().includes(filter.toLowerCase()) ||
+    //       s.pools.some((p) =>
+    //         p.token0.symbol.toLowerCase().includes(filter.toLowerCase())
+    //       )
+    //   ),
+    // fetchUserStrategies: (user: Principal) => {
+    //   if (!userStrategies) dispatch(fetchUserStrategies(user));
+    // },
+    // userStrategies,
   };
 }

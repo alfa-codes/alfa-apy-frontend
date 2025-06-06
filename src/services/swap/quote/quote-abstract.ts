@@ -82,6 +82,7 @@ export abstract class QuoteAbstract implements Quote {
   }
 
   getTargetAmountPrettifiedWithSymbol(): string {
+    console.log("getTargetAmountPrettifiedWithSymbol", this.getTargetAmount());
     return (
       this.getTargetAmount()
         .minus(Number(this.target.fee))

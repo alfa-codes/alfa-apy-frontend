@@ -6,11 +6,17 @@ import {
   DepositResponse,
   WithdrawResponse,
 } from "../../idl/vault";
+import {
+  Agent as DfinityAgent,
+} from "@dfinity/agent";
+import {
+  PoolByTokens,
+  PoolMetrics,
+} from "../../idl/pool_stats";
 import { idlFactory } from "../../idl/vault_idl";
 import { Principal } from "@dfinity/principal";
-import { getAnonActor } from "../utils";
+import { getAnonActor, getDfinityActor } from "../utils";
 import { poolStatsService } from "./pool-stats.service";
-import { getPoolId } from "../../utils/pools";
 import { VAULT_CANISTER_ID } from "../../constants";
 
 export interface Strategy extends StrategyResponse {
@@ -40,7 +46,7 @@ export class StrategiesService {
     );
     console.log("poolMetricsArgs", poolMetricsArgs);
 
-    const poolStats = await poolStatsService.get_pool_metrics(poolMetricsArgs);
+    const poolStats: [PoolByTokens, PoolMetrics][] = await poolStatsService.get_pool_metrics(poolMetricsArgs);
     console.log("poolStats", poolStats);
 
     return strategies.map((strategy) => ({
@@ -48,19 +54,7 @@ export class StrategiesService {
       apy:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;
-
-          return strategy.current_pool.length
-            ? getPoolId({
-                provider: currentPool.provider,
-                token0: currentPool.token0.symbol,
-                token1: currentPool.token1.symbol,
-              }) ===
-                getPoolId({
-                  provider: pool[0].provider,
-                  token0: pool[0].token0.symbol,
-                  token1: pool[0].token1.symbol,
-                })
-            : false;
+          return currentPool.provider === pool[0].provider && currentPool.token0.symbol === pool[0].token0.symbol && currentPool.token1.symbol === pool[0].token1.symbol;
         })?.[1].apy ?? 0,
     }));
   }
@@ -84,8 +78,10 @@ export class StrategiesService {
     strategy_id: number,
     ledger: string,
     amount: bigint,
+    agent: DfinityAgent
   ) : Promise<DepositResponse> {
-    const anonymousActor = await getAnonActor<VaultType>(
+    const anonymousActor = await getDfinityActor<VaultType>(
+      agent,
       VAULT_CANISTER_ID,
       idlFactory
     );

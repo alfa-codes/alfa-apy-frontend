@@ -70,9 +70,12 @@ export function Swap({ className }: { className?: string }) {
   }));
 
   const fromBalance = balances[fromToken];
+  console.log("fromBalance", fromBalance);
   const toBalance = balances[toToken];
+  console.log("toBalance", toBalance);
 
   const targetAmount = quote?.getTargetAmountPrettifiedWithSymbol();
+  console.log("targetAmount", targetAmount);
   const sourceUsdAmount = quote?.getSourceAmountUSD();
   const targetUsdAmount = quote?.getTargetAmountUSD();
 
