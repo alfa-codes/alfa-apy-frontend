@@ -106,7 +106,6 @@ export class KongSwapShroffImpl extends ShroffAbstract {
   }
 
   async swap(): Promise<void> {
-    debugger;
     if (!this.requestedQuote) {
       throw new Error("Quote not set");
     }
@@ -226,7 +225,6 @@ export class KongShroffBuilder {
 
   //todo generify
   public async build(agent: DfinityAgent, principal: string): Promise<Shroff> {
-    debugger;
     if (!this.source) {
       throw new Error("Source is required");
     }

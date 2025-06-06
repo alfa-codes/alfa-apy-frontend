@@ -183,18 +183,15 @@ export function useSwap({
       return;
 
     if (!shroff) return;
-    shroff
-      .swap()
-      .then(() => {
-        setIsSwapSuccess(true);
-        alert(`Swap ${sourceAmount} to ${targetAmount} successful`);
-      })
-      .catch((error) => {
-        setSwapError(error);
-      })
-      .finally(() => {
-        onSuccess();
-      });
+    
+    try {
+      await shroff.swap();
+      setIsSwapSuccess(true);
+      onSuccess();
+    } catch (error) {
+      setSwapError(error as WithdrawError | SwapError | DepositError);
+      throw error;
+    }
   }, [quote, shroff, onSuccess]);
 
   return {
