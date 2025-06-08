@@ -5,7 +5,6 @@ import {
   useTokens,
   useWithdraw,
 } from "../../hooks";
-import { StrategyResponse } from "../../idl/vault";
 import { Card } from "../ui";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getTokenLogo } from "./utils";
@@ -22,6 +21,7 @@ import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 import { ConnectWallet } from "../connect-wallet";
 import { PaymentsCard } from "../payments";
+import { Strategy as StrategyResponse } from "../../services/strategies/strategy-service";
 
 interface APYBreakdown {
   vaultApr: number;

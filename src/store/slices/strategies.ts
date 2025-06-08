@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   strategiesService,
   StrategiesService,
+  Strategy,
 } from "../../services/strategies/strategy-service";
 import { Status } from "../types";
 import { Agent } from "@dfinity/agent";
@@ -25,8 +26,8 @@ export const fetchStrategies = createAsyncThunk(
   "strategies/fetch",
   async () => {
     try {
-      const response = await strategiesService.get_strategies();
-      console.log("strategies", response);
+      const response : Array<Strategy> = await strategiesService.get_strategies();
+      console.log("response", response);
       return response;
     } catch (e) {
       console.error(e);
@@ -103,7 +104,7 @@ const strategiesSlice = createSlice({
     },
   } as {
     strategies: {
-      data?: Array<StrategyResponse>;
+      data?: Array<Strategy>;
       status: Status;
       error?: string;
     };
