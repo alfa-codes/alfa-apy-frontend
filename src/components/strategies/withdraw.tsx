@@ -3,6 +3,9 @@ import { Button, Input } from "../ui";
 import { useState } from "react";
 import BigNumber from "bignumber.js";
 
+// TODO: fix this
+const TOKEN_DECIMALS = 8;
+
 export function Withdraw({
   className,
   isOpen,
@@ -26,11 +29,11 @@ export function Withdraw({
   const [inputError, setInputError] = useState("");
   const [value, setValue] = useState("");
   const isZeroAvailbale = BigNumber(available).eq(0);
-
+  const formattedAvailable = Number(available) / Math.pow(10, TOKEN_DECIMALS);
   const percent = isZeroAvailbale
     ? "0"
     : BigNumber(value || 0)
-        .div(available)
+        .div(formattedAvailable)
         .multipliedBy(100)
         .toString();
 
@@ -52,7 +55,7 @@ export function Withdraw({
           Withdraw {tokenSymbol}
         </h2>
         <p className="mb-[35px] sm:mb-[45px]">
-          Available balance: {available} {tokenSymbol}
+          Available balance: {formattedAvailable} {tokenSymbol}
         </p>
         <input
           disabled={isZeroAvailbale}
@@ -63,7 +66,7 @@ export function Withdraw({
             setValue(
               BigNumber(e.target.value || 0)
                 .div(100)
-                .multipliedBy(available)
+                .multipliedBy(formattedAvailable)
                 .toString()
             );
           }}
@@ -86,7 +89,7 @@ export function Withdraw({
                   const value = e.target.value;
                   if (!value) {
                     setInputError("Required");
-                  } else if (BigNumber(value).gt(available)) {
+                  } else if (BigNumber(value).gt(formattedAvailable)) {
                     setInputError("Not enough balance");
                   }
                   setValue(e.target.value);

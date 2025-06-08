@@ -3,7 +3,7 @@ import { useStrategies } from "../../hooks/strategies";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { Button, Card, Input } from "../ui";
 import { useTokens } from "../../hooks";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import { Strategy } from "./strategy";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
@@ -84,6 +84,9 @@ export function Strategies() {
 
   if (selectedStrategy) {
     const strategy = strategies.find((s) => s.id === selectedStrategy)!;
+
+    console.log("b", balances?.[strategy.id]);
+
     return (
       <Strategy
         value={strategy}
@@ -306,7 +309,8 @@ export function Strategies() {
                       <span className="text-gray-600 block">Deposited:</span>
                       <p className="font-medium">
                         $
-                        {balances?.[s.id]?.usd_balance?.toLocaleString() ?? "0"}
+                        {/* {balances?.[s.id]?.usd_balance?.toLocaleString() ?? "0"} */}
+                        "N/A"
                       </p>
                     </div>
                     <div>
@@ -315,9 +319,10 @@ export function Strategies() {
                       </span>
                       <p className="font-medium">
                         $
-                        {balances?.[s.id]?.usd_balance
+                        {/* {balances?.[s.id]?.usd_balance
                           ? (balances[s.id].usd_balance * 0.001).toFixed(2)
-                          : "0.00"}
+                          : "0.00"} */}
+                        "N/A"
                       </p>
                     </div>
                   </>

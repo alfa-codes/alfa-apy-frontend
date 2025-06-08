@@ -14,12 +14,9 @@ const MOCK_USER_BALANCES = {
     strategy_id: 1,
     user_shares: 100,
     total_shares: 1000,
-    price: "1.02",
-    usd_balance: 1020,
-    amount_0: 500,
-    amount_1: 510,
+    initial_deposit: 1000,
   },
-};
+}
 
 export const fetchStrategies = createAsyncThunk(
   "strategies/fetch",
@@ -51,24 +48,28 @@ export const fetchStrategiesBalances = createAsyncThunk(
   "strategies/fetchBalances",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
   async (_params: any) => {
-    // TODO: Uncomment when KongSwap is fixed
-    // try {
-    //   const balances = await StrategiesService.get_user_strategies(
-    //     Principal.from(principal)
-    //   );
-    //   return balances.reduce(
-    //     (acc, value) => ({
-    //       ...acc,
-    //       [value.strategy_id]: value,
-    //     }),
-    //     {}
-    //   );
-    // } catch (e) {
-    //   console.error(e);
-    // }
+    try {
+      const balances = await strategiesService.get_user_strategies(
+        Principal.from(_params.principal)
+      );
 
-    // Using mock data for now
-    return MOCK_USER_BALANCES;
+      let mappedBalances = balances.reduce(
+        (acc, value) => ({
+          ...acc,
+          [value.strategy_id]: value,
+        }),
+        {}
+      );
+
+      // debugger;
+
+      // Using mock data for now
+      // return MOCK_USER_BALANCES;
+
+      return mappedBalances;
+    } catch (e) {
+      console.error(e);
+    }
   }
 );
 
@@ -123,10 +124,11 @@ const strategiesSlice = createSlice({
         {
           user_shares: number;
           total_shares: number;
-          price: string;
-          usd_balance: number;
-          amount_0: number;
-          amount_1: number;
+          initial_deposit: number;
+          // price: string;
+          // usd_balance: number;
+          // amount_0: number;
+          // amount_1: number;
         }
       >;
       status: Status;

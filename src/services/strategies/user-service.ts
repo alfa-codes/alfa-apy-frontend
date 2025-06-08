@@ -7,7 +7,7 @@ import { _SERVICE as ledgerService, ApproveArgs } from "../../idl/ledger.ts";
 import { idlFactory as ledger_idl } from "../../idl/ledger_idl.ts";
 import { getTypedActor } from "../utils.ts";
 
-export const alfaACanister = "hx54w-raaaa-aaaaa-qafla-cai";
+export const alfaACanister = "ownab-uaaaa-aaaap-qp2na-cai";
 export const poolsDataCanister = "oxawg-7aaaa-aaaag-aub6q-cai";
 
 export class UserService {
@@ -16,12 +16,13 @@ export class UserService {
     ledger: string,
     amount: bigint,
     agent: DfinityAgent
-  ) {
+  ) { 
     const actor = await getTypedActor<VaultType>(
       alfaACanister,
       agent,
       idlFactory
     );
+
     return actor.withdraw({
       strategy_id,
       ledger: Principal.fromText(ledger),

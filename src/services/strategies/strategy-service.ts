@@ -66,48 +66,10 @@ export class StrategiesService {
       VAULT_CANISTER_ID,
       idlFactory
     );
-    const userStrategiesIds = (await anonymousActor.user_strategies(user)).map(
-      (s) => s.strategy_id
-    );
-    return (await this.get_strategies()).filter((s) =>
-      userStrategiesIds.includes(s.id)
-    ) as unknown as Array<UserStrategyResponse>;
-  }
 
-  public async accept_investment(
-    strategy_id: number,
-    ledger: string,
-    amount: bigint,
-    agent: DfinityAgent
-  ) : Promise<DepositResponse> {
-    const anonymousActor = await getDfinityActor<VaultType>(
-      agent,
-      VAULT_CANISTER_ID,
-      idlFactory
-    );
+    const userStrategies = await anonymousActor.user_strategies(user);
 
-    return await anonymousActor.accept_investment({
-      strategy_id,
-      ledger: Principal.fromText(ledger),
-      amount,
-    });
-  }
-
-  public async withdraw(
-    strategy_id: number,
-    ledger: string,
-    amount: bigint,
-  ) : Promise<WithdrawResponse> {
-    const anonymousActor = await getAnonActor<VaultType>(
-      VAULT_CANISTER_ID,
-      idlFactory
-    );
-
-    return await anonymousActor.withdraw({
-      strategy_id,
-      ledger: Principal.fromText(ledger),
-      amount,
-    });
+    return userStrategies;
   }
 }
 

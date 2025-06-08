@@ -40,10 +40,11 @@ export function Strategy({
   balance?: {
     user_shares: number;
     total_shares: number;
-    price: string;
-    usd_balance: number;
-    amount_0: number;
-    amount_1: number;
+    initial_deposit: number;
+    // usd_balance: number;
+    // price: string;
+    // amount_0: number;
+    // amount_1: number;
   };
 }) {
   const navigate = useNavigate();
@@ -69,18 +70,22 @@ export function Strategy({
   const { deposit, isDepositing } = useDeposit();
   const { withdraw, isWithdrawing } = useWithdraw();
 
-  const available = balance
-    ? BigNumber(balance.user_shares)
-        .div(balance.total_shares)
-        .multipliedBy(
-          // BigNumber(balance.amount_1)
-          //   .multipliedBy(currentPool?.price ?? 0)
-          //   .plus(balance.amount_0)  TODO: fix this
-          1
-        )
-        .toFixed(token!.decimals)
-    : "0";
+  // const amountToWithdraw = balance
+  //   ? BigNumber(balance.user_shares)
+  //       .div(balance.total_shares)
+  //       .multipliedBy(
+  //         // BigNumber(balance.amount_1)
+  //         //   .multipliedBy(currentPool?.price ?? 0)
+  //         //   .plus(balance.amount_0)  TODO: fix this
+  //         1
+  //       )
+  //       .toFixed(token!.decimals)
+  //   : "0";
+
+  const amountToWithdraw = balance ? BigNumber(balance.initial_deposit).toString() : "0";
   const shares = balance?.user_shares ?? 0;
+
+  // debugger;
 
   // Calculate APY breakdown
   const apyBreakdown: APYBreakdown = {
@@ -236,7 +241,8 @@ export function Strategy({
                     <div className="flex items-center gap-2">
                       <TokensLogos logos={logos} size={24} />
                       <p className="text-lg font-medium">
-                        ${balance?.usd_balance.toFixed(2) ?? "0.00"}
+                        {/* ${balance?.usd_balance.toFixed(2) ?? "0.00"} */}
+                        "0.00"
                       </p>
                     </div>
                   </div>
@@ -244,10 +250,11 @@ export function Strategy({
                     <p className="text-gray-600">Daily Yield</p>
                     <p className="text-lg font-medium text-green-600">
                       $
-                      {(
+                      {/* {(
                         (balance?.usd_balance ?? 0) *
                         (apyBreakdown.totalApy / 365 / 100)
-                      ).toFixed(2)}
+                      ).toFixed(2)} */}
+                      "N/A"
                     </p>
                   </div>
                 </div>
@@ -293,8 +300,7 @@ export function Strategy({
                       }}
                       onWithdraw={(percent) => {
                         withdraw({
-                          amount:
-                            (BigInt(shares) * BigInt(percent)) / BigInt(100),
+                          amount: (BigInt(shares) * BigInt(percent)) / BigInt(100),
                           strategyId: value.id,
                           ledger: tokenAddress as string,
                           principal: user!.principal,
@@ -303,7 +309,7 @@ export function Strategy({
                           alert(e.message);
                         });
                       }}
-                      available={available}
+                      available={amountToWithdraw}
                       tokenSymbol={token?.symbol ?? ""}
                       loading={isWithdrawing}
                     />
