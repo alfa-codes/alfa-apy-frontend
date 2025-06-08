@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import colors from "tailwindcss/colors";
 import debounce from "lodash.debounce";
+import { SuccessModal } from "./success-modal";
 
 export function Swap({ className }: { className?: string }) {
   const { user } = useAuth();
@@ -19,21 +20,25 @@ export function Swap({ className }: { className?: string }) {
   );
   const [toToken, setToToken] = useState<string>("etik7-oiaaa-aaaar-qagia-cai");
   const [amount, setAmount] = useState("");
+  const [throttledAmount, setThrottledAmount] = useState("");
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isSwapLoading, setIsSwapLoading] = useState(false);
+  
   const throttledSetAmount = useRef(
     debounce((value: string) => {
-      setAmount(value); // Throttled update
+      setThrottledAmount(value);
     }, 1000)
   ).current;
 
   useEffect(() => {
-    return () => throttledSetAmount.cancel(); // Cleanup to prevent memory leaks
+    return () => throttledSetAmount.cancel();
   }, []);
 
   const { setSlippage, slippage } = useSwapSlippage();
-  const { isQuoteLoading, liquidityError, swap, quote, quoteTimer } = useSwap({
+  const { isQuoteLoading, liquidityError, swap, quote, quoteTimer, isSuccess } = useSwap({
     fromToken,
     toToken,
-    amount,
+    amount: throttledAmount,
     slippage,
     onSuccess: () => {
       refetchBalanceByCanister(tokens.find((t) => t.ledger === fromToken)!);
@@ -53,6 +58,28 @@ export function Swap({ className }: { className?: string }) {
     }
   }, [toToken, tokens, refetchBalanceByCanister]);
 
+  useEffect(() => {
+    if (isSuccess) {
+      setIsSuccessModalOpen(true);
+      setIsSwapLoading(false);
+    }
+  }, [isSuccess]);
+
+  const handleSwapTokens = () => {
+    const tempToken = fromToken;
+    setFromToken(toToken);
+    setToToken(tempToken);
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers and one dot
+    if (/^\d*\.?\d*$/.test(value)) {
+      setAmount(value);
+      throttledSetAmount(value);
+    }
+  };
+
   if (loading || !tokens.length)
     return (
       <SquareLoader
@@ -70,14 +97,28 @@ export function Swap({ className }: { className?: string }) {
   }));
 
   const fromBalance = balances[fromToken];
-  console.log("fromBalance", fromBalance);
   const toBalance = balances[toToken];
-  console.log("toBalance", toBalance);
 
   const targetAmount = quote?.getTargetAmountPrettifiedWithSymbol();
-  console.log("targetAmount", targetAmount);
   const sourceUsdAmount = quote?.getSourceAmountUSD();
   const targetUsdAmount = quote?.getTargetAmountUSD();
+
+  const handleSwap = async () => {
+    try {
+      setIsSwapLoading(true);
+      await swap();
+    } catch (error) {
+      console.error("Swap failed:", error);
+    } finally {
+      setIsSwapLoading(false);
+    }
+  };
+
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
+    setAmount(""); // Reset input amount
+    setThrottledAmount(""); // Reset throttled amount
+  };
 
   return (
     <>
@@ -97,9 +138,8 @@ export function Swap({ className }: { className?: string }) {
           balance={fromBalance?.balance ?? "0.00"}
           usdValue={sourceUsdAmount ?? "0.00"}
           onTokenChange={setFromToken}
-          onChange={(e) => {
-            throttledSetAmount(e.target.value);
-          }}
+          onChange={handleAmountChange}
+          value={amount}
           disabled={isQuoteLoading}
         />
         {liquidityError && (
@@ -107,7 +147,12 @@ export function Swap({ className }: { className?: string }) {
             {liquidityError?.message}
           </div>
         )}
-        <div className="text-[30px] mx-auto my-[10px]">↕️</div>
+        <div 
+          className="text-[30px] mx-auto my-[10px] cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={handleSwapTokens}
+        >
+          ↕️
+        </div>
         <Input
           value={targetAmount ? targetAmount.split(" ")[0] : "0.00"}
           tokens={dropdownOptions}
@@ -124,15 +169,17 @@ export function Swap({ className }: { className?: string }) {
           </div>
         )}
         <Button
-          onClick={swap}
+          onClick={handleSwap}
           className="mt-[30px]"
-          disabled={!user || isQuoteLoading || !amount || !quote}
+          disabled={!user || isQuoteLoading || !amount || !quote || isSwapLoading}
         >
           {user
             ? !amount
               ? "Enter an amount"
               : isQuoteLoading
               ? "Fetching quotes 1 of 2"
+              : isSwapLoading
+              ? "Swapping..."
               : "Swap tokens"
             : "Connect wallet"}
         </Button>
@@ -141,6 +188,14 @@ export function Swap({ className }: { className?: string }) {
         isOpen={slippageModalOpened}
         onClose={() => setSlippageModalOpened(false)}
         onSlippageChange={(slippage) => setSlippage(parseFloat(slippage))}
+      />
+      <SuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={handleSuccessModalClose}
+        fromAmount={amount || "0"}
+        toAmount={targetAmount?.split(" ")[0] || "0"}
+        fromToken={fromToken}
+        toToken={toToken}
       />
     </>
   );

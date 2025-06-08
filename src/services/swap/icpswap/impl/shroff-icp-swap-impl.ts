@@ -38,7 +38,6 @@ import { actorBuilder } from "../../../actors";
 import { hasOwnProperty } from "../../../utils";
 import { exchangeRateService } from "../../../exchange/exchange-rate";
 import { Account, SubAccount } from "@dfinity/ledger-icp";
-import { TREASURY_CANISTER_ID } from "../../../../constants";
 import { ContactSupportError } from "../../errors/types/contact-support-error";
 
 export class ShroffIcpSwapImpl extends ShroffAbstract {
@@ -152,23 +151,23 @@ export class ShroffIcpSwapImpl extends ShroffAbstract {
     if (!this.requestedQuote) {
       throw new Error("Request quote first");
     }
-    const icrc2supported = await this.icrc2supported();
+    // const icrc2supported = await this.icrc2supported();
 
     let icrcTransferId;
 
-    if (icrc2supported) {
-      // TODO ask Oleksii about root canister
-      const kong = "2ipq2-uqaaa-aaaar-qailq-cai"
-      await this.icrc2approve(kong);
-      console.log("ICRC2 approve response", JSON.stringify(icrcTransferId));
-    } else {
+    // if (icrc2supported) {
+    //   // TODO ask Oleksii about root canister
+    //   const kong = "2ipq2-uqaaa-aaaar-qailq-cai"
+    //   await this.icrc2approve(kong);
+    //   console.log("ICRC2 approve response", JSON.stringify(icrcTransferId));
+    // } else {
       try {
         await this.transferToSwap(await this.getAuthenticatedAgent());
         console.log("ICRC21 transfer response", JSON.stringify(icrcTransferId));
       } catch (e) {
         throw new ContactSupportError("Deposit error: " + e);
       }
-    }
+    // }
 
     console.debug("Transfer to swap done");
     await this.deposit();
@@ -177,7 +176,7 @@ export class ShroffIcpSwapImpl extends ShroffAbstract {
     console.debug("Swap done");
     await this.withdraw();
     console.debug("Withdraw done");
-    await this.transferFromSwap(TREASURY_CANISTER_ID);
+    // await this.transferFromSwap(TREASURY_CANISTER_ID);
     console.debug("Transfer to NFID done");
   }
 
@@ -352,7 +351,6 @@ export class IcpSwapShroffBuilder {
   }
 
   public async build(agent: DfinityAgent, principal: string): Promise<Shroff> {
-    debugger;
     if (!this.source) {
       throw new Error("Source is required");
     }
