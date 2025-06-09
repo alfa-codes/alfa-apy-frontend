@@ -1,12 +1,12 @@
 import { ICRC1 } from "../../idl/icrc1_oracle";
-import { StrategyResponse } from "../../idl/vault";
+import { Strategy } from "../../services";
 
 export function getTokenLogo(symbol: string, tokens: ICRC1[]) {
   return tokens.find((token) => token.symbol === symbol)?.logo?.[0] ?? "";
 }
 
 export function getStrategyTokenLogos(
-  strategy: StrategyResponse,
+  strategy: Strategy,
   tokens: ICRC1[]
 ) {
   const tokenNames = strategy.pools
@@ -20,10 +20,10 @@ export function getStrategyTokenLogos(
 
 export type ProfitLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'Hot';
 
-export function getProfitLevel(strategy: StrategyResponse): ProfitLevel {
+export function getProfitLevel(strategy: Strategy): ProfitLevel {
   // Example logic: mark id 1 as 'Hot', otherwise use TVL for profit level
   if (strategy.id === 1) return 'Hot';
-  const tvl = Number((strategy.current_pool as unknown as Array<{tvl: string}>)[0]?.tvl || 0);
+  const tvl = Number((strategy.tvl));
   if (tvl > 1000000) return 'LOW';
   if (tvl > 100000) return 'MEDIUM';
   return 'HIGH';

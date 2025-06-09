@@ -3,30 +3,28 @@ import { useStrategies } from "../../hooks/strategies";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { Button, Card, Input } from "../ui";
 import { useTokens } from "../../hooks";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Strategy } from "./strategy";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
+import { fetchUserStrategies } from "../../store";
 
 interface PlatformStats {
   totalTvl: bigint;
   avgApy: bigint;
   totalStrategies: number;
   deposited: number;
-  monthlyYield: number;
-  dailyYield: number;
+  totalUsers: number;
 }
 
 export function Strategies() {
   const { user } = useAuth();
-  const {
-    strategies,
-    balances,
-    filterStrategies,
-  } = useStrategies(user?.principal.toString());
+  const { strategies, balances, filterStrategies } = useStrategies(
+    user?.principal.toString()
+  );
   const { tokens } = useTokens();
   const [selectedStrategy, setSelectedStrategy] = useState<
     number | undefined
@@ -34,24 +32,23 @@ export function Strategies() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserStrategies, setShowUserStrategies] = useState(false);
 
-  // useEffect(() => {
-  //   if (user) fetchUserStrategies(user.principal);
-  // }, [showUserStrategies, user, fetchUserStrategies]);
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
+    //TODO hui poimi chto
     (acc, strategy) => {
-      const currentPool = strategy.current_pool[0];
+      const currentPool = strategy.currentPool;
       if (currentPool) {
-        const tvl = strategy.tvl;
-        const apy = strategy.apy;
         return {
           ...acc,
-          totalTvl: acc.totalTvl + tvl,
-          avgApy: acc.avgApy + apy,
-          deposited: 0, // These would come from actual user data
-          monthlyYield: 0,
-          dailyYield: 0,
+          totalTvl: acc.totalTvl + strategy.tvl,
+          avgApy: (acc.avgApy + strategy.apy) / BigInt(strategies?.length || 1),
+          deposited: strategy.initialDeposit.reduce(
+            (acc, [, value]) =>
+              acc + Number(value) / 10 ** strategy.pools[0].token0.decimals * (strategy.pools[0].price0 ?? 0),
+            0
+          ), // These would come from actual user data
+          totalUsers: acc.totalUsers + strategy.userShares.length,
         };
       }
       return acc;
@@ -61,8 +58,7 @@ export function Strategies() {
       avgApy: 0n,
       totalStrategies: strategies?.length || 0,
       deposited: 0,
-      monthlyYield: 0,
-      dailyYield: 0,
+      totalUsers: 0,
     }
   );
 
@@ -97,7 +93,7 @@ export function Strategies() {
   }
 
   const filteredStrategies = filterStrategies(searchTerm);
-  const filteredUserStrategies =  filteredStrategies;
+  const filteredUserStrategies = filteredStrategies;
 
   return (
     <motion.div
@@ -121,19 +117,19 @@ export function Strategies() {
             <div>
               <h3 className="text-gray-600 text-sm">DEPOSITED</h3>
               <p className="text-2xl font-bold">
-                ${platformStats?.deposited.toLocaleString() ?? "0"}
+                ${(platformStats?.deposited ?? 0 / 10 ** 8).toFixed(2) ?? "0"}
               </p>
             </div>
             <div>
               <h3 className="text-gray-600 text-sm">TOTAL USERS</h3>
               <p className="text-2xl font-bold">
-                ${platformStats?.monthlyYield.toLocaleString() ?? "0"}
+                {platformStats?.totalUsers.toLocaleString() ?? "0"}
               </p>
             </div>
             <div>
               <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
               <p className="text-2xl font-bold">
-                {Number(platformStats?.avgApy ?? 0) / 100}%
+                {Number(platformStats?.avgApy ?? 0)}%
               </p>
             </div>
             <div>
@@ -214,7 +210,7 @@ export function Strategies() {
           : filteredStrategies
         )?.map((s) => {
           const logos = getStrategyTokenLogos(s, tokens);
-          const currentPool = s.current_pool[0]
+          const currentPool = s.currentPool;
           const isDisabled = !currentPool;
 
           return (
@@ -250,9 +246,7 @@ export function Strategies() {
 
                 <div className="text-right">
                   <p className="text-sm text-gray-600">TVL</p>
-                  <p className="text-lg font-medium">
-                    ${s.tvl.toString()}
-                  </p>
+                  <p className="text-lg font-medium">${s.tvl.toString()}</p>
                 </div>
               </div>
 
@@ -260,8 +254,7 @@ export function Strategies() {
               <div className="flex justify-center items-center gap-20 mt-6 pt-6 border-t border-amber-600/20">
                 <div className="flex items-baseline gap-2">
                   <span className="gradient-text text-[30px] font-bold">
-                    {Number(s.apy) / 100}
-                    %
+                    {Number(s.apy) / 100}%
                   </span>
                   <span className="text-gray-600">APY</span>
                 </div>
@@ -296,17 +289,15 @@ export function Strategies() {
                 <div>
                   {/* TODO: Fix this */}
                   <span className="text-gray-600 block">Deposit Token:</span>
-                  <p className="font-medium">
-                    {s.pools[0]?.token0.symbol} 
-                  </p>
+                  <p className="font-medium">{s.pools[0]?.token0.symbol}</p>
                 </div>
                 {user && (
                   <>
                     <div>
                       <span className="text-gray-600 block">Deposited:</span>
                       <p className="font-medium">
-                        $
-                        {/* {balances?.[s.id]?.usd_balance?.toLocaleString() ?? "0"} */}
+                        {balances?.[s.id]?.initial_deposit?.toLocaleString() ??
+                          "0"}
                         "N/A"
                       </p>
                     </div>
@@ -316,9 +307,9 @@ export function Strategies() {
                       </span>
                       <p className="font-medium">
                         $
-                        {/* {balances?.[s.id]?.usd_balance
-                          ? (balances[s.id].usd_balance * 0.001).toFixed(2)
-                          : "0.00"} */}
+                        {balances?.[s.id]?.user_shares
+                          ? (balances[s.id].user_shares * 0.001).toFixed(2)
+                          : "0.00"}
                         "N/A"
                       </p>
                     </div>

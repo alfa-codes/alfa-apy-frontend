@@ -53,8 +53,8 @@ export function Strategy({
   const { tokens } = useTokens();
   const logos = tokens ? getStrategyTokenLogos(value, tokens) : [];
   const { resetPools } = usePools(value.pools.map((p) => p.token0.symbol));
-  const currentPool = value.current_pool[0];
-  const tokenAddress = currentPool?.token0.ledger.toText();
+  const currentPool = value.pools.find((p) => p.id === value.currentPool);
+  const tokenAddress = currentPool?.token0.ledger;
   const token = tokens.length
     ? tokens.find((t) => t.ledger === tokenAddress)!
     : undefined;
@@ -84,8 +84,6 @@ export function Strategy({
 
   const amountToWithdraw = balance ? BigNumber(balance.initial_deposit).toString() : "0";
   const shares = balance?.user_shares ?? 0;
-
-  // debugger;
 
   // Calculate APY breakdown
   const apyBreakdown: APYBreakdown = {
@@ -271,20 +269,26 @@ export function Strategy({
                       onClick={() => {
                         setDepositOpen(true);
                       }}
-                      onDeposit={(amount) => {
-                        deposit({
-                          amount: BigInt(
-                            BigNumber(amount)
-                              .multipliedBy(Math.pow(10, token!.decimals))
-                              .toString()
-                          ),
-                          strategyId: value.id,
-                          ledger: tokenAddress as string,
-                          principal: user!.principal,
-                          agent: agent!,
-                        }).catch((e) => {
-                          alert(e.message);
-                        });
+                      onDeposit={async (amount) => {
+                        try {
+                          await deposit({
+                            amount: BigInt(
+                              BigNumber(amount)
+                                .multipliedBy(Math.pow(10, token!.decimals))
+                                .toString()
+                            ),
+                            strategyId: value.id,
+                            ledger: tokenAddress as string,
+                            principal: user!.principal,
+                            agent: agent!,
+                          });
+                        } catch (e: unknown) {
+                          if (e instanceof Error) {
+                            alert(e.message);
+                          } else {
+                            alert('An unknown error occurred');
+                          }
+                        }
                       }}
                       balance={tokenBalance?.balance ?? "0"}
                       tokenSymbol={token?.symbol ?? ""}
@@ -298,16 +302,22 @@ export function Strategy({
                       onClick={() => {
                         setWithdrawOpen(true);
                       }}
-                      onWithdraw={(percent) => {
-                        withdraw({
-                          amount: (BigInt(shares) * BigInt(percent)) / BigInt(100),
-                          strategyId: value.id,
-                          ledger: tokenAddress as string,
-                          principal: user!.principal,
-                          agent: agent!,
-                        }).catch((e) => {
-                          alert(e.message);
-                        });
+                      onWithdraw={async (percent) => {
+                        try {
+                          await withdraw({
+                            amount: (BigInt(shares) * BigInt(percent)) / BigInt(100),
+                            strategyId: value.id,
+                            ledger: tokenAddress as string,
+                            principal: user!.principal,
+                            agent: agent!,
+                          });
+                        } catch (e: unknown) {
+                          if (e instanceof Error) {
+                            alert(e.message);
+                          } else {
+                            alert('An unknown error occurred');
+                          }
+                        }
                       }}
                       available={amountToWithdraw}
                       tokenSymbol={token?.symbol ?? ""}
@@ -341,17 +351,17 @@ export function Strategy({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div>
               <p className="text-gray-600">Users in Pool</p>
-              <p className="text-lg font-medium">{value.user_shares.length}</p>
+              <p className="text-lg font-medium">{value.userShares.length}</p>
             </div>
             <div>
               <p className="text-gray-600">Last Deposit</p>
-              {value.initial_deposit.length > 0 ? (
+              {value.initialDeposit.length > 0 ? (
                 <p className="text-lg font-medium">
-                  {value.initial_deposit[
-                    value.initial_deposit.length - 1
+                  {value.initialDeposit[
+                    value.initialDeposit.length - 1
                   ][1].toString()}{" "}
                   by{" "}
-                  {value.initial_deposit[value.initial_deposit.length - 1][0]
+                  {value.initialDeposit[value.initialDeposit.length - 1][0]
                     .toString()
                     .slice(0, 8)}
                   ...

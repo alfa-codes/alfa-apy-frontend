@@ -4,7 +4,7 @@ import { RootState } from "../store";
 import { Principal } from "@dfinity/principal";
 import { Agent } from "@dfinity/agent";
 import { poolStatsService } from "../../services";
-import { PoolByTokens, PoolMetrics } from "../../idl/pool_stats";
+import { PoolMetrics } from "../../idl/pool_stats";
 import { userService } from "../../services/strategies/user-service";
 
 export const fetchPools = createAsyncThunk(
@@ -87,7 +87,7 @@ const strategySlice = createSlice({
     fetchPools: {
       status: Status;
       error?: string;
-      pools: [PoolByTokens, PoolMetrics][];
+      pools: [string, PoolMetrics][];
     };
     deposit: {
       status: Status;

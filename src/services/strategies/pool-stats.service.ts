@@ -1,7 +1,6 @@
 import {
   _SERVICE,
   Pool,
-  PoolByTokens,
   PoolMetrics,
 } from "../../idl/pool_stats";
 import { idlFactory } from "../../idl/pool_stats_idl";
@@ -16,19 +15,18 @@ export class PoolStatsService {
     return await anonymousActor.get_pools();
   }
 
-  public async get_all_pool_metrics(): Promise<Array<[PoolByTokens, PoolMetrics]>> {
+  public async get_all_pool_metrics(): Promise<Array<[string, PoolMetrics]>> {
     const pools = await this.get_pools();
-    const poolMetrics = await this.get_pool_metrics(pools.map((p) => ({
-      provider: p.provider,
-      token0: p.token0,
-      token1: p.token1,
-    })));
+
+    const poolMetrics = await this.get_pool_metrics(pools.map((p) => p.id));
     return poolMetrics;
   }
 
+
+  //TODO: add_type_pool_id
   public async get_pool_metrics(
-    metricsRequest: Array<PoolByTokens>
-  ): Promise<Array<[PoolByTokens, PoolMetrics]>> {
+    metricsRequest: Array<string>
+  ): Promise<Array<[string, PoolMetrics]>> {
     const anonymousActor = await getAnonActor<_SERVICE>(
       POOL_STATS_CANISTER_ID,
       idlFactory

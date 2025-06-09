@@ -26,7 +26,7 @@ export const useDashboard = () => {
     {
       id: '2',
       name: 'ICP Staking',
-      tvl: 300000,
+      tvl: 3000,
       apy: 18.5,
       risk: 'low',
       description: 'Stake ICP to earn native rewards',

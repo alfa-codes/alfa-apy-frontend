@@ -15,7 +15,7 @@ export function useStrategies(user?: string) {
 
   const {
     strategies: { data, status },
-    // userStrategies: { data: userStrategies },
+    userStrategies: { data: userStrategies },
     balances: { data: balances, status: balancesStatus },
     service,
   } = useSelector((state) => state.strategies);
@@ -53,18 +53,15 @@ export function useStrategies(user?: string) {
             p.token0.symbol.toLowerCase().includes(filter.toLowerCase())
           )
       ),
-    // filterUserStrategies: (filter: string) =>
-    //   userStrategies?.filter(
-    //     (s) =>
-    //       s.name.toLowerCase().includes(filter.toLowerCase()) ||
-    //       s.description.toLowerCase().includes(filter.toLowerCase()) ||
-    //       s.pools.some((p) =>
-    //         p.token0.symbol.toLowerCase().includes(filter.toLowerCase())
-    //       )
-    //   ),
-    // fetchUserStrategies: (user: Principal) => {
-    //   if (!userStrategies) dispatch(fetchUserStrategies(user));
-    // },
-    // userStrategies,
+    filterUserStrategies: (filter: string) =>
+      userStrategies?.filter(
+        (s) =>
+          s.name.toLowerCase().includes(filter.toLowerCase()) ||
+          s.description.toLowerCase().includes(filter.toLowerCase()) ||
+          s.pools.some((p) =>
+            p.token0.symbol.toLowerCase().includes(filter.toLowerCase())
+          )
+      ),
+    userStrategies,
   };
 }

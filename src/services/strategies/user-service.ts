@@ -30,7 +30,7 @@ export class UserService {
     });
   }
 
-  //todo accept identity-kit actor
+  //todo naming
   public async accept_investment(
     strategy_id: number,
     ledger: string,

@@ -67,6 +67,7 @@ export class ICRC1OracleService {
     }
   }
 
+  //TODO add cache
   async requestNetworkForCanisters(): Promise<ICRC1[]> {
     const cacheKey = 'requestNetworkForCanisters';
     const cached = await integrationCache.getItem<ICRC1[]>(cacheKey);
