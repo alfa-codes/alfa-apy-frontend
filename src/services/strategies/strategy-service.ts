@@ -5,6 +5,7 @@ import {
   UserStrategyResponse,
   DepositResponse,
   WithdrawResponse,
+  Pool,
 } from "../../idl/vault";
 import {
   Agent as DfinityAgent,
@@ -20,12 +21,12 @@ import { poolStatsService } from "./pool-stats.service";
 import { VAULT_CANISTER_ID } from "../../constants";
 
 export interface Strategy extends StrategyResponse {
-  apy: number;
-  tvl: number;
+  apy: bigint;
+  tvl: bigint;
 }
 
 export class StrategiesService {
-  public async get_strategies(): Promise<Array<StrategyResponse>> {
+  public async get_strategies(): Promise<Array<Strategy>> {
     const anonymousActor = await getAnonActor<VaultType>(
       VAULT_CANISTER_ID,
       idlFactory
@@ -33,7 +34,7 @@ export class StrategiesService {
     const strategies = await anonymousActor.get_strategies()
       .then((strategies) => strategies.filter((strategy) => strategy.current_pool.length > 0));
 
-    const poolMetricsArgs = await Promise.all(
+    const poolMetricsArgs :  PoolByTokens[] = await Promise.all(
       strategies.flatMap((strategy) =>
         strategy.pools.map((pool) => {
           return {
@@ -44,18 +45,26 @@ export class StrategiesService {
         })
       )
     );
-    console.log("poolMetricsArgs", poolMetricsArgs);
 
     const poolStats: [PoolByTokens, PoolMetrics][] = await poolStatsService.get_pool_metrics(poolMetricsArgs);
+
     console.log("poolStats", poolStats);
 
     return strategies.map((strategy) => ({
       ...strategy,
       apy:
+      //TODO: Fix this
+        // poolStats.find((pool) => {
+        //   const currentPool = strategy.current_pool[0]!;
+        //   return currentPool.token0.symbol === pool[0].token0.symbol && currentPool.token1.symbol === pool[0].token1.symbol;
+        // })?.[1].apy ??
+         12n,
+        tvl:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;
-          return currentPool.provider === pool[0].provider && currentPool.token0.symbol === pool[0].token0.symbol && currentPool.token1.symbol === pool[0].token1.symbol;
-        })?.[1].apy ?? 0,
+          return currentPool.token0.symbol === pool[0].token0.symbol && currentPool.token1.symbol === pool[0].token1.symbol;
+        })?.[1].tvl  ?? 
+        0n,
     }));
   }
 

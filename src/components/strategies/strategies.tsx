@@ -12,8 +12,8 @@ import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
 
 interface PlatformStats {
-  totalTvl: number;
-  avgApy: number;
+  totalTvl: bigint;
+  avgApy: bigint;
   totalStrategies: number;
   deposited: number;
   monthlyYield: number;
@@ -43,8 +43,8 @@ export function Strategies() {
     (acc, strategy) => {
       const currentPool = strategy.current_pool[0];
       if (currentPool) {
-        const tvl = 0;
-        const apy = 0;
+        const tvl = strategy.tvl;
+        const apy = strategy.apy;
         return {
           ...acc,
           totalTvl: acc.totalTvl + tvl,
@@ -57,8 +57,8 @@ export function Strategies() {
       return acc;
     },
     {
-      totalTvl: 0,
-      avgApy: 0,
+      totalTvl: 0n,
+      avgApy: 0n,
       totalStrategies: strategies?.length || 0,
       deposited: 0,
       monthlyYield: 0,
@@ -68,7 +68,7 @@ export function Strategies() {
 
   if (platformStats) {
     platformStats.avgApy =
-      platformStats.avgApy / (strategies?.length || 1) / 100;
+      platformStats.avgApy / BigInt(strategies?.length || 1) / 100n;
   }
 
   if (!strategies || !tokens.length) {
@@ -133,7 +133,7 @@ export function Strategies() {
             <div>
               <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
               <p className="text-2xl font-bold">
-                {(platformStats?.avgApy ?? 0).toFixed(2)}%
+                {Number(platformStats?.avgApy ?? 0) / 100}%
               </p>
             </div>
             <div>
@@ -251,7 +251,7 @@ export function Strategies() {
                 <div className="text-right">
                   <p className="text-sm text-gray-600">TVL</p>
                   <p className="text-lg font-medium">
-                    ${"0"}
+                    ${s.tvl.toString()}
                   </p>
                 </div>
               </div>
@@ -260,7 +260,7 @@ export function Strategies() {
               <div className="flex justify-center items-center gap-20 mt-6 pt-6 border-t border-amber-600/20">
                 <div className="flex items-baseline gap-2">
                   <span className="gradient-text text-[30px] font-bold">
-                    {"0.00"}
+                    {Number(s.apy) / 100}
                     %
                   </span>
                   <span className="text-gray-600">APY</span>
@@ -289,18 +289,15 @@ export function Strategies() {
                 <div>
                   <span className="text-gray-600 block">Platform:</span>
                   <p className="font-medium">
-                    {Array.from(
-                      new Set(s.pools.map((p) => p.provider).filter(Boolean))
-                    ).join(", ") ||
-                      (s.name.toLowerCase().includes("kong")
-                        ? "KongSwap"
-                        : "IcpSwap")}
+                    {/* TODO: Fix this */}
+                    {Array.from(["KongSwap", "IcpSwap"]).join(", ")}
                   </p>
                 </div>
                 <div>
+                  {/* TODO: Fix this */}
                   <span className="text-gray-600 block">Deposit Token:</span>
                   <p className="font-medium">
-                    {"N/A"}
+                    {s.pools[0]?.token0.symbol} 
                   </p>
                 </div>
                 {user && (
