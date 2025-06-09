@@ -11,15 +11,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'KongSwap' : IDL.Null,
     'ICPSwap' : IDL.Null,
   });
-  const TokenInfo = IDL.Record({
-    'ledger' : IDL.Principal,
-    'symbol' : IDL.Text,
-  });
-  const PoolByTokens = IDL.Record({
-    'provider' : ExchangeId,
-    'token0' : TokenInfo,
-    'token1' : TokenInfo,
-  });
   const PoolData = IDL.Record({ 'tvl' : IDL.Nat });
   const PositionData = IDL.Record({
     'id' : IDL.Nat,
@@ -42,9 +33,14 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   const Pool = IDL.Record({
     'id' : IDL.Text,
     'provider' : ExchangeId,
-    'token0' : TokenInfo,
-    'token1' : TokenInfo,
-    'position' : IDL.Opt(Position),
+    'initial_position' : IDL.Opt(Position),
+    'token0' : IDL.Principal,
+    'token1' : IDL.Principal,
+  });
+  const PoolByTokens = IDL.Record({
+    'provider' : ExchangeId,
+    'token0' : IDL.Principal,
+    'token1' : IDL.Principal,
   });
   const ApyValue = IDL.Record({ 'tokens_apy' : IDL.Nat, 'usd_apy' : IDL.Nat });
   const PoolApy = IDL.Record({
@@ -70,24 +66,31 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   });
   return IDL.Service({
     'add_liquidity_to_pool' : IDL.Func([IDL.Text, IDL.Nat], [Result], []),
-    'add_pool' : IDL.Func([PoolByTokens], [], []),
+    'add_pool' : IDL.Func(
+        [IDL.Principal, IDL.Principal, ExchangeId],
+        [IDL.Text],
+        [],
+      ),
     'add_pool_snapshot' : IDL.Func([PoolSnapshotArgs], [], []),
-    'delete_pool' : IDL.Func([PoolByTokens], [], []),
+    'delete_all_pools_and_snapshots' : IDL.Func([], [IDL.Bool], []),
+    'delete_pool' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'delete_pool_snapshot' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'delete_pool_snapshots' : IDL.Func([IDL.Text], [], []),
+    'get_pool_by_id' : IDL.Func([IDL.Text], [IDL.Opt(Pool)], []),
     'get_pool_by_tokens' : IDL.Func([PoolByTokens], [IDL.Opt(Pool)], []),
     'get_pool_metrics' : IDL.Func(
-        [IDL.Vec(PoolByTokens)],
-        [IDL.Vec(IDL.Tuple(PoolByTokens, PoolMetrics))],
+        [IDL.Vec(IDL.Text)],
+        [IDL.Vec(IDL.Tuple(IDL.Text, PoolMetrics))],
         [],
       ),
     'get_pools' : IDL.Func([], [IDL.Vec(Pool)], []),
     'get_pools_snapshots' : IDL.Func(
-        [IDL.Vec(PoolByTokens)],
-        [IDL.Vec(IDL.Tuple(PoolByTokens, IDL.Vec(PoolSnapshot)))],
+        [IDL.Vec(IDL.Text)],
+        [IDL.Vec(IDL.Tuple(IDL.Text, IDL.Vec(PoolSnapshot)))],
         [],
       ),
     'remove_liquidity_from_pool' : IDL.Func([IDL.Text], [Result_1], []),
     'set_operator' : IDL.Func([IDL.Principal], [], []),
+    'update_pool_ids' : IDL.Func([], [IDL.Bool], []),
   });
 };
