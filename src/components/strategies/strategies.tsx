@@ -1,16 +1,15 @@
 import colors from "tailwindcss/colors";
-import { useStrategies } from "../../hooks/strategies";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { Button, Card, Input } from "../ui";
 import { useTokens } from "../../hooks";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Strategy } from "./strategy";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
-import { fetchUserStrategies } from "../../store";
+import { useStrategies } from "../../hooks/strategies";
 
 interface PlatformStats {
   totalTvl: bigint;
@@ -22,16 +21,11 @@ interface PlatformStats {
 
 export function Strategies() {
   const { user } = useAuth();
-  const { strategies, balances, filterStrategies } = useStrategies(
-    user?.principal.toString()
-  );
+  const { strategies, balances } = useStrategies(user?.principal.toString());
   const { tokens } = useTokens();
-  const [selectedStrategy, setSelectedStrategy] = useState<
-    number | undefined
-  >();
+  const [selectedStrategy, setSelectedStrategy] = useState<number | undefined>();
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserStrategies, setShowUserStrategies] = useState(false);
-
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
@@ -92,8 +86,17 @@ export function Strategies() {
     );
   }
 
-  const filteredStrategies = filterStrategies(searchTerm);
-  const filteredUserStrategies = filteredStrategies;
+  const filteredStrategies = strategies?.filter(strategy => 
+    strategy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    strategy.pools[0].token0.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    strategy.pools[0].token1.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredUserStrategies = showUserStrategies 
+    ? strategies?.filter(strategy => 
+        strategy.userShares.some(([principal]) => principal.toString() === user?.principal.toString())
+      )
+    : filteredStrategies;
 
   return (
     <motion.div
@@ -180,15 +183,14 @@ export function Strategies() {
       {/* Search and Filters */}
       <div className="flex flex-col items-center md:items-end md:flex-row justify-between justify-end md:justify-between mb-[10px]">
         <div className="flex items-center mb-[20px] md:mb-0 gap-4">
-          {(user ? ["All", "My strategies"] : ([] as const)).map((p, i) => (
+          {(user ? ["All", "My strategies"] : ([] as const)).map((p) => (
             <Button
               key={p}
               onClick={() => {
-                if (p === "My strategies") setShowUserStrategies(true);
-                else setShowUserStrategies(false);
+                setShowUserStrategies(p === "My strategies");
               }}
               className="!h-[24px] !min-w-[40px] !px-2 text-xs"
-              bg={!i ? "#fbbf24" : "#fef3c7"}
+              bg={p === "My strategies" ? (showUserStrategies ? "#fbbf24" : "#fef3c7") : (showUserStrategies ? "#fef3c7" : "#fbbf24")}
             >
               {p}
             </Button>
