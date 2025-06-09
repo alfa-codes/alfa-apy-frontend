@@ -7,9 +7,13 @@ import {
   useDispatch,
   useSelector,
   withdraw,
+  fetchStrategies
 } from "../store";
 import { useStrategies } from "./strategies";
 import toaster from "../components/ui/toast";
+import { useBalances } from "./balances";
+import { useTokens } from "./tokens";
+import { ICRC1 } from "../idl/icrc1_oracle";
 
 export function usePools(pools_symbols: string[]) {
   const dispatch = useDispatch();
@@ -31,6 +35,8 @@ export function usePools(pools_symbols: string[]) {
 
 export function useDeposit() {
   const dispatch = useDispatch();
+  const { refetchBalanceByCanister } = useBalances();
+  const { tokens } = useTokens();
 
   const {
     deposit: { status, error },
@@ -39,13 +45,17 @@ export function useDeposit() {
   useEffect(() => {
     if (status === Status.SUCCEEDED) {
       toaster.success("Successfully deposited");
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      dispatch(fetchStrategies());
+      // Update token balances
+      if (tokens?.length) {
+        tokens.forEach((token: ICRC1) => {
+          refetchBalanceByCanister(token);
+        });
+      }
     } else if (status === Status.FAILED && error) {
       toaster.error(error);
     }
-  }, [status, error]);
+  }, [status, error, dispatch, tokens, refetchBalanceByCanister]);
 
   return {
     deposit: (...params: Parameters<typeof deposit>) =>
@@ -57,6 +67,8 @@ export function useDeposit() {
 
 export function useWithdraw() {
   const dispatch = useDispatch();
+  const { refetchBalanceByCanister } = useBalances();
+  const { tokens } = useTokens();
 
   const {
     withdraw: { status, error },
@@ -65,13 +77,17 @@ export function useWithdraw() {
   useEffect(() => {
     if (status === Status.SUCCEEDED) {
       toaster.success("Successfully withdrawed");
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      dispatch(fetchStrategies());
+      // Update token balances
+      if (tokens?.length) {
+        tokens.forEach((token: ICRC1) => {
+          refetchBalanceByCanister(token);
+        });
+      }
     } else if (status === Status.FAILED && error) {
       toaster.error(error);
     }
-  }, [status, error]);
+  }, [status, error, dispatch, tokens, refetchBalanceByCanister]);
 
   return {
     withdraw: (...params: Parameters<typeof deposit>) =>

@@ -33,7 +33,7 @@ interface APYBreakdown {
 export function Strategy({
   value,
   onBack,
-  balance,
+  // balance,
 }: {
   value: StrategyResponse;
   onBack: () => unknown;
@@ -82,8 +82,8 @@ export function Strategy({
   //       .toFixed(token!.decimals)
   //   : "0";
 
-  const amountToWithdraw = balance ? BigNumber(balance.initial_deposit).toString() : "0";
-  const shares = balance?.user_shares ?? 0;
+  const amountToWithdraw =  "0";
+  // const shares = balance?.user_shares ?? 0;
 
   // Calculate APY breakdown
   const apyBreakdown: APYBreakdown = {
@@ -305,7 +305,7 @@ export function Strategy({
                       onWithdraw={async (percent) => {
                         try {
                           await withdraw({
-                            amount: (BigInt(shares) * BigInt(percent)) / BigInt(100),
+                            amount: BigInt(percent),
                             strategyId: value.id,
                             ledger: tokenAddress as string,
                             principal: user!.principal,

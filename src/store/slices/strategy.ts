@@ -6,6 +6,8 @@ import { Agent } from "@dfinity/agent";
 import { poolStatsService } from "../../services";
 import { PoolMetrics } from "../../idl/pool_stats";
 import { userService } from "../../services/strategies/user-service";
+import { fetchStrategies } from "./strategies";
+import { fetchStrategiesBalances } from "./strategies";
 
 export const fetchPools = createAsyncThunk(
   "strategy/fetchPools",
@@ -22,6 +24,7 @@ export const deposit = createAsyncThunk(
       amount,
       strategyId,
       ledger,
+      principal,
       agent,
     }: {
       amount: bigint;
@@ -30,17 +33,21 @@ export const deposit = createAsyncThunk(
       principal: Principal;
       agent: Agent;
     },
-    { getState, rejectWithValue }
+    { getState, rejectWithValue, dispatch }
   ) => {
     const strategiesService = (getState() as RootState).strategies.service.data;
     if (!strategiesService)
       return rejectWithValue("Strategies service not inited");
-    return await userService.accept_investment(
+    const result = await userService.accept_investment(
       strategyId,
       ledger,
       amount,
       agent
     );
+    // After successful deposit, fetch updated data
+    dispatch(fetchStrategies());
+    dispatch(fetchStrategiesBalances({ principal }));
+    return result;
   }
 );
 
@@ -51,6 +58,7 @@ export const withdraw = createAsyncThunk(
       amount,
       strategyId,
       ledger,
+      principal,
       agent,
     }: {
       amount: bigint;
@@ -59,12 +67,16 @@ export const withdraw = createAsyncThunk(
       principal: Principal;
       agent: Agent;
     },
-    { getState, rejectWithValue }
+    { getState, rejectWithValue, dispatch }
   ) => {
     const strategiesService = (getState() as RootState).strategies.service.data;
     if (!strategiesService)
       return rejectWithValue("Strategies service not inited");
-    return await userService.withdraw(strategyId, ledger, amount, agent);
+    const result = await userService.withdraw(strategyId, ledger, amount, agent);
+    // After successful withdraw, fetch updated data
+    dispatch(fetchStrategies());
+    dispatch(fetchStrategiesBalances({ principal }));
+    return result;
   }
 );
 

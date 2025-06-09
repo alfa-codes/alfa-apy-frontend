@@ -26,7 +26,7 @@ export class UserService {
     return actor.withdraw({
       strategy_id,
       ledger: Principal.fromText(ledger),
-      amount,
+      amount: BigInt(amount),
     });
   }
 
@@ -42,7 +42,7 @@ export class UserService {
       agent,
       ledger_idl
     );
-    await checkAndApproveTokens(amount, ledgerActor);
+    await checkAndApproveTokens(BigInt(amount), ledgerActor);
     const actor = await getTypedActor<VaultType>(
       alfaACanister,
       agent,
@@ -51,7 +51,7 @@ export class UserService {
     return actor.accept_investment({
       strategy_id,
       ledger: Principal.fromText(ledger),
-      amount,
+      amount: BigInt(amount),
     });
   }
 }

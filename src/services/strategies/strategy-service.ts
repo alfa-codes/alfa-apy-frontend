@@ -123,9 +123,8 @@ export class StrategiesService {
   public async getUserStrategies(
     user: Principal
   ): Promise<Array<Strategy>> {
-    const userStrategies = await this.getStrategies()
-    .then((strategies) => strategies.filter((strategy) => strategy.userShares.some(([principal]) => principal.toString() === user.toString())));
-    return userStrategies;
+    const userStrategies = await this.getStrategies();
+    return userStrategies.filter((strategy) => strategy.userShares.some(([principal]) => principal.toString() === user.toString()));
   }
 }
 

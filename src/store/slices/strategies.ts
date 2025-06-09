@@ -9,14 +9,14 @@ import { Agent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 
 // Mock data for user balances
-// const MOCK_USER_BALANCES = {
-//   1: {
-//     strategy_id: 1,
-//     user_shares: 100,
-//     total_shares: 1000,
-//     initial_deposit: 1000,
-//   },
-// }
+const MOCK_USER_BALANCES = {
+  1: {
+    strategy_id: 1,
+    user_shares: 100,
+    total_shares: 1000,
+    initial_deposit: 10,
+  },
+}
 
 export const fetchStrategies = createAsyncThunk(
   "strategies/fetch",
@@ -51,24 +51,26 @@ export const fetchStrategiesBalances = createAsyncThunk(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
   async (_params: any) => {
     try {
-      const balances = await strategiesService.getUserStrategies(
-        Principal.from(_params.principal)
-      );
+      // const balances = await strategiesService.getUserStrategies(
+      //   Principal.from(_params.principal)
+      // );
 
-      const mappedBalances: Record<number, Strategy> = balances.reduce(
-        (acc, value) => ({
-          ...acc,
-          [value.id]: value,
-        }),
-        {}
-      );
+
+
+      // // const mappedBalances: Record<number, Strategy> = balances.reduce(
+      //   (acc, value) => ({
+      //     ...acc,
+      //     [value.id]: value,
+      //   }),
+      //   {}
+      // );
 
       // debugger;
 
       // Using mock data for now
-      // return MOCK_USER_BALANCES;
+      return MOCK_USER_BALANCES;
 
-      return mappedBalances;
+      // return mappedBalances;
     } catch (e) {
       console.error(e);
     }
@@ -176,10 +178,10 @@ const strategiesSlice = createSlice({
       .addCase(fetchStrategiesBalances.pending, (state) => {
         state.balances.status = Status.LOADING;
       })
-      .addCase(fetchStrategiesBalances.fulfilled, (state, action) => {
-        state.strategies.status = Status.SUCCEEDED;
-        state.balances.data = action.payload;
-      })
+      // .addCase(fetchStrategiesBalances.fulfilled, (state, action) => {
+      //   state.strategies.status = Status.SUCCEEDED;
+      //   state.balances.data = action.payload;
+      // })
       .addCase(fetchStrategiesBalances.rejected, (state, action) => {
         state.strategies.status = Status.FAILED;
         state.balances.error = action.error.message;

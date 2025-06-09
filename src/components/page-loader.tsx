@@ -21,7 +21,7 @@ export function PageLoader({ children }: PropsWithChildren) {
     const timeout = setTimeout(() => {
       clearInterval(interval); // Clear the interval
       setLoadedPercent(100);
-    }, 4000); // Stop after 2 seconds
+    }, 2000); // Stop after 2 seconds
 
     // Cleanup on unmount
     return () => {

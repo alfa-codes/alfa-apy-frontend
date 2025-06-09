@@ -1,9 +1,7 @@
 import { Card } from "../ui";
 import { useAuth } from "@nfid/identitykit/react";
-import { useEffect, useState } from "react";
-import { fetchUserStrategies } from "../../store";
+import { useMemo } from "react";
 import {
-  useDispatch,
   useSelector,
   Status,
 } from "../../store";
@@ -19,65 +17,56 @@ interface UserStatsData {
 
 export function UserStats() {
   const { user } = useAuth();
-  const dispatch = useDispatch();
-  const strategies = useSelector((state) => state.strategies.strategies.data);
+  const strategies = useSelector((state) => state.strategies.strategies.data?.filter((strategy) => strategy.userShares.some(([principal]) => principal.toString() === user?.principal.toString())));
   const balances = useSelector((state) => state.strategies.balances);
   const status = useSelector((state) => state.strategies.strategies.status);
 
-  const [userStats, setUserStats] = useState<UserStatsData>({
-    totalTvl: 0n,
-    avgApy: 0n,
-    avgApyMonth: 0n,
-    totalStrategies: 0,
-    deposited: 0,
-  });
-
-  useEffect(() => {
-    if (user) {
-      dispatch(fetchUserStrategies(user.principal));
+  const userStats = useMemo(() => {
+    if (!strategies || !balances || status !== Status.SUCCEEDED) {
+      return {
+        totalTvl: 0n,
+        avgApy: 0n,
+        avgApyMonth: 0n,
+        totalStrategies: 0,
+        deposited: 0,
+      };
     }
-  }, [user, dispatch]);
 
-  useEffect(() => {
-    if (strategies && balances && status === Status.SUCCEEDED) {
-      const stats = strategies.reduce(
-        (acc: UserStatsData, strategy: Strategy) => {
-          const currentPool = strategy.currentPool;
-          if (currentPool) {
-            return {
-              ...acc,
-              totalTvl: acc.totalTvl + strategy.tvl,
-              avgApy: (acc.avgApy + strategy.apy),
-              avgApyMonth: (acc.avgApyMonth + strategy.apy_month),
-              totalStrategies: acc.totalStrategies + 1,
-              deposited: strategy.initialDeposit.reduce(
-                (acc, [, value]) =>
-                  acc + Number(value) / (10 ** strategy.pools[0].token0.decimals) * (strategy.pools[0].price0 ?? 0),
-                0
-              )
-            };
-          }
-          return acc;
-        },
-        {
-          totalTvl: 0n,
-          avgApy: 0n,
-          avgApyMonth: 0n,
-          totalStrategies: 0,
-          deposited: 0,
+    const stats = strategies.reduce(
+      (acc: UserStatsData, strategy: Strategy) => {
+        const currentPool = strategy.currentPool;
+        if (currentPool) {
+          return {
+            ...acc,
+            totalTvl: acc.totalTvl + strategy.tvl,
+            avgApy: (acc.avgApy + strategy.apy),
+            avgApyMonth: (acc.avgApyMonth + strategy.apy_month),
+            totalStrategies: acc.totalStrategies + 1,
+            deposited: strategy.initialDeposit.reduce(
+              (acc, [, value]) =>
+                acc + Number(value) / (10 ** strategy.pools[0].token0.decimals) * (strategy.pools[0].price0 ?? 0),
+              0
+            )
+          };
         }
-      );
-
-      // Calculate average APY
-      if (stats.totalStrategies > 0) {
-        stats.avgApy = stats.avgApy / BigInt(stats.totalStrategies) / 100n;
-        stats.avgApyMonth = stats.avgApyMonth / BigInt(stats.totalStrategies) / 100n;
+        return acc;
+      },
+      {
+        totalTvl: 0n,
+        avgApy: 0n,
+        avgApyMonth: 0n,
+        totalStrategies: 0,
+        deposited: 0,
       }
+    );
 
-      console.log("stats", stats);
-
-      setUserStats(stats);
+    // Calculate average APY
+    if (stats.totalStrategies > 0) {
+      stats.avgApy = stats.avgApy / BigInt(stats.totalStrategies) / 100n;
+      stats.avgApyMonth = stats.avgApyMonth / BigInt(stats.totalStrategies) / 100n;
     }
+
+    return stats;
   }, [strategies, balances, status]);
 
   return (
