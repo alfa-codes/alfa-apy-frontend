@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { _SERVICE as VaultType, DepositResponse } from "../../idl/vault.ts";
+import { StrategyDepositResponse, StrategyWithdrawResponse, _SERVICE as VaultType } from "../../idl/vault.ts";
 import { ActorSubclass, Agent as DfinityAgent } from "@dfinity/agent";
 import { idlFactory } from "../../idl/vault_idl.ts";
 import { Principal } from "@dfinity/principal";
 import { _SERVICE as ledgerService, ApproveArgs } from "../../idl/ledger.ts";
 import { idlFactory as ledger_idl } from "../../idl/ledger_idl.ts";
-import { getTypedActor } from "../utils.ts";
+import { getTypedActor, hasOwnProperty } from "../utils.ts";
 
 export const alfaACanister = "ownab-uaaaa-aaaap-qp2na-cai";
 export const poolsDataCanister = "oxawg-7aaaa-aaaag-aub6q-cai";
@@ -16,18 +16,24 @@ export class UserService {
     ledger: string,
     amount: bigint,
     agent: DfinityAgent
-  ) { 
+  ): Promise<StrategyWithdrawResponse> { 
     const actor = await getTypedActor<VaultType>(
       alfaACanister,
       agent,
       idlFactory
     );
 
-    return actor.withdraw({
+    const result = await actor.withdraw({
       strategy_id,
       ledger: Principal.fromText(ledger),
-      amount: BigInt(amount),
+      percentage: BigInt(amount),
     });
+
+    if (hasOwnProperty(result, "Err")) {
+      throw new Error((result.Err as { message: string }).message);
+    }
+
+    return result.Ok;
   }
 
   //todo naming
@@ -36,7 +42,7 @@ export class UserService {
     ledger: string,
     amount: bigint,
     agent: DfinityAgent
-  ): Promise<DepositResponse> {
+  ): Promise<StrategyDepositResponse> {
     const ledgerActor = await getTypedActor<ledgerService>(
       ledger,
       agent,
@@ -48,11 +54,17 @@ export class UserService {
       agent,
       idlFactory
     );
-    return actor.accept_investment({
+    const result = await actor.deposit({
       strategy_id,
       ledger: Principal.fromText(ledger),
       amount: BigInt(amount),
     });
+
+    if (hasOwnProperty(result, "Err")) {
+      throw new Error((result.Err as { message: string }).message);
+    }
+
+    return result.Ok;
   }
 }
 

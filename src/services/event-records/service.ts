@@ -1,22 +1,27 @@
-import { Principal } from "@dfinity/principal";
 import { getAnonActor } from "../utils";
 import { VAULT_CANISTER_ID } from "../../constants";
-import { _SERVICE as VaultType, UserEvent, SystemEvent } from "../../idl/vault";
+import {
+  GetEventRecordsResult,
+  ListItemsPaginationRequest,
+  _SERVICE as VaultType,
+  EventRecord as EventRecordIdl,
+} from "../../idl/vault";
 import { idlFactory } from "../../idl/vault_idl";
+import { eventToEventRecordType } from "./event-type";
 
 export type EventRecordType = "Rebalance" | "Withdrawal" | "Deposit";
 
 export type EventRecord = {
-  id: number;
-  amount: string;
-  date: string;
-  from: string;
-  to: string;
-  type: EventRecordType;
-  token: string;
-  userPrincipal?: Principal;
-  error?: [];
-  fee?: string;
+  id: bigint;
+  // amount: string;
+  // date: string;
+  // from: string;
+  // to: string;
+  type: string;
+  // token: string;
+  // userPrincipal?: Principal;
+  // error?: [];
+  // fee?: string;
 };
 
 export class EventRecordsService {
@@ -32,27 +37,23 @@ export class EventRecordsService {
       VAULT_CANISTER_ID,
       idlFactory
     );
-    const records = await Promise.all([
-      anonymousActor.get_system_events(BigInt(0), BigInt(100)),
-      anonymousActor.get_user_events(
-        Principal.anonymous(),
-        BigInt(0),
-        BigInt(100)
-      ),
-    ]).then((arr) => arr.flat());
+    const request: ListItemsPaginationRequest = {
+      page: BigInt(0),
+      page_size: BigInt(10),
+      sort_order: {
+        Asc: null,
+      },
+      search: [],
+    };
+    const response: GetEventRecordsResult =
+      await anonymousActor.get_event_records(request);
+    const items: [EventRecordIdl] = response.Ok.items;
+
     // Map raw events to EventRecord shape
-    const mappedRecords: EventRecord[] = records.map((event: UserEvent | SystemEvent, i: number) => {
+    const mappedRecords: EventRecord[] = items.map((event: EventRecordIdl) => {
       return {
-        id: i + 1,
-        amount: 'amount' in event && event.amount !== undefined ? String(event.amount) : "0",
-        date: 'date' in event && event.date !== undefined ? String(event.date) : "",
-        from: 'from' in event && typeof event.from === 'string' ? event.from : "",
-        to: 'to' in event && typeof event.to === 'string' ? event.to : "",
-        type: 'type' in event && typeof event.type === 'string' ? event.type as EventRecordType : "Deposit",
-        token: 'token' in event && typeof event.token === 'string' ? event.token : "",
-        userPrincipal: 'userPrincipal' in event && event.userPrincipal !== undefined ? event.userPrincipal as Principal : undefined,
-        error: 'error' in event && event.error !== undefined ? event.error as [] : undefined,
-        fee: 'fee' in event && event.fee !== undefined ? event.fee as string : undefined,
+        id: event.id,
+        type: eventToEventRecordType(event.event),
       };
     });
     return mappedRecords.filter((EventRecord) =>

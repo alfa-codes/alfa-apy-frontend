@@ -23,10 +23,9 @@ export interface Strategy  {
   currentPool : string | undefined,
   totalBalance : bigint,
   pools : Array<StrategyPool>,
-  apy: bigint;
-  apy_month: bigint;
-  apy_week: bigint;
+  apy: number;
   tvl: bigint;
+  getUserInitialDeposit(user: Principal): bigint;
 }
 
 
@@ -38,6 +37,11 @@ export interface StrategyPool {
   price1: number | undefined,
   token0 : ICRC1,
   token1 : ICRC1,
+  tvl: bigint,
+  apy: number,
+  // usd_apy1: bigint,
+  // usd_apy2: bigint,
+  isActive: boolean,
 }
 
 export class StrategiesService {
@@ -78,7 +82,6 @@ export class StrategiesService {
     const poolStats: [string, PoolMetrics][] =
       await poolStatsService.get_pool_metrics(poolIds);
     console.log("poolStats", poolStats);
-
     return strategies.map((strategy) => ({
       id: strategy.id,
       name: strategy.name,
@@ -95,28 +98,29 @@ export class StrategiesService {
         price0: prices.find((price) => price.ledger === pool.token0.toText())?.price,
         token1: icrc1TokensMap.get(pool.token1.toText())!,
         price1: prices.find((price) => price.ledger === pool.token1.toText())?.price,
+        isActive: strategy.current_pool[0]?.id === pool.id,
+        tvl: poolStats.find((poolSt) => {
+          return poolSt[0] === pool.id;
+        })?.[1].tvl ?? 0n,
+        apy: poolStats.find((poolSt) => {
+          return poolSt[0] === pool.id;
+        })?.[1].apy.tokens_apy ?? 0,
       })),
       apy:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;
           return pool[0] === currentPool.id;
-        })?.[1].apy.year.tokens_apy ?? 0n, //TODO: Fix this
-      apy_month:
-        poolStats.find((pool) => {
-          const currentPool = strategy.current_pool[0]!;
-          return pool[0] === currentPool.id;
-        })?.[1].apy.month.tokens_apy ?? 0n,
-      apy_week:
-        poolStats.find((pool) => {
-          const currentPool = strategy.current_pool[0]!;
-          return pool[0] === currentPool.id;
-        })?.[1].apy.week.tokens_apy ?? 0n,
-
+        })?.[1].apy.tokens_apy ?? 0,
       tvl:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;
           return pool[0] === currentPool.id;
         })?.[1].tvl ?? 0n,
+      getUserInitialDeposit: (user: Principal) => {
+        const initDeposit = strategy.initial_deposit.find(([principal]) => principal.toString() === user.toString())?.[1];
+
+        return initDeposit ?? 0n;
+      }
     }));
   }
 

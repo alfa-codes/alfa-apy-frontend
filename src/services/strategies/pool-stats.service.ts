@@ -4,7 +4,7 @@ import {
   PoolMetrics,
 } from "../../idl/pool_stats";
 import { idlFactory } from "../../idl/pool_stats_idl";
-import { getAnonActor } from "../utils";
+import { getAnonActor, hasOwnProperty } from "../utils";
 import { POOL_STATS_CANISTER_ID } from "../../constants";
 export class PoolStatsService {
   public async get_pools(): Promise<Array<Pool>> {
@@ -12,7 +12,11 @@ export class PoolStatsService {
       POOL_STATS_CANISTER_ID,
       idlFactory
     );
-    return await anonymousActor.get_pools();
+    const result = await anonymousActor.get_pools();
+    if (hasOwnProperty(result, "Err")) {
+      throw new Error((result.Err as { message: string }).message);
+    }
+    return result.Ok;
   }
 
   public async get_all_pool_metrics(): Promise<Array<[string, PoolMetrics]>> {

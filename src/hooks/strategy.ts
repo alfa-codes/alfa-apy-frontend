@@ -15,7 +15,7 @@ import { useBalances } from "./balances";
 import { useTokens } from "./tokens";
 import { ICRC1 } from "../idl/icrc1_oracle";
 
-export function usePools(pools_symbols: string[]) {
+export function usePools(pools_symbols: string[])  {
   const dispatch = useDispatch();
 
   const {

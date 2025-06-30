@@ -13,7 +13,7 @@ import { useStrategies } from "../../hooks/strategies";
 
 interface PlatformStats {
   totalTvl: bigint;
-  avgApy: bigint;
+  avgApy: number;
   totalStrategies: number;
   deposited: number;
   totalUsers: number;
@@ -36,7 +36,7 @@ export function Strategies() {
         return {
           ...acc,
           totalTvl: acc.totalTvl + strategy.tvl,
-          avgApy: (acc.avgApy + strategy.apy) / BigInt(strategies?.length || 1),
+          avgApy: (acc.avgApy + strategy.apy) / (strategies?.length || 1),
           deposited: strategy.initialDeposit.reduce(
             (acc, [, value]) =>
               acc + Number(value) / 10 ** strategy.pools[0].token0.decimals * (strategy.pools[0].price0 ?? 0),
@@ -49,7 +49,7 @@ export function Strategies() {
     },
     {
       totalTvl: 0n,
-      avgApy: 0n,
+      avgApy: 0,
       totalStrategies: strategies?.length || 0,
       deposited: 0,
       totalUsers: 0,
@@ -58,7 +58,7 @@ export function Strategies() {
 
   if (platformStats) {
     platformStats.avgApy =
-      platformStats.avgApy / BigInt(strategies?.length || 1) / 100n;
+      platformStats.avgApy / (strategies?.length || 1) / 100;
   }
 
   if (!strategies || !tokens.length) {

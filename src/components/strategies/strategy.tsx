@@ -1,7 +1,7 @@
 import {
   useBalances,
   useDeposit,
-  usePools,
+  // usePools,
   useTokens,
   useWithdraw,
 } from "../../hooks";
@@ -22,13 +22,6 @@ import { useNavigate } from "react-router-dom";
 import { ConnectWallet } from "../connect-wallet";
 import { PaymentsCard } from "../payments";
 import { Strategy as StrategyResponse } from "../../services/strategies/strategy-service";
-
-interface APYBreakdown {
-  vaultApr: number;
-  tradingApr: number;
-  boostApr: number;
-  totalApy: number;
-}
 
 export function Strategy({
   value,
@@ -51,8 +44,8 @@ export function Strategy({
   const { user } = useAuth();
   const agent = useAgent({ host: "https://ic0.app" });
   const { tokens } = useTokens();
-  const logos = tokens ? getStrategyTokenLogos(value, tokens) : [];
-  const { resetPools } = usePools(value.pools.map((p) => p.token0.symbol));
+  const logos = tokens ? getStrategyTokenLogos(value, tokens) : []; //TODO
+  // const { resetPools } = usePools(value.pools.map((p) => p.token0.symbol));
   const currentPool = value.pools.find((p) => p.id === value.currentPool);
   const tokenAddress = currentPool?.token0.ledger;
   const token = tokens.length
@@ -85,13 +78,6 @@ export function Strategy({
   const amountToWithdraw =  "0";
   // const shares = balance?.user_shares ?? 0;
 
-  // Calculate APY breakdown
-  const apyBreakdown: APYBreakdown = {
-    vaultApr: 0,
-    tradingApr: 0.65, // Example value, replace with actual calculation
-    boostApr: 0, // We don't have boost yet
-    totalApy: 0,
-  };
 
   // Dropdown for chart label
   const [chartType, setChartType] = useState<"APR Change" | "TVL Change">(
@@ -151,7 +137,7 @@ export function Strategy({
         <button
           onClick={() => {
             onBack();
-            resetPools();
+            // resetPools();
           }}
           className="text-gray-600 hover:text-gray-800 transition-colors"
         >
@@ -237,10 +223,11 @@ export function Strategy({
                   <div>
                     <p className="text-gray-600">Your Deposit</p>
                     <div className="flex items-center gap-2">
-                      <TokensLogos logos={logos} size={24} />
+                      <TokensLogos logos={[logos[0]]} size={24} />
                       <p className="text-lg font-medium">
+                        {value.getUserInitialDeposit(user!.principal).toString()}
                         {/* ${balance?.usd_balance.toFixed(2) ?? "0.00"} */}
-                        "0.00"
+                        {/* "0.00" */}
                       </p>
                     </div>
                   </div>
@@ -348,47 +335,22 @@ export function Strategy({
         {/* Combined Stats Card */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">🔢 Strategy Stats</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <div>
               <p className="text-gray-600">Users in Pool</p>
               <p className="text-lg font-medium">{value.userShares.length}</p>
             </div>
             <div>
-              <p className="text-gray-600">Last Deposit</p>
-              {value.initialDeposit.length > 0 ? (
-                <p className="text-lg font-medium">
-                  {value.initialDeposit[
-                    value.initialDeposit.length - 1
-                  ][1].toString()}{" "}
-                  by{" "}
-                  {value.initialDeposit[value.initialDeposit.length - 1][0]
-                    .toString()
-                    .slice(0, 8)}
-                  ...
-                </p>
-              ) : (
-                <p className="text-lg font-medium">No deposits yet</p>
-              )}
-            </div>
-            <div>
-              <p className="text-gray-600">Strategy Age</p>
-              <p className="text-lg font-medium">
-                {"N/A"}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-            <div>
               <p className="text-gray-600">TVL</p>
               <p className="text-lg font-medium">
                 $
-                { "0"}
+                {value.tvl}
               </p>
             </div>
             <div>
               <p className="text-gray-600">APY</p>
               <p className="text-lg font-medium">
-                {(apyBreakdown.totalApy * 100).toFixed(2)}%
+                {value.apy}%
               </p>
             </div>
           </div>
@@ -417,49 +379,36 @@ export function Strategy({
                 </tr>
               </thead>
               <tbody>
-                {[
-                  {
-                    lp_token_symbol: "ICP_CHAT",
-                    symbol_0: "ICP",
-                    symbol_1: "CHAT",
-                    price: 1.02,
-                    tvl: 500000,
-                    rolling_24h_apy: 15.2,
-                    provider: "IcpSwap",
-                    active: true,
-                  },
-                ].map((p, i) => (
+                {value.pools.map((p, i) => (
                   <tr
                     key={i}
                     className={clsx("border-t border-amber-600/10", {
-                      ["bg-amber-300"]: p.active,
+                      ["bg-amber-300"]: p.isActive,
                     })}
                   >
                     <td
-                      className={clsx("py-4", { ["rounded-l-lg"]: p.active })}
+                      className={clsx("py-4", { ["rounded-l-lg"]: p.isActive })}
                     >
                       <TokensLogos
                         size={30}
-                        logos={p.lp_token_symbol
-                          .split("_")
-                          .map((symbol) => getTokenLogo(symbol, tokens))}
+                        logos={[getTokenLogo(p.token0.symbol, tokens), getTokenLogo(p.token1.symbol, tokens)]}
                       />
                     </td>
                     <td className="py-4">
                       <span className="font-medium">
-                        {p.symbol_0}/{p.symbol_1}
+                        {p.token0.symbol}/{p.token1.symbol}
                       </span>
                     </td>
                     <td className="py-4">
                       <span className="font-medium">{(p).provider}</span>
                     </td>
-                    <td className="py-4">${Number(p.tvl).toLocaleString()}</td>
+                    <td className="py-4">${Number(p.tvl1).toLocaleString()}</td>
                     <td
                       className={clsx("py-4 font-medium", {
-                        ["rounded-r-lg"]: p.active,
+                        ["rounded-r-lg"]: p.isActive,
                       })}
                     >
-                      {(p.rolling_24h_apy / 100).toFixed(2)}%
+                      {(p.apy1)}%
                     </td>
                   </tr>
                 ))}
@@ -486,14 +435,10 @@ export function Strategy({
           {detailsTab === "tokens" && (
             <div className="flex flex-col md:flex-row gap-6">
               {logos.slice(0, 2).map((logo, idx) => {
-                const tokenSymbol =
-                  idx === 0 ? currentPool?.token0.symbol : currentPool?.token1.symbol;
+                const token =  idx === 0 ? currentPool?.token0 : currentPool?.token1;
+                const price = idx === 0 ? currentPool?.price0 : currentPool?.price1;
+                const tokenSymbol = token?.symbol;
                 const tokenObj = tokens.find((t) => t.symbol === tokenSymbol);
-                // Hardcode prices for the two tokens
-                let hardcodedPrice = "N/A";
-                if (tokenSymbol === "ICP") hardcodedPrice = "$12.34";
-                if (tokenSymbol === "CHAT") hardcodedPrice = "$0.56";
-                if (tokenSymbol === "ckBTC") hardcodedPrice = "$65000.12";
                 return (
                   <div
                     key={tokenSymbol}
@@ -506,7 +451,7 @@ export function Strategy({
                         {tokenObj?.name ?? ""}
                       </div>
                       <div className="text-black text-base mt-1">
-                        {hardcodedPrice}
+                        { price ? `$${price.toFixed(2)}` : "N/A"}
                       </div>
                     </div>
                   </div>
@@ -529,33 +474,34 @@ export function Strategy({
                       ( "bg-gray-300")
                     }
                   >
-                    {"❓"}
+                    {provider.toString() === "KongSwap"
+                      ? "🦍" //TODO: add logo
+                      : provider.toString() === "ICPSwap"
+                      ? "🔄"
+                      : "❓"}
                   </span>
                   <div>
-                    <div className="font-bold text-lg">{provider.toString()}</div>
-                    <div className="text-gray-600 text-sm mb-2">
-                      {provider.toString() === "KongSwap"
-                        ? "KongSwap is a decentralized AMM on ICP."
-                        : provider.toString() === "IcpSwap"
-                        ? "IcpSwap is a leading DEX on ICP."
-                        : "No description."}
-                    </div>
-                    <div className="flex gap-4">
+                    <div className="font-bold text-lg">
                       <a
                         href={
                           provider.toString() === "KongSwap"
-                            ? "https://kongswap.com/"
-                            : "https://icpswap.com/"
+                            ? "https://www.kongswap.io/"
+                            : "https://www.icpswap.com/"
                         }
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-700 hover:underline"
                       >
-                        Website
+                        {provider.toString()}
                       </a>
-                      <a href="#" className="text-blue-700 hover:underline">
-                        Docs
-                      </a>
+                    </div>
+                    <div className="text-gray-600 text-sm mb-2">
+                      {provider.toString() === "KongSwap"
+                        ? "KongSwap is a decentralized AMM on ICP."
+                        : provider.toString() === "ICPSwap"
+                        ? "IcpSwap is a leading DEX on ICP."
+                        // TODO: move to service
+                        : "No description."}
                     </div>
                   </div>
                 </div>

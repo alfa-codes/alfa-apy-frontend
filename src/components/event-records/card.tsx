@@ -24,7 +24,7 @@ export function EventRecordsCard() {
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 Type
               </th>
-              <th className="text-left py-2 px-2 text-gray-600 font-medium">
+              {/* <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 Amount
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
@@ -38,7 +38,7 @@ export function EventRecordsCard() {
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 To
-              </th>
+              </th> */}
             </tr>
           </thead>
           {!eventRecords && (
@@ -58,11 +58,11 @@ export function EventRecordsCard() {
               <tr key={i} className="border-t border-amber-600/10">
                 <td className="py-2 px-2">#{tx.id}</td>
                 <td className="py-2 px-2">{tx.type}</td>
-                <td className="py-2 px-2">{tx.amount}</td>
+                {/* <td className="py-2 px-2">{tx.amount}</td>
                 <td className="py-2 px-2">{tx.token}</td>
                 <td className="py-2 px-2">{tx.date}</td>
                 <td className="py-2 px-2">{tx.from}</td>
-                <td className="py-2 px-2">{tx.to}</td>
+                <td className="py-2 px-2">{tx.to}</td> */}
               </tr>
             ))}
           </tbody>

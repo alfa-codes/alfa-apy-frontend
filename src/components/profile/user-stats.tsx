@@ -9,8 +9,7 @@ import { Strategy } from "../../services/strategies/strategy-service";
 
 interface UserStatsData {
   totalTvl: bigint;
-  avgApy: bigint;
-  avgApyMonth: bigint;
+  avgApy: number;
   totalStrategies: number;
   deposited: number;
 }
@@ -40,7 +39,6 @@ export function UserStats() {
             ...acc,
             totalTvl: acc.totalTvl + strategy.tvl,
             avgApy: (acc.avgApy + strategy.apy),
-            avgApyMonth: (acc.avgApyMonth + strategy.apy_month),
             totalStrategies: acc.totalStrategies + 1,
             deposited: strategy.initialDeposit.reduce(
               (acc, [, value]) =>
@@ -53,8 +51,7 @@ export function UserStats() {
       },
       {
         totalTvl: 0n,
-        avgApy: 0n,
-        avgApyMonth: 0n,
+        avgApy: 0,
         totalStrategies: 0,
         deposited: 0,
       }
@@ -62,8 +59,7 @@ export function UserStats() {
 
     // Calculate average APY
     if (stats.totalStrategies > 0) {
-      stats.avgApy = stats.avgApy / BigInt(stats.totalStrategies) / 100n;
-      stats.avgApyMonth = stats.avgApyMonth / BigInt(stats.totalStrategies) / 100n;
+      stats.avgApy = stats.avgApy / (stats.totalStrategies) / 100;
     }
 
     return stats;
