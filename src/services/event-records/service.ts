@@ -42,7 +42,7 @@ export class EventRecordsService {
       page: BigInt(1),
       page_size: BigInt(10),
       sort_order: {
-        Asc: null,
+        Desc: null,
       },
       search: [],
     };

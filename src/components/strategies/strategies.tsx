@@ -13,7 +13,7 @@ import { useStrategies } from "../../hooks/strategies";
 
 interface PlatformStats {
   totalTvl: bigint;
-  avgApy: number;
+  maxApy: number;
   totalStrategies: number;
   deposited: number;
   totalUsers: number;
@@ -37,7 +37,7 @@ export function Strategies() {
         return {
           ...acc,
           totalTvl: acc.totalTvl + strategy.tvl,
-          avgApy: (acc.avgApy + strategy.apy) / (strategies?.length || 1),
+          maxApy: Math.max(acc.maxApy, strategy.apy),
           deposited: strategy.initialDeposit.reduce(
             (acc, [, value]) =>
               acc + Number(value) / 10 ** strategy.pools[0].token0.decimals * (strategy.pools[0].price0 ?? 0),
@@ -51,17 +51,13 @@ export function Strategies() {
     },
     {
       totalTvl: 0n,
-      avgApy: 0,
+      maxApy: 0,
       totalStrategies: strategies?.length || 0,
       deposited: 0,
       totalUsers: 0,
     }
   );
 
-  if (platformStats) {
-    platformStats.avgApy =
-      platformStats.avgApy / (strategies?.length || 1);
-  }
 
   if (!strategies || !tokens.length) {
     return (
@@ -134,7 +130,7 @@ export function Strategies() {
             <div>
               <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
               <p className="text-2xl font-bold">
-                {Number(platformStats?.avgApy ?? 0)}%
+                {Number(platformStats?.maxApy ?? 0)/100}%
               </p>
             </div>
             <div>

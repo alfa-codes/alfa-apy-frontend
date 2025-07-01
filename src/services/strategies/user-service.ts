@@ -36,7 +36,7 @@ export class UserService {
     return result.Ok;
   }
 
-  //todo naming
+  //todo naming + лишний лэджер параметр
   public async accept_investment(
     strategy_id: number,
     ledger: string,

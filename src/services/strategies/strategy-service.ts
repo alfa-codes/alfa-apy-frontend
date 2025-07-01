@@ -25,6 +25,7 @@ export interface Strategy  {
   pools : Array<StrategyPool>,
   apy: number;
   tvl: bigint;
+  usd_apy: number;
   getUserInitialDeposit(user: Principal): bigint;
 }
 
@@ -82,7 +83,7 @@ export class StrategiesService {
     const poolStats: [string, PoolMetrics][] =
       await poolStatsService.get_pool_metrics(poolIds);
     console.log("poolStats", poolStats);
-    return strategies.map((strategy) => ({
+    const data: Strategy[] = strategies.map((strategy) => ({
       id: strategy.id,
       name: strategy.name,
       description: strategy.description,
@@ -104,24 +105,30 @@ export class StrategiesService {
         })?.[1].tvl ?? 0n,
         apy: poolStats.find((poolSt) => {
           return poolSt[0] === pool.id;
-        })?.[1].apy.usd_apy ?? 0,
+        })?.[1].apy.tokens_apy ?? 0,
       })),
       apy:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;
           return pool[0] === currentPool.id;
-        })?.[1].apy.usd_apy ?? 0,
+        })?.[1].apy.tokens_apy ?? 0,
       tvl:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;
           return pool[0] === currentPool.id;
         })?.[1].tvl ?? 0n,
+      usd_apy:
+        poolStats.find((pool) => {
+          const currentPool = strategy.current_pool[0]!;
+          return pool[0] === currentPool.id;
+        })?.[1].apy.usd_apy ?? 0,
       getUserInitialDeposit: (user: Principal) => {
         const initDeposit = strategy.initial_deposit.find(([principal]) => principal.toString() === user.toString())?.[1];
 
         return initDeposit ?? 0n;
       }
     }));
+    return data;
   }
 
   public async getUserStrategies(

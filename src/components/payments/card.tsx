@@ -10,10 +10,10 @@ export function PaymentsCard() {
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold mb-4">🧾Strategy Events</h3>
-        <a href="#" className="hover:underline text-sm">
+        <h3 className="text-lg font-semibold mb-4">Events Log</h3>
+        {/* <a href="#" className="hover:underline text-sm">
           More →
-        </a>
+        </a> */}
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">

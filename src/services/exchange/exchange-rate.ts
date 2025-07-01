@@ -46,10 +46,11 @@ export class ExchangeRateService {
   async getAllIcpTokens() {
     const responseJson = await fetch("https://web2.icptokens.net/api/tokens");
     if (!responseJson.ok) return undefined;
+    const response = await responseJson.json();
     const tokens: Array<{
       canister_id: string;
       metrics: { price: { usd: string }; change: { "24h": { usd: string } } };
-    }> = await responseJson.json();
+    }> = Array.isArray(response) ? response : [];
     return tokens.map((el) => ({
       address: el.canister_id,
       price: Number(el.metrics.price.usd),

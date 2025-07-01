@@ -341,16 +341,22 @@ export function Strategy({
               <p className="text-lg font-medium">{value.userShares.length}</p>
             </div>
             <div>
+              <p className="text-gray-600">APY</p>
+              <p className="text-lg font-medium">
+                {value.apy}%
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-600">USD APY</p>
+              <p className="text-lg font-medium">
+                {value.usd_apy}%
+              </p>
+            </div>
+            <div>
               <p className="text-gray-600">TVL</p>
               <p className="text-lg font-medium">
                 $
                 {value.tvl}
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-600">APY</p>
-              <p className="text-lg font-medium">
-                {value.apy}%
               </p>
             </div>
           </div>
@@ -402,13 +408,13 @@ export function Strategy({
                     <td className="py-4">
                       <span className="font-medium">{(p).provider}</span>
                     </td>
-                    <td className="py-4">${Number(p.tvl1).toLocaleString()}</td>
+                    <td className="py-4">${Number(p.tvl).toLocaleString()}</td>
                     <td
                       className={clsx("py-4 font-medium", {
                         ["rounded-r-lg"]: p.isActive,
                       })}
                     >
-                      {(p.apy1)}%
+                      {(p.apy)}%
                     </td>
                   </tr>
                 ))}
