@@ -125,7 +125,7 @@ export class StrategiesService {
       getUserInitialDeposit: (user: Principal) => {
         const initDeposit = strategy.initial_deposit.find(([principal]) => principal.toString() === user.toString())?.[1];
         const decimals = icrc1TokensMap.get(strategy.pools[0].token0.toText())?.decimals ?? 0;
-        if (!initDeposit) return 0n;
+        if (!initDeposit) return 0;
         return Number(initDeposit) / Number(10 ** decimals);
       }
     }));
