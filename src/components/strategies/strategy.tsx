@@ -455,15 +455,18 @@ export function Strategy({
                 return (
                   <div
                     key={tokenSymbol}
-                    className="flex items-center gap-4 p-4 rounded-lg bg-white/40 shadow"
+                    className={clsx(
+                      "flex items-center gap-4 p-4 rounded-lg shadow",
+                      theme === 'dark' ? 'bg-[#232136] border-2 border-purple-600 text-green-400' : 'bg-white/40'
+                    )}
                   >
                     <TokensLogos logos={[logo]} size={40} />
                     <div>
                       <div className="font-bold text-lg">{tokenSymbol}</div>
-                      <div className="text-gray-600 text-sm">
+                      <div className={clsx("text-sm", theme === 'dark' ? 'text-green-300' : 'text-gray-600')}>
                         {tokenObj?.name ?? ""}
                       </div>
-                      <div className="text-black text-base mt-1">
+                      <div className={clsx("text-base mt-1", theme === 'dark' ? 'text-green-400' : 'text-black')}>
                         { price ? `$${price.toFixed(2)}` : "N/A"}
                       </div>
                     </div>
@@ -479,16 +482,19 @@ export function Strategy({
               ).map((provider) => (
                 <div
                   key={provider.toString()}
-                  className="flex items-center gap-4 p-4 rounded-lg bg-white/40 shadow"
+                  className={clsx(
+                    "flex items-center gap-4 p-4 rounded-lg shadow",
+                    theme === 'dark' ? 'bg-[#232136] border-2 border-purple-600 text-green-400' : 'bg-white/40'
+                  )}
                 >
                   <span
-                    className={
-                      `flex items-center justify-center rounded-full w-10 h-10 text-2xl ` +
-                      ( "bg-gray-300")
-                    }
+                    className={clsx(
+                      "flex items-center justify-center rounded-full w-10 h-10 text-2xl",
+                      theme === 'dark' ? 'bg-purple-600 text-green-400' : 'bg-gray-300'
+                    )}
                   >
                     {provider.toString() === "KongSwap"
-                      ? "🦍" //TODO: add logo
+                      ? "🦍"
                       : provider.toString() === "ICPSwap"
                       ? "🔄"
                       : "❓"}
@@ -503,17 +509,16 @@ export function Strategy({
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-700 hover:underline"
+                        className={theme === 'dark' ? 'text-green-400 hover:underline' : 'text-blue-700 hover:underline'}
                       >
                         {provider.toString()}
                       </a>
                     </div>
-                    <div className="text-gray-600 text-sm mb-2">
+                    <div className={clsx("text-sm mb-2", theme === 'dark' ? 'text-green-300' : 'text-gray-600')}>
                       {provider.toString() === "KongSwap"
                         ? "KongSwap is a decentralized AMM on ICP."
                         : provider.toString() === "ICPSwap"
                         ? "IcpSwap is a leading DEX on ICP."
-                        // TODO: move to service
                         : "No description."}
                     </div>
                   </div>
