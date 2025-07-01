@@ -29,10 +29,11 @@ export function Strategies() {
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
-    //TODO hui poimi chto
+    //TODO: hui poimi chto
     (acc, strategy) => {
       const currentPool = strategy.currentPool;
       if (currentPool) {
+        console.log("strategy deposited", strategy.initialDeposit);
         return {
           ...acc,
           totalTvl: acc.totalTvl + strategy.tvl,
@@ -45,6 +46,7 @@ export function Strategies() {
           totalUsers: acc.totalUsers + strategy.userShares.length,
         };
       }
+      
       return acc;
     },
     {
@@ -58,7 +60,7 @@ export function Strategies() {
 
   if (platformStats) {
     platformStats.avgApy =
-      platformStats.avgApy / (strategies?.length || 1) / 100;
+      platformStats.avgApy / (strategies?.length || 1);
   }
 
   if (!strategies || !tokens.length) {

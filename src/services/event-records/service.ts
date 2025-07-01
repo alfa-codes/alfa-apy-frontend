@@ -13,6 +13,7 @@ export type EventRecordType = "Rebalance" | "Withdrawal" | "Deposit";
 
 export type EventRecord = {
   id: bigint;
+  timestamp: bigint;
   // amount: string;
   // date: string;
   // from: string;
@@ -38,24 +39,36 @@ export class EventRecordsService {
       idlFactory
     );
     const request: ListItemsPaginationRequest = {
-      page: BigInt(0),
+      page: BigInt(1),
       page_size: BigInt(10),
       sort_order: {
         Asc: null,
       },
       search: [],
     };
-    const response: GetEventRecordsResult =
-      await anonymousActor.get_event_records(request);
-    const items: [EventRecordIdl] = response.Ok.items;
+    const response: GetEventRecordsResult = await anonymousActor.get_event_records(request);
 
-    // Map raw events to EventRecord shape
-    const mappedRecords: EventRecord[] = items.map((event: EventRecordIdl) => {
-      return {
-        id: event.id,
-        type: eventToEventRecordType(event.event),
-      };
-    });
+    console.log("events_response", response);
+
+    let mappedRecords: EventRecord[] = [];
+
+    if ('Ok' in response) {
+      const items: EventRecordIdl[] = response.Ok.items;
+      // Map raw events to EventRecord shape
+      mappedRecords = items.map((event: EventRecordIdl) => {
+        return {
+          id: event.id,
+          type: eventToEventRecordType(event.event),
+          timestamp: event.timestamp,
+          user: event.user,
+        };
+      });
+    } else {
+      throw new Error("Failed to get event records");
+    }
+
+    console.log("mappedRecords", mappedRecords);
+
     return mappedRecords.filter((EventRecord) =>
       Object.entries(filter).every(
         ([key, value]) => EventRecord[key as keyof EventRecord] === value

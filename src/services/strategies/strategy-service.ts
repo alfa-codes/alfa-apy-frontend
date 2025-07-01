@@ -104,13 +104,13 @@ export class StrategiesService {
         })?.[1].tvl ?? 0n,
         apy: poolStats.find((poolSt) => {
           return poolSt[0] === pool.id;
-        })?.[1].apy.tokens_apy ?? 0,
+        })?.[1].apy.usd_apy ?? 0,
       })),
       apy:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;
           return pool[0] === currentPool.id;
-        })?.[1].apy.tokens_apy ?? 0,
+        })?.[1].apy.usd_apy ?? 0,
       tvl:
         poolStats.find((pool) => {
           const currentPool = strategy.current_pool[0]!;

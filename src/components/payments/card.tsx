@@ -2,6 +2,7 @@ import colors from "tailwindcss/colors";
 import { Card } from "../ui/card";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { useEventRecords } from "../../hooks/event-records";
+import { formatTimestamp } from "../../utils/date";
 
 export function PaymentsCard() {
   const { eventRecords } = useEventRecords();
@@ -25,20 +26,20 @@ export function PaymentsCard() {
                 Type
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
+                Date
+              </th>
+              {/* <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 Amount
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 Pair
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                Date
-              </th>
-              <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 From
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 To
-              </th>
+              </th> */}
             </tr>
           </thead>
           {!eventRecords && (
@@ -54,15 +55,15 @@ export function PaymentsCard() {
             </tbody>
           )}
           <tbody>
-            {eventRecords?.map((tx, i) => (
+            {eventRecords?.map((record, i) => (
               <tr key={i} className="border-t border-amber-600/10">
-                <td className="py-2 px-2">#{tx.id}</td>
-                <td className="py-2 px-2">{tx.type}</td>
-                {/* <td className="py-2 px-2">{tx.amount}</td>
-                <td className="py-2 px-2">{tx.token}</td>
-                <td className="py-2 px-2">{tx.date}</td>
-                <td className="py-2 px-2">{tx.from}</td>
-                <td className="py-2 px-2">{tx.to}</td> */}
+                <td className="py-2 px-2">#{record.id}</td>
+                <td className="py-2 px-2">{record.type}</td>
+                <td className="py-2 px-2">{formatTimestamp(record.timestamp)}</td>
+                {/* <td className="py-2 px-2">{tx.amount}</td> */}
+                {/* <td className="py-2 px-2">{tx.token}</td> */}
+                {/* <td className="py-2 px-2">{tx.from}</td> */}
+                {/* <td className="py-2 px-2">{tx.to}</td> */}
               </tr>
             ))}
           </tbody>

@@ -20,7 +20,11 @@ export function UserStats() {
   const balances = useSelector((state) => state.strategies.balances);
   const status = useSelector((state) => state.strategies.strategies.status);
 
+  console.log("Initial data:", { user, strategies, balances, status });
+
   const userStats = useMemo(() => {
+    console.log("useMemo called", { strategies, balances, status });
+
     if (!strategies || !balances || status !== Status.SUCCEEDED) {
       return {
         totalTvl: 0n,
@@ -33,8 +37,12 @@ export function UserStats() {
 
     const stats = strategies.reduce(
       (acc: UserStatsData, strategy: Strategy) => {
+        console.log("Processing strategy:", strategy);
+        console.log("Current acc state:", acc);
+
         const currentPool = strategy.currentPool;
         if (currentPool) {
+          console.log("Current pool found:", currentPool);
           return {
             ...acc,
             totalTvl: acc.totalTvl + strategy.tvl,
@@ -59,7 +67,8 @@ export function UserStats() {
 
     // Calculate average APY
     if (stats.totalStrategies > 0) {
-      stats.avgApy = stats.avgApy / (stats.totalStrategies) / 100;
+      stats.avgApy = stats.avgApy / stats.totalStrategies;
+      console.log("Final stats after averaging:", stats);
     }
 
     return stats;
