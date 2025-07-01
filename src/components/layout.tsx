@@ -1,7 +1,6 @@
 import { PropsWithChildren } from "react";
 import { Header } from "./header";
 import { Footer } from "./footer";
-import { Badge } from "./ui";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export function Layout({ children }: PropsWithChildren) {
@@ -14,7 +13,6 @@ export function Layout({ children }: PropsWithChildren) {
         <h1 className="text-center text-[36px]">
           Dominate DeFi with highest APY
         </h1>
-        <Badge className="mx-auto !mt-[10px] mb-[70px]">Alpha version</Badge>
         {location.pathname === "/swap" && (
           <div className="w-full mb-[20px]">
             <button

@@ -22,7 +22,6 @@ export function Header() {
           onClick={() => navigate("/swap")}
           className="flex items-center justify-between cursor-pointer gap-4"
         >
-          <h2 className="mb-0 font-bold">$0.00</h2>
           <h2 className="mb-0 flex items-center">
             <span className="!text-[18px] mr-[4px]">🔄</span>Swap
           </h2>
