@@ -9,8 +9,10 @@ import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import colors from "tailwindcss/colors";
 import debounce from "lodash.debounce";
 import { SuccessModal } from "./success-modal";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export function Swap({ className }: { className?: string }) {
+  const { theme } = useTheme();
   const { user } = useAuth();
   const { tokens, loading } = useTokens();
   const { balances, refetchBalanceByCanister } = useBalances();
@@ -172,6 +174,8 @@ export function Swap({ className }: { className?: string }) {
           onClick={handleSwap}
           className="mt-[30px]"
           disabled={!user || isQuoteLoading || !amount || !quote || isSwapLoading}
+          bg={theme === 'dark' ? '#a78bfa' : undefined}
+          textColor={theme === 'dark' ? '#22ff88' : undefined}
         >
           {user
             ? !amount

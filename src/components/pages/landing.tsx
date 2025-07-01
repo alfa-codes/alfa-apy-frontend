@@ -3,11 +3,13 @@ import { Button, Card } from "../ui";
 import { useNavigate } from "react-router-dom";
 import { ConnectWallet } from "../connect-wallet";
 import { useAuth } from "@nfid/identitykit/react";
+import { useTheme } from "../../contexts/ThemeContext";
 import colors from "tailwindcss/colors";
 
 export function Landing() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { theme } = useTheme();
 
   const stats = [
     { label: "Total Value Locked", value: "$2.5M+", change: "+15%" },
@@ -58,9 +60,13 @@ export function Landing() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-100 py-20">
+      <section className={`relative overflow-hidden py-20 ${
+        theme === 'dark' 
+          ? 'bg-gradient-to-br from-black/50 via-purple-900/50 to-black/50' 
+          : 'bg-gradient-to-br from-amber-50/50 to-orange-100/50'
+      }`}>
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -68,10 +74,16 @@ export function Landing() {
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+            <h1 className={`text-5xl md:text-7xl font-bold mb-6 ${
+              theme === 'dark'
+                ? 'bg-gradient-to-r from-green-400 to-purple-400 bg-clip-text text-transparent'
+                : 'bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent'
+            }`}>
               Dominate DeFi
             </h1>
-            <p className="text-xl md:text-2xl text-gray-700 mb-8 leading-relaxed">
+            <p className={`text-xl md:text-2xl mb-8 leading-relaxed ${
+              theme === 'dark' ? 'text-green-300' : 'text-gray-700'
+            }`}>
               Access the highest APY strategies on Internet Computer. 
               <br />
               <span className="font-semibold">Up to 65% annual returns</span> with automated rebalancing.
@@ -79,14 +91,21 @@ export function Landing() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
                 onClick={() => navigate("/strategies")}
-                className="px-8 py-4 text-lg font-semibold"
-                bg={colors.amber[500]}
+                className={`px-8 py-4 text-lg font-semibold ${
+                  theme === 'dark' 
+                    ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+                    : 'bg-amber-500 hover:bg-amber-600 text-white'
+                }`}
               >
                 View Strategies
               </Button>
               <Button
                 onClick={() => navigate("/swap")}
-                className="px-8 py-4 text-lg font-semibold bg-white text-amber-600 border-2 border-amber-600 hover:bg-amber-50"
+                className={`px-8 py-4 text-lg font-semibold border-2 ${
+                  theme === 'dark'
+                    ? 'bg-transparent text-green-400 border-green-400 hover:bg-green-400 hover:text-black'
+                    : 'bg-white text-amber-600 border-amber-600 hover:bg-amber-50'
+                }`}
               >
                 <span className="mr-2">🔄</span>
                 Start Swapping
@@ -102,7 +121,7 @@ export function Landing() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -113,10 +132,14 @@ export function Landing() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="text-center"
               >
-                <div className="text-3xl md:text-4xl font-bold text-amber-600 mb-2">
+                <div className={`text-3xl md:text-4xl font-bold mb-2 ${
+                  theme === 'dark' ? 'text-green-400' : 'text-amber-600'
+                }`}>
                   {stat.value}
                 </div>
-                <div className="text-sm text-gray-600 mb-1">{stat.label}</div>
+                <div className={`text-sm mb-1 ${
+                  theme === 'dark' ? 'text-green-300' : 'text-gray-600'
+                }`}>{stat.label}</div>
                 <div className="text-xs text-green-600 font-medium">{stat.change}</div>
               </motion.div>
             ))}
@@ -125,7 +148,7 @@ export function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
+      <section className={`py-20 ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-gray-50/50'}`}>
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -133,10 +156,14 @@ export function Landing() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+            <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${
+              theme === 'dark' ? 'text-green-400' : 'text-gray-900'
+            }`}>
               Why Choose Alfa APY?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className={`text-xl max-w-2xl mx-auto ${
+              theme === 'dark' ? 'text-green-300' : 'text-gray-600'
+            }`}>
               We combine cutting-edge DeFi strategies with the security of Internet Computer
             </p>
           </motion.div>
@@ -149,12 +176,20 @@ export function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="p-6 text-center h-full hover:shadow-lg transition-shadow">
+                <Card className={`p-6 text-center h-full transition-shadow ${
+                  theme === 'dark' 
+                    ? 'bg-gray-800/80 border-purple-600 hover:shadow-purple-500/20 hover:shadow-lg' 
+                    : 'hover:shadow-lg'
+                }`}>
                   <div className="text-4xl mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                  <h3 className={`text-xl font-semibold mb-3 ${
+                    theme === 'dark' ? 'text-green-400' : 'text-gray-900'
+                  }`}>
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className={`leading-relaxed ${
+                    theme === 'dark' ? 'text-green-300' : 'text-gray-600'
+                  }`}>
                     {feature.description}
                   </p>
                 </Card>
@@ -165,7 +200,7 @@ export function Landing() {
       </section>
 
       {/* How it Works */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -173,10 +208,14 @@ export function Landing() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+            <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${
+              theme === 'dark' ? 'text-green-400' : 'text-gray-900'
+            }`}>
               How It Works
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className={`text-xl max-w-2xl mx-auto ${
+              theme === 'dark' ? 'text-green-300' : 'text-gray-600'
+            }`}>
               Get started in just 3 simple steps
             </p>
           </motion.div>
@@ -191,16 +230,24 @@ export function Landing() {
                 className="text-center relative"
               >
                 {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-amber-200 z-0"></div>
+                  <div className={`hidden md:block absolute top-8 left-full w-full h-0.5 z-0 ${
+                    theme === 'dark' ? 'bg-purple-600' : 'bg-amber-200'
+                  }`}></div>
                 )}
                 <div className="relative z-10">
-                  <div className="w-16 h-16 bg-amber-500 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-6">
+                  <div className={`w-16 h-16 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-6 ${
+                    theme === 'dark' ? 'bg-purple-600' : 'bg-amber-500'
+                  }`}>
                     {step.number}
                   </div>
-                  <h3 className="text-xl font-semibold mb-3 text-gray-900">
+                  <h3 className={`text-xl font-semibold mb-3 ${
+                    theme === 'dark' ? 'text-green-400' : 'text-gray-900'
+                  }`}>
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className={`leading-relaxed ${
+                    theme === 'dark' ? 'text-green-300' : 'text-gray-600'
+                  }`}>
                     {step.description}
                   </p>
                 </div>
@@ -211,7 +258,11 @@ export function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-amber-500 to-orange-500">
+      <section className={`py-20 ${
+        theme === 'dark' 
+          ? 'bg-gradient-to-r from-purple-900/80 to-green-900/80' 
+          : 'bg-gradient-to-r from-amber-500 to-orange-500'
+      }`}>
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -221,19 +272,25 @@ export function Landing() {
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
               Ready to Start Earning?
             </h2>
-            <p className="text-xl text-amber-100 mb-8 max-w-2xl mx-auto">
+            <p className={`text-xl mb-8 max-w-2xl mx-auto ${
+              theme === 'dark' ? 'text-green-200' : 'text-amber-100'
+            }`}>
               Join thousands of users already earning high yields on their crypto assets
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() => navigate("/strategies")}
-                className="px-8 py-4 text-lg font-semibold bg-white text-amber-600 hover:bg-amber-50"
+                className={`px-8 py-4 text-lg font-semibold ${
+                  theme === 'dark'
+                    ? 'bg-green-400 text-black hover:bg-green-300'
+                    : 'bg-white text-amber-600 hover:bg-amber-50'
+                }`}
               >
                 View Strategies
               </Button>
               <Button
                 onClick={() => navigate("/swap")}
-                className="px-8 py-4 text-lg font-semibold bg-transparent text-white border-2 border-white hover:bg-white hover:text-amber-600"
+                className="px-8 py-4 text-lg font-semibold bg-transparent text-white border-2 border-white hover:bg-white hover:text-black"
               >
                 <span className="mr-2">🔄</span>
                 Start Swapping
@@ -244,23 +301,31 @@ export function Landing() {
       </section>
 
       {/* Documentation Section */}
-      <section className="py-20 bg-gray-50">
+      <section className={`py-20 ${theme === 'dark' ? 'bg-gray-900/50' : 'bg-gray-50/50'}`}>
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+            <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${
+              theme === 'dark' ? 'text-green-400' : 'text-gray-900'
+            }`}>
               Still have questions?
             </h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className={`text-xl mb-8 max-w-2xl mx-auto ${
+              theme === 'dark' ? 'text-green-300' : 'text-gray-600'
+            }`}>
               Read our comprehensive documentation to learn more about our DeFi strategies and how to maximize your yields
             </p>
             <div className="flex justify-center">
               <Button
                 onClick={() => window.open("https://github.com/olsemeno/alfaAPY/blob/main/README.md", "_blank")}
-                className="px-8 py-4 text-lg font-semibold bg-amber-600 text-white hover:bg-amber-700"
+                className={`px-8 py-4 text-lg font-semibold ${
+                  theme === 'dark'
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-amber-600 text-white hover:bg-amber-700'
+                }`}
               >
                 <span className="mr-2">📚</span>
                 Read Documentation

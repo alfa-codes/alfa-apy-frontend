@@ -4,6 +4,7 @@ import { useState } from "react";
 import BigNumber from "bignumber.js";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import colors from "tailwindcss/colors";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export function Deposit({
   className,
@@ -28,6 +29,7 @@ export function Deposit({
   const [inputError, setInputError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { theme } = useTheme();
 
   const handleDeposit = async (value: string) => {
     try {
@@ -41,7 +43,7 @@ export function Deposit({
 
   if (isProcessing) {
     return (
-      <Popup isOpen={!!isOpen} onClose={() => {}} className="modal">
+      <Popup isOpen={!!isOpen} onClose={() => {}} className={`modal ${theme === 'dark' ? 'bg-[#232136] text-green-400 border-2 border-purple-600' : ''}`}>
         <div className="flex flex-col items-center justify-center py-12">
           <SquareLoader
             className="mx-auto mb-6"
@@ -71,7 +73,7 @@ export function Deposit({
           setInputError("");
           setShowSuccess(false);
         }}
-        className="modal"
+        className={`modal ${theme === 'dark' ? 'bg-[#232136] text-green-400 border-2 border-purple-600' : ''}`}
       >
         {!showSuccess ? (
           <>

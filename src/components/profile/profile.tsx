@@ -3,8 +3,10 @@ import { LineChart } from "../charts/line-chart";
 import { Button, Card } from "../ui";
 import { UserStats } from "./user-stats";
 import { EventRecordsCard } from "../event-records/card";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export function Profile() {
+  const { theme } = useTheme();
   // Dropdown for chart label
   const [chartType, setChartType] = useState<"APR Change" | "TVL Change">(
     "APR Change"
@@ -74,7 +76,13 @@ export function Profile() {
                   key={p}
                   onClick={() => setPeriod(p)}
                   className="!h-[24px] !min-w-[40px] !px-2 text-xs"
-                  bg={period === p ? "#fbbf24" : "#fef3c7"}
+                  bg={
+                    theme === 'dark'
+                      ? (period === p ? '#a78bfa' : '#232136')
+                      : (period === p ? '#fbbf24' : '#fef3c7')
+                  }
+                  textColor={theme === 'dark' ? '#22ff88' : undefined}
+                  shadowColor={theme === 'dark' ? '#a78bfa' : undefined}
                 >
                   {p}
                 </Button>

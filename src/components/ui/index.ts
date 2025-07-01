@@ -6,3 +6,4 @@ export * from "./dropdown";
 export * from "./input";
 export * from "./toast";
 export * from "./tabs";
+export * from "./theme-toggle";

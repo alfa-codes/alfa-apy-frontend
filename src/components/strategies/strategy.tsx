@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { ConnectWallet } from "../connect-wallet";
 import { PaymentsCard } from "../payments";
 import { Strategy as StrategyResponse } from "../../services/strategies/strategy-service";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export function Strategy({
   value,
@@ -55,6 +56,7 @@ export function Strategy({
   const tokenBalance = token ? balances[token.ledger] : undefined;
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (token && !tokenBalance) refetchBalanceByCanister(token);
@@ -182,7 +184,13 @@ export function Strategy({
                   key={p}
                   onClick={() => setPeriod(p)}
                   className="!h-[24px] !min-w-[40px] !px-2 text-xs"
-                  bg={period === p ? "#fbbf24" : "#fef3c7"}
+                  bg={
+                    theme === 'dark'
+                      ? (period === p ? '#a78bfa' : '#232136')
+                      : (period === p ? '#fbbf24' : '#fef3c7')
+                  }
+                  textColor={theme === 'dark' ? '#22ff88' : undefined}
+                  shadowColor={theme === 'dark' ? '#a78bfa' : undefined}
                 >
                   {p}
                 </Button>
@@ -382,9 +390,15 @@ export function Strategy({
                 {value.pools.map((p, i) => (
                   <tr
                     key={i}
-                    className={clsx("border-t border-amber-600/10", {
-                      ["bg-amber-300"]: p.isActive,
-                    })}
+                    className={clsx(
+                      "border-t",
+                      {
+                        "bg-amber-300": p.isActive && theme !== 'dark',
+                        "bg-[#232136] border-purple-600/40": theme === 'dark',
+                        "bg-[#393552] border-purple-400": theme === 'dark' && p.isActive,
+                        "border-amber-600/10": theme !== 'dark',
+                      }
+                    )}
                   >
                     <td
                       className={clsx("py-4", { ["rounded-l-lg"]: p.isActive })}

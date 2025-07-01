@@ -3,16 +3,26 @@ import { Button as PixelButton, ButtonProps } from "pixel-retroui";
 import { useState } from "react";
 import colors from "tailwindcss/colors";
 import CircleLoader from "react-spinners/MoonLoader";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export function Button({
   className,
   loading,
+  shadowColor,
   ...props
-}: ButtonProps & { loading?: boolean; disabled?: boolean }) {
+}: ButtonProps & { loading?: boolean; disabled?: boolean; shadowColor?: string }) {
   const disabled = loading || props.disabled;
   const [hovered, setHovered] = useState(false);
+  const { theme } = useTheme();
 
   const isDisabled = disabled || loading;
+
+  // Dark theme colors
+  const darkBg = props.bg || (theme === 'dark' ? colors.purple[600] : colors.amber[400]);
+  const darkHoverBg = theme === 'dark' ? colors.purple[700] : colors.amber[500];
+  const darkShadow = theme === 'dark' ? colors.purple[800] : colors.amber[600];
+  const darkHoverShadow = theme === 'dark' ? colors.purple[900] : colors.amber[700];
+  const darkTextColor = theme === 'dark' ? colors.white : colors.black;
 
   return (
     <PixelButton
@@ -26,11 +36,11 @@ export function Button({
         isDisabled
           ? colors.gray[300]
           : hovered
-          ? colors.amber[500]
-          : props.bg ?? colors.amber[400]
+          ? darkHoverBg
+          : darkBg
       }
-      shadow={isDisabled ? colors.gray[500] : colors.amber[hovered ? 700 : 600]}
-      textColor={colors.black}
+      shadow={shadowColor || (isDisabled ? colors.gray[500] : darkHoverShadow)}
+      textColor={darkTextColor}
       onMouseOver={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -38,7 +48,7 @@ export function Button({
         {loading && (
           <CircleLoader
             className="mr-[5px]"
-            color={colors.black}
+            color={darkTextColor}
             loading={true}
             size={15}
           />

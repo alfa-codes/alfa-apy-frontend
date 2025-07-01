@@ -29,7 +29,21 @@ export function getProfitLevel(strategy: Strategy): ProfitLevel {
   return 'HIGH';
 }
 
-export function getProfitColor(level: ProfitLevel): string {
+export function getProfitColor(level: ProfitLevel, theme?: 'light' | 'dark'): string {
+  if (theme === 'dark') {
+    switch (level) {
+      case 'LOW':
+        return 'bg-green-900 text-green-400 border border-green-400';
+      case 'MEDIUM':
+        return 'bg-yellow-900 text-yellow-300 border border-yellow-300';
+      case 'HIGH':
+        return 'bg-purple-900 text-green-400 border border-green-400';
+      case 'Hot':
+        return 'bg-red-700 text-white border border-red-400';
+      default:
+        return 'bg-gray-900 text-green-400 border border-green-400';
+    }
+  }
   switch (level) {
     case 'LOW':
       return 'bg-green-100 text-green-800';

@@ -7,6 +7,8 @@ import {
 import colors from "tailwindcss/colors";
 import { useState, useMemo } from "react";
 import { Input } from "./input";
+import { useTheme } from "../../contexts/ThemeContext";
+import clsx from "clsx";
 
 function Item({ icon, label }: { icon: string; label: string }) {
   return (
@@ -27,6 +29,7 @@ export function Dropdown({
   onChange: (value: string) => unknown;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const { theme } = useTheme();
   const currentItem = values.find((v) => v.value === value);
 
   const filteredValues = useMemo(() => {
@@ -39,10 +42,10 @@ export function Dropdown({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger bg={colors.amber[50]}>
+      <DropdownMenuTrigger bg={theme === 'dark' ? '#232136' : colors.amber[50]}>
         <Item icon={currentItem!.icon} label={currentItem!.label} />
       </DropdownMenuTrigger>
-      <DropdownMenuContent bg={colors.amber[50]} className="max-h-[300px] overflow-y-scroll">
+      <DropdownMenuContent bg={theme === 'dark' ? '#232136' : colors.amber[50]} className={`max-h-[300px] overflow-y-scroll ${theme === 'dark' ? 'text-green-400' : ''}`}>
         <div className="p-2">
           <Input
             value={searchQuery}
@@ -52,7 +55,7 @@ export function Dropdown({
           />
         </div>
         {filteredValues.map(({ value, label, icon }) => (
-          <DropdownMenuItem className="px-[5px] py-[2.5px] hover:bg-amber-100" key={value}>
+          <DropdownMenuItem className={clsx("px-[5px] py-[2.5px]", theme === 'dark' ? 'hover:bg-purple-900' : 'hover:bg-amber-100')} key={value}>
             <div onClick={() => onChange(value)}>
               <Item icon={icon} label={label} />
             </div>

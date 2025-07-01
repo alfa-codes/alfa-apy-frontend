@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useTheme } from "../../contexts/ThemeContext";
 
 export function TokensLogos({
   logos,
@@ -9,6 +10,8 @@ export function TokensLogos({
   size?: number;
   className?: string;
 }) {
+  const { theme } = useTheme();
+  
   return (
     <div 
       className="relative inline-flex" 
@@ -30,7 +33,10 @@ export function TokensLogos({
         >
           <img
           className={clsx(
-              "w-full h-full rounded-full border-2 border-black bg-white object-cover",
+              "w-full h-full rounded-full border-2 object-cover",
+              theme === 'dark' 
+                ? 'border-purple-600 bg-gray-800' 
+                : 'border-black bg-white',
             className
           )}
             src={logo}

@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
 import { useStrategies } from "../../hooks/strategies";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface PlatformStats {
   totalTvl: bigint;
@@ -26,6 +27,7 @@ export function Strategies() {
   const [selectedStrategy, setSelectedStrategy] = useState<number | undefined>();
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserStrategies, setShowUserStrategies] = useState(false);
+  const { theme } = useTheme();
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
@@ -107,35 +109,35 @@ export function Strategies() {
     >
       {user && (
         <>
-          <h3 className="text-lg font-bold">Your Stats</h3>
+          <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>Your Stats</h3>
           <UserStats />
         </>
       )}
       <>
-        <h3 className="text-lg font-bold">Platform Stats</h3>
+        <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>Platform Stats</h3>
         <Card className="p-[20px]" light={!!user}>
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
-              <h3 className="text-gray-600 text-sm">DEPOSITED</h3>
-              <p className="text-2xl font-bold">
+              <h3 className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>DEPOSITED</h3>
+              <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                 ${(platformStats?.deposited ?? 0 / 10 ** 8).toFixed(2) ?? "0"}
               </p>
             </div>
             <div className="text-center flex-1">
-              <h3 className="text-gray-600 text-sm">TOTAL USERS</h3>
-              <p className="text-2xl font-bold">
+              <h3 className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>TOTAL USERS</h3>
+              <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                 {platformStats?.totalUsers.toLocaleString() ?? "0"}
               </p>
             </div>
             <div className="text-center flex-1">
-              <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
-              <p className="text-2xl font-bold">
+              <h3 className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>HIGHEST APY</h3>
+              <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                 {Number(platformStats?.maxApy ?? 0).toFixed(2)}%
               </p>
             </div>
             <div className="text-center flex-1">
-              <h3 className="text-gray-600 text-sm">STRATEGIES</h3>
-              <p className="text-2xl font-bold">
+              <h3 className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>STRATEGIES</h3>
+              <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                 {platformStats?.totalStrategies ?? 0}
               </p>
             </div>
@@ -182,7 +184,15 @@ export function Strategies() {
                 setShowUserStrategies(p === "My strategies");
               }}
               className="!h-[24px] !min-w-[40px] !px-2 text-xs"
-              bg={p === "My strategies" ? (showUserStrategies ? "#fbbf24" : "#fef3c7") : (showUserStrategies ? "#fef3c7" : "#fbbf24")}
+              bg={
+                theme === 'dark'
+                  ? (p === "My strategies" 
+                      ? (showUserStrategies ? colors.purple[600] : colors.gray[700]) 
+                      : (showUserStrategies ? colors.gray[700] : colors.purple[600]))
+                  : (p === "My strategies" 
+                      ? (showUserStrategies ? "#fbbf24" : "#fef3c7") 
+                      : (showUserStrategies ? "#fef3c7" : "#fbbf24"))
+              }
             >
               {p}
             </Button>
@@ -211,8 +221,9 @@ export function Strategies() {
             <Card
               key={s.id}
               className="p-[20px] relative hover:shadow-lg transition-shadow duration-200"
-              bg={isDisabled ? colors.gray[200] : colors.amber[200]}
-              shadowColor={isDisabled ? colors.gray[600] : colors.amber[600]}
+              bg={theme === 'dark' ? '#181825' : colors.amber[200]}
+              shadowColor={theme === 'dark' ? '#a78bfa' : colors.amber[600]}
+              style={theme === 'dark' ? { border: '2px solid #a78bfa' } : {}}
             >
               {/* First row - Logo, Name, Description, TVL */}
               <div className="flex items-start gap-6">
@@ -225,32 +236,30 @@ export function Strategies() {
                     <span
                       className={
                         "px-2 py-0.5 rounded text-sm " +
-                        (getProfitLevel(s) === "Hot"
-                          ? "bg-red-500 text-white"
-                          : getProfitColor(getProfitLevel(s)))
+                        getProfitColor(getProfitLevel(s), theme)
                       }
                     >
                       {getProfitLevel(s).toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className={`text-sm mt-2 ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>
                     {s.description || "Earn rewards by providing liquidity"}
                   </p>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-sm text-gray-600">TVL</p>
-                  <p className="text-lg font-medium">${s.initialDeposit.reduce((acc, [, value]) => acc + Number(value) / 10 ** s.pools[0].token0.decimals * (s.pools[0].price0 ?? 0), 0).toFixed(2)}</p>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>TVL</p>
+                  <p className={`text-lg font-medium ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>${s.initialDeposit.reduce((acc, [, value]) => acc + Number(value) / 10 ** s.pools[0].token0.decimals * (s.pools[0].price0 ?? 0), 0).toFixed(2)}</p>
                 </div>
               </div>
 
               {/* Second row - APY and Button */}
-              <div className="flex justify-center items-center gap-20 mt-6 pt-6 border-t border-amber-600/20">
+              <div className={`flex justify-center items-center gap-20 mt-6 pt-6 border-t ${theme === 'dark' ? 'border-purple-600/20' : 'border-amber-600/20'}`}>
                 <div className="flex items-baseline gap-2">
                   <span className="gradient-text text-[30px] font-bold">
                     {Number(s.apy).toFixed(2)}%
                   </span>
-                  <span className="text-gray-600">APY</span>
+                  <span className={`${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>APY</span>
                 </div>
 
                 <Button
@@ -270,41 +279,29 @@ export function Strategies() {
                   (user
                     ? "grid grid-cols-2 md:grid-cols-4"
                     : "grid grid-cols-2") +
-                  " gap-x-8 mt-6 pt-6 border-t border-amber-600/20 text-sm justify-items-stretch text-center"
+                  ` gap-x-8 mt-6 pt-6 border-t ${theme === 'dark' ? 'border-purple-600/20' : 'border-amber-600/20'} text-sm justify-items-stretch text-center`
                 }
               >
                 <div>
-                  <span className="text-gray-600 block">Platform:</span>
-                  <p className="font-medium">
+                  <span className={`block ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>Platform:</span>
+                  <p className={`font-medium ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                     {/* TODO: Fix this */}
                     {Array.from(["KongSwap", "IcpSwap"]).join(", ")}
                   </p>
                 </div>
                 <div>
                   {/* TODO: Fix this */}
-                  <span className="text-gray-600 block">Deposit Token:</span>
-                  <p className="font-medium">{s.pools[0]?.token0.symbol}</p>
+                  <span className={`block ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>Deposit Token:</span>
+                  <p className={`font-medium ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>{s.pools[0]?.token0.symbol}</p>
                 </div>
                 {user && (
                   <>
                     <div>
-                      <span className="text-gray-600 block">Deposited:</span>
-                      <p className="font-medium">
+                      <span className={`block ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>Deposited:</span>
+                      <p className={`font-medium ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                         ${s.initialDeposit.filter(([principal]) => principal.toString() === user?.principal.toString()).reduce((acc, [, value]) => acc + Number(value) / 10 ** s.pools[0].token0.decimals * (s.pools[0].price0 ?? 0), 0).toFixed(2)}
                       </p>
                     </div>
-                    {/* <div>
-                      <span className="text-gray-600 block">
-                        Yield (Daily):
-                      </span>
-                      <p className="font-medium">
-                        $
-                        {balances?.[s.id]?.user_shares
-                          ? (balances[s.id].user_shares * 0.001).toFixed(2)
-                          : "0.00"}
-                        "N/A"
-                      </p>
-                    </div> */}
                   </>
                 )}
               </div>
