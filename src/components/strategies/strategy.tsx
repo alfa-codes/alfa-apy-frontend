@@ -320,13 +320,13 @@ export function Strategy({
                       tokenSymbol={token?.symbol ?? ""}
                       loading={isWithdrawing}
                     />
-                    <Button
+                    {/* <Button
                       className="md:w-[150px]"
                       onClick={() => navigate("/swap")}
                     >
                       <span className="text-[20px] block mr-[5px]">🔄</span>{" "}
                       Swap
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </div>

@@ -110,3 +110,40 @@ body {
   color: #22ff88 !important;
   border: 2px solid #8b5cf6 !important;
 }
+
+.dark .connect-wallet-dropdown h2 {
+  color: #22ff88 !important;
+}
+
+.dark .ik-disconnect {
+  color: #22ff88 !important;
+}
+
+.dark .ik-disconnect:hover {
+  background: #22ff88 !important;
+  color: #000 !important;
+}
+
+.dark .ik-text-black,
+.dark .ik-text-white {
+  color: #22ff88 !important;
+}
+
+.dark .ik-font-semibold {
+  color: #22ff88 !important;
+}
+
+.dark .connect-wallet-dropdown svg {
+  color: #22ff88 !important;
+  fill: #22ff88 !important;
+  stroke: #22ff88 !important;
+}
+
+.dark .connect-wallet-dropdown svg path {
+  fill: #22ff88 !important;
+  stroke: #22ff88 !important;
+}
+
+.dark .connect-wallet-dropdown svg circle {
+  fill: #22ff88 !important;
+}

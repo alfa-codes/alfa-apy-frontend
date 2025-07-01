@@ -15,7 +15,7 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
   return (
-    <div className={clsx('flex border-b border-amber-600/20', className)}>
+    <div className={clsx('flex border-b', className, 'dark:border-purple-400/20 border-amber-600/20')}>
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -23,8 +23,8 @@ export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
           className={clsx(
             'px-4 py-2 font-medium text-sm transition-colors relative flex items-center gap-2',
             activeTab === tab.id
-              ? 'text-amber-800 after:absolute after:bottom-[-1px] after:left-0 after:right-0 after:h-[2px] after:bg-amber-600'
-              : 'text-gray-600 hover:text-amber-700'
+              ? 'text-amber-800 after:absolute after:bottom-[-1px] after:left-0 after:right-0 after:h-[2px] after:bg-amber-600 dark:text-purple-400 dark:after:bg-purple-400'
+              : 'text-gray-600 hover:text-amber-700 dark:text-purple-700 dark:hover:text-purple-400'
           )}
         >
           {tab.icon && <span className="text-lg">{tab.icon}</span>}
