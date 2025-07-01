@@ -15,6 +15,7 @@ export enum EventRecordType {
   SwapTokenCompleted = "SwapTokenCompleted",
   WithdrawLiquidityFromPoolCompleted = "WithdrawLiquidityFromPoolCompleted",
   StrategyRebalanceStarted = "StrategyRebalanceStarted",
+  StrategyRebalanceCompleted = "StrategyRebalanceCompleted",
   SwapTokenStarted = "SwapTokenStarted",
   StrategyWithdrawFailed = "StrategyWithdrawFailed",
   WithdrawLiquidityFromPoolFailed = "WithdrawLiquidityFromPoolFailed",
@@ -69,6 +70,8 @@ export function eventToEventRecordType(event: Event): EventRecordType {
   if (hasOwnProperty(event, "WithdrawLiquidityFromPoolFailed")) {
     return EventRecordType.WithdrawLiquidityFromPoolFailed;
   }
+  if (hasOwnProperty(event, "StrategyRebalanceCompleted")) {
+    return EventRecordType.StrategyRebalanceCompleted;
+  }
   return EventRecordType.StrategyWithdrawCompleted;
 }
-
