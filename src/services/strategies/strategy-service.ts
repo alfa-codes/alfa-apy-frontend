@@ -26,7 +26,7 @@ export interface Strategy  {
   apy: number;
   tvl: bigint;
   usd_apy: number;
-  getUserInitialDeposit(user: Principal): bigint;
+  getUserInitialDeposit(user: Principal): number;
 }
 
 
@@ -124,8 +124,9 @@ export class StrategiesService {
         })?.[1].apy.usd_apy ?? 0,
       getUserInitialDeposit: (user: Principal) => {
         const initDeposit = strategy.initial_deposit.find(([principal]) => principal.toString() === user.toString())?.[1];
-
-        return initDeposit ?? 0n;
+        const decimals = icrc1TokensMap.get(strategy.pools[0].token0.toText())?.decimals ?? 0;
+        if (!initDeposit) return 0n;
+        return Number(initDeposit) / Number(10 ** decimals);
       }
     }));
     return data;

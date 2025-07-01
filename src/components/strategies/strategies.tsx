@@ -38,7 +38,7 @@ export function Strategies() {
           ...acc,
           totalTvl: acc.totalTvl + strategy.tvl,
           maxApy: Math.max(acc.maxApy, strategy.apy),
-          deposited: strategy.initialDeposit.reduce(
+          deposited: acc.deposited + strategy.initialDeposit.reduce(
             (acc, [, value]) =>
               acc + Number(value) / 10 ** strategy.pools[0].token0.decimals * (strategy.pools[0].price0 ?? 0),
             0
@@ -114,32 +114,26 @@ export function Strategies() {
       <>
         <h3 className="text-lg font-bold">Platform Stats</h3>
         <Card className="p-[20px]" light={!!user}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
-            <div>
+          <div className="flex justify-between items-center">
+            <div className="text-center flex-1">
               <h3 className="text-gray-600 text-sm">DEPOSITED</h3>
               <p className="text-2xl font-bold">
                 ${(platformStats?.deposited ?? 0 / 10 ** 8).toFixed(2) ?? "0"}
               </p>
             </div>
-            <div>
+            <div className="text-center flex-1">
               <h3 className="text-gray-600 text-sm">TOTAL USERS</h3>
               <p className="text-2xl font-bold">
                 {platformStats?.totalUsers.toLocaleString() ?? "0"}
               </p>
             </div>
-            <div>
+            <div className="text-center flex-1">
               <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
               <p className="text-2xl font-bold">
                 {Number(platformStats?.maxApy ?? 0).toFixed(2)}%
               </p>
             </div>
-            <div>
-              <h3 className="text-gray-600 text-sm">TVL</h3>
-              <p className="text-2xl font-bold">
-                ${platformStats?.totalTvl.toLocaleString() ?? "0"}
-              </p>
-            </div>
-            <div>
+            <div className="text-center flex-1">
               <h3 className="text-gray-600 text-sm">STRATEGIES</h3>
               <p className="text-2xl font-bold">
                 {platformStats?.totalStrategies ?? 0}
@@ -246,7 +240,7 @@ export function Strategies() {
 
                 <div className="text-right">
                   <p className="text-sm text-gray-600">TVL</p>
-                  <p className="text-lg font-medium">${s.tvl.toString()}</p>
+                  <p className="text-lg font-medium">${s.initialDeposit.reduce((acc, [, value]) => acc + Number(value) / 10 ** s.pools[0].token0.decimals * (s.pools[0].price0 ?? 0), 0).toFixed(2)}</p>
                 </div>
               </div>
 
@@ -296,12 +290,10 @@ export function Strategies() {
                     <div>
                       <span className="text-gray-600 block">Deposited:</span>
                       <p className="font-medium">
-                        {balances?.[s.id]?.initial_deposit?.toLocaleString() ??
-                          "0"}
-                        "N/A"
+                        ${s.initialDeposit.filter(([principal]) => principal.toString() === user?.principal.toString()).reduce((acc, [, value]) => acc + Number(value) / 10 ** s.pools[0].token0.decimals * (s.pools[0].price0 ?? 0), 0).toFixed(2)}
                       </p>
                     </div>
-                    <div>
+                    {/* <div>
                       <span className="text-gray-600 block">
                         Yield (Daily):
                       </span>
@@ -312,7 +304,7 @@ export function Strategies() {
                           : "0.00"}
                         "N/A"
                       </p>
-                    </div>
+                    </div> */}
                   </>
                 )}
               </div>

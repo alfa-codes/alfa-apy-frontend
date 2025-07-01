@@ -225,7 +225,8 @@ export function Strategy({
                     <div className="flex items-center gap-2">
                       <TokensLogos logos={[logos[0]]} size={24} />
                       <p className="text-lg font-medium">
-                        {value.getUserInitialDeposit(user!.principal).toString()}
+                        {value.getUserInitialDeposit(user!.principal)}
+                        
                         {/* ${balance?.usd_balance.toFixed(2) ?? "0.00"} */}
                         {/* "0.00" */}
                       </p>
@@ -350,13 +351,6 @@ export function Strategy({
               <p className="text-gray-600">USD APY</p>
               <p className="text-lg font-medium">
                 {Number(value.usd_apy).toFixed(2)}%
-              </p>
-            </div>
-            <div>
-              <p className="text-gray-600">TVL</p>
-              <p className="text-lg font-medium">
-                $
-                {value.tvl}
               </p>
             </div>
           </div>

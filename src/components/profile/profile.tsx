@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { LineChart } from "../charts/line-chart";
 import { Button, Card } from "../ui";
-import { PaymentsCard } from "../payments";
 import { UserStats } from "./user-stats";
+import { EventRecordsCard } from "../event-records/card";
 
 export function Profile() {
   // Dropdown for chart label
@@ -93,7 +93,7 @@ export function Profile() {
           />
         </Card>
       </div>
-      <PaymentsCard />
+      <EventRecordsCard />
     </div>
   );
 }

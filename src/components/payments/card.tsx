@@ -4,6 +4,12 @@ import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { useEventRecords } from "../../hooks/event-records";
 import { formatTimestamp } from "../../utils/date";
 
+const formatPrincipal = (principal: string | undefined): string => {
+  if (!principal) return "N/A";
+  if (principal.length <= 14) return principal;
+  return `${principal.slice(0, 7)}...${principal.slice(-7)}`;
+};
+
 export function PaymentsCard() {
   const { eventRecords } = useEventRecords();
 
@@ -15,7 +21,7 @@ export function PaymentsCard() {
           More →
         </a> */}
       </div>
-      <div className="overflow-x-auto">
+      <div className="max-h-[400px] overflow-y-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -24,6 +30,9 @@ export function PaymentsCard() {
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 Type
+              </th>
+              <th className="text-left py-2 px-2 text-gray-600 font-medium">
+                Principal
               </th>
               <th className="text-left py-2 px-2 text-gray-600 font-medium">
                 Date
@@ -59,6 +68,7 @@ export function PaymentsCard() {
               <tr key={i} className="border-t border-amber-600/10">
                 <td className="py-2 px-2">#{record.id}</td>
                 <td className="py-2 px-2">{record.type}</td>
+                <td className="py-2 px-2">{formatPrincipal(record.userPrincipal?.toString())}</td>
                 <td className="py-2 px-2">{formatTimestamp(record.timestamp)}</td>
                 {/* <td className="py-2 px-2">{tx.amount}</td> */}
                 {/* <td className="py-2 px-2">{tx.token}</td> */}

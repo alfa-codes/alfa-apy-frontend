@@ -1,7 +1,6 @@
 import { PropsWithChildren } from "react";
 import { Header } from "./header";
 import { Footer } from "./footer";
-import { PageLoader } from "./page-loader";
 import { Badge } from "./ui";
 import { useLocation, useNavigate } from "react-router-dom";
 

@@ -1,9 +1,12 @@
 import { ConnectWallet } from "./connect-wallet";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@nfid/identitykit/react";
 
 export function Header() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
   return (
     <div className="flex py-[20px] md:py-[30px] justify-between items-center">
       <img
@@ -24,14 +27,16 @@ export function Header() {
             <span className="!text-[18px] mr-[4px]">🔄</span>Swap
           </h2>
         </div>
-        <div
-          onClick={() => navigate("/profile")}
-          className="flex items-center justify-between cursor-pointer"
-        >
-          <h2 className="mb-0">
-            <span className="!text-[18px] mr-[4px]">👤</span>Profile
-          </h2>
-        </div>
+        {user && (
+          <div
+            onClick={() => navigate("/profile")}
+            className="flex items-center justify-between cursor-pointer"
+          >
+            <h2 className="mb-0">
+              <span className="!text-[18px] mr-[4px]">👤</span>Profile
+            </h2>
+          </div>
+        )}
         <ConnectWallet />
       </div>
     </div>

@@ -3,9 +3,21 @@ import { useEventRecords } from "../../hooks/event-records";
 import { Card } from "../ui/card";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { formatTimestamp } from "../../utils/date";
+import { useAuth } from "@nfid/identitykit/react";
+import { useMemo } from "react";
 
 export function EventRecordsCard() {
+
+
+  const { user } = useAuth();
+
   const { eventRecords } = useEventRecords();
+
+
+  const filteredEventRecords = useMemo(() => {
+    return eventRecords?.filter((record) => record.userPrincipal?.toString() === user?.principal.toString());
+  }, [eventRecords, user]);
+
 
   return (
     <Card className="p-6">
@@ -15,7 +27,7 @@ export function EventRecordsCard() {
           More →
         </a>
       </div>
-      <div className="overflow-x-auto">
+      <div className="max-h-[400px] overflow-y-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -42,7 +54,7 @@ export function EventRecordsCard() {
               </th> */}
             </tr>
           </thead>
-          {!eventRecords && (
+          {!filteredEventRecords && (
             <tbody>
               <div className="flex justify-center items-center h-full">
                 <SquareLoader
@@ -55,7 +67,7 @@ export function EventRecordsCard() {
             </tbody>
           )}
           <tbody>
-            {eventRecords?.map((record, i) => (
+            {filteredEventRecords?.map((record, i) => (
               <tr key={i} className="border-t border-amber-600/10">
                 <td className="py-2 px-2">#{record.id.toString()}</td>
                 <td className="py-2 px-2">{record.type}</td>

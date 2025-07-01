@@ -4,8 +4,8 @@ import { eventRecordsService, EventRecordType, EventRecord } from "../../service
 export const fetchEventRecords = createAsyncThunk<
   Array<EventRecord>,
   { user?: string; type?: EventRecordType; from?: string; to?: string } | undefined
->("EventRecords/fetchEventRecords", async (params) => {
-  const response = await eventRecordsService.getEventRecords(params);
+>("EventRecords/fetchEventRecords", async () => {
+  const response = await eventRecordsService.getEventRecords();
   return response;
 });
 

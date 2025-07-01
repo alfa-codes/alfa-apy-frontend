@@ -8,6 +8,7 @@ import {
 } from "../../idl/vault";
 import { idlFactory } from "../../idl/vault_idl";
 import { eventToEventRecordType } from "./event-type";
+import { Principal } from "@dfinity/principal";
 
 export type EventRecordType = "Rebalance" | "Withdrawal" | "Deposit";
 
@@ -20,7 +21,7 @@ export type EventRecord = {
   // to: string;
   type: string;
   // token: string;
-  // userPrincipal?: Principal;
+  userPrincipal?: Principal;
   // error?: [];
   // fee?: string;
 };
@@ -30,8 +31,8 @@ export class EventRecordsService {
     filter: {
       user?: string;
       type?: EventRecordType;
-      from?: string;
-      to?: string;
+      from?: bigint;
+      to?: bigint;
     } = {}
   ): Promise<Array<EventRecord>> {
     const anonymousActor = await getAnonActor<VaultType>(
@@ -39,8 +40,8 @@ export class EventRecordsService {
       idlFactory
     );
     const request: ListItemsPaginationRequest = {
-      page: BigInt(1),
-      page_size: BigInt(10),
+      page: BigInt(filter.from ? Number(filter.from) : 1),
+      page_size: BigInt(filter.to ? Number(filter.to) : 1000),
       sort_order: {
         Desc: null,
       },
@@ -60,7 +61,7 @@ export class EventRecordsService {
           id: event.id,
           type: eventToEventRecordType(event.event),
           timestamp: event.timestamp,
-          user: event.user,
+          userPrincipal: event.user.length > 0 ? event.user[0] : undefined,
         };
       });
     } else {
