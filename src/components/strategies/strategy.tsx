@@ -18,7 +18,6 @@ import { LineChart } from "../charts/line-chart";
 import { Button } from "../ui";
 import { Tabs } from "../ui/tabs";
 import clsx from "clsx";
-import { useNavigate } from "react-router-dom";
 import { ConnectWallet } from "../connect-wallet";
 import { PaymentsCard } from "../payments";
 import { Strategy as StrategyResponse } from "../../services/strategies/strategy-service";
@@ -41,7 +40,6 @@ export function Strategy({
     // amount_1: number;
   };
 }) {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const agent = useAgent({ host: "https://ic0.app" });
   const { tokens } = useTokens();

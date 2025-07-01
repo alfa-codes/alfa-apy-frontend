@@ -1,14 +1,10 @@
 import { motion } from "framer-motion";
 import { Button, Card } from "../ui";
 import { useNavigate } from "react-router-dom";
-import { ConnectWallet } from "../connect-wallet";
-import { useAuth } from "@nfid/identitykit/react";
 import { useTheme } from "../../contexts/ThemeContext";
-import colors from "tailwindcss/colors";
 
 export function Landing() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { theme } = useTheme();
 
   const stats = [
