@@ -43,7 +43,9 @@ export function Dropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger bg={theme === 'dark' ? '#232136' : colors.amber[50]}>
-        <Item icon={currentItem!.icon} label={currentItem!.label} />
+        <span className={theme === 'dark' ? 'text-green-400' : 'text-black'}>
+          <Item icon={currentItem!.icon} label={currentItem!.label} />
+        </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent bg={theme === 'dark' ? '#232136' : colors.amber[50]} className={`max-h-[300px] overflow-y-scroll ${theme === 'dark' ? 'text-green-400' : ''}`}>
         <div className="p-2">
