@@ -2,6 +2,7 @@ import { ConnectWallet } from "./connect-wallet";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@nfid/identitykit/react";
+import { Button } from "./ui";
 
 export function Header() {
   const navigate = useNavigate();
@@ -18,23 +19,19 @@ export function Header() {
         className="w-[100px] cursor-pointer"
       />
       <div className="flex items-center gap-4">
-        <div
+        <Button
           onClick={() => navigate("/swap")}
-          className="flex items-center justify-between cursor-pointer gap-4"
+          className="flex items-center"
         >
-          <h2 className="mb-0 flex items-center">
-            <span className="!text-[18px] mr-[4px]">🔄</span>Swap
-          </h2>
-        </div>
+          <span className="mr-2">🔄</span>Swap
+        </Button>
         {user && (
-          <div
+          <Button
             onClick={() => navigate("/profile")}
-            className="flex items-center justify-between cursor-pointer"
+            className="flex items-center"
           >
-            <h2 className="mb-0">
-              <span className="!text-[18px] mr-[4px]">👤</span>Profile
-            </h2>
-          </div>
+            <span className="mr-2">👤</span>Profile
+          </Button>
         )}
         <ConnectWallet />
       </div>

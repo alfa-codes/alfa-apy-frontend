@@ -44,7 +44,7 @@ export function Profile() {
     const chartData = provider === "KongSwap" ? kongSwap : icpSwap;
 
   return (
-    <div className="grid grid-cols-1 gap-8">
+    <div className="grid grid-cols-1 gap-8 min-w-[800px]">
       <UserStats />
       <div className="grid grid-cols-1 gap-8">
         {/* TVL Chart */}

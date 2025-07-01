@@ -242,6 +242,33 @@ export function Landing() {
           </motion.div>
         </div>
       </section>
+
+      {/* Documentation Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+              Still have questions?
+            </h2>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Read our comprehensive documentation to learn more about our DeFi strategies and how to maximize your yields
+            </p>
+            <div className="flex justify-center">
+              <Button
+                onClick={() => window.open("https://github.com/olsemeno/alfaAPY/blob/main/README.md", "_blank")}
+                className="px-8 py-4 text-lg font-semibold bg-amber-600 text-white hover:bg-amber-700"
+              >
+                <span className="mr-2">📚</span>
+                Read Documentation
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 } 
