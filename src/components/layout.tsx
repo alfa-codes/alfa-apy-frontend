@@ -1,12 +1,12 @@
 import { PropsWithChildren } from "react";
 import { Header } from "./header";
 import { Footer } from "./footer";
-import { useLocation, useNavigate } from "react-router-dom";
+// import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
 
 export function Layout({ children }: PropsWithChildren) {
-  const navigate = useNavigate();
-  const location = useLocation();
+  // const navigate = useNavigate();
+  // const location = useLocation();
   const { theme } = useTheme();
   
   return (
@@ -20,20 +20,6 @@ export function Layout({ children }: PropsWithChildren) {
         }`}>
           Dominate DeFi with highest APY
         </h1>
-        {location.pathname === "/swap" && (
-          <div className="w-full mb-[20px]">
-            <button
-              onClick={() => navigate("/")}
-              className={`transition-colors text-[20px] ml-[20px] ${
-                theme === 'dark' 
-                  ? 'text-green-300 hover:text-green-400' 
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              ← Back
-            </button>
-          </div>
-        )}
         <div className="my-auto pb-[50px]">{children}</div>
         <Footer className="mt-auto" />
       </div>

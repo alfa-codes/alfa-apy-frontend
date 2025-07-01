@@ -7,22 +7,8 @@ export function Profile() {
   const { theme } = useTheme();
 
   return (
-    <>
-      <div>
-        <button
-          onClick={() => navigate("/")}
-          className={`transition-colors text-[20px] ml-[20px] ${
-            theme === 'dark' 
-              ? 'text-green-300 hover:text-green-400' 
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          ← Back
-        </button>
-      </div>
-      <div className="flex flex-col items-center">
-        <ProfileCard />
-      </div>
-    </>
+    <div className="flex flex-col items-center">
+      <ProfileCard />
+    </div>
   );
 }
