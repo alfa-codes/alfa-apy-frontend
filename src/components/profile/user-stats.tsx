@@ -84,15 +84,9 @@ export function UserStats() {
           </p>
         </div>
         <div className="text-center flex-1">
-          <h3 className="text-gray-600 text-sm">AVG. APY</h3>
+          <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
           <p className="text-2xl font-bold">
-            {Number(userStats.avgApy)}%
-          </p>
-        </div>
-        <div className="text-center flex-1">
-          <h3 className="text-gray-600 text-sm">TVL</h3>
-          <p className="text-2xl font-bold">
-            ${(Number(userStats.totalTvl) / 10**8).toFixed(2)}
+            {Number(userStats.avgApy).toFixed(2)}%
           </p>
         </div>
         <div className="text-center flex-1">

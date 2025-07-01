@@ -343,13 +343,13 @@ export function Strategy({
             <div>
               <p className="text-gray-600">APY</p>
               <p className="text-lg font-medium">
-                {value.apy}%
+                {Number(value.apy).toFixed(2)}%
               </p>
             </div>
             <div>
               <p className="text-gray-600">USD APY</p>
               <p className="text-lg font-medium">
-                {value.usd_apy}%
+                {Number(value.usd_apy).toFixed(2)}%
               </p>
             </div>
             <div>
@@ -414,7 +414,7 @@ export function Strategy({
                         ["rounded-r-lg"]: p.isActive,
                       })}
                     >
-                      {(p.apy)}%
+                      {Number(p.apy).toFixed(2)}%
                     </td>
                   </tr>
                 ))}

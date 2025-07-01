@@ -130,7 +130,7 @@ export function Strategies() {
             <div>
               <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
               <p className="text-2xl font-bold">
-                {Number(platformStats?.maxApy ?? 0)/100}%
+                {Number(platformStats?.maxApy ?? 0).toFixed(2)}%
               </p>
             </div>
             <div>
@@ -254,7 +254,7 @@ export function Strategies() {
               <div className="flex justify-center items-center gap-20 mt-6 pt-6 border-t border-amber-600/20">
                 <div className="flex items-baseline gap-2">
                   <span className="gradient-text text-[30px] font-bold">
-                    {Number(s.apy) / 100}%
+                    {Number(s.apy).toFixed(2)}%
                   </span>
                   <span className="text-gray-600">APY</span>
                 </div>
