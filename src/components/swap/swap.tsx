@@ -172,7 +172,7 @@ export function Swap({ className }: { className?: string }) {
         )}
         <Button
           onClick={handleSwap}
-          className="mt-[30px]"
+          className={`mt-[30px] ${theme === 'dark' && (!user || !amount) ? 'bg-[#a78bfa] text-[#22ff88] opacity-60' : ''}`}
           disabled={!user || isQuoteLoading || !amount || !quote || isSwapLoading}
           bg={theme === 'dark' ? '#a78bfa' : undefined}
           textColor={theme === 'dark' ? '#22ff88' : undefined}

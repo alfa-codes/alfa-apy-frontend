@@ -20,7 +20,6 @@ export function Button({
   // Dark theme colors
   const darkBg = props.bg || (theme === 'dark' ? colors.purple[600] : colors.amber[400]);
   const darkHoverBg = theme === 'dark' ? colors.purple[700] : colors.amber[500];
-  const darkShadow = theme === 'dark' ? colors.purple[800] : colors.amber[600];
   const darkHoverShadow = theme === 'dark' ? colors.purple[900] : colors.amber[700];
   const darkTextColor = theme === 'dark' ? colors.white : colors.black;
 

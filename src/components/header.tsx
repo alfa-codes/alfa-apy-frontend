@@ -24,10 +24,20 @@ export function Header() {
       />
       <div className="flex items-center gap-4">
         <Button
+          onClick={() => navigate("/strategies")}
+          className={`flex items-center ${
+            theme === 'dark' 
+              ? 'bg-purple-600 hover:bg-purple-700 text-green-400' 
+              : ''
+          }`}
+        >
+          <span className="mr-2">📈</span>Strategies
+        </Button>
+        <Button
           onClick={() => navigate("/swap")}
           className={`flex items-center ${
             theme === 'dark' 
-              ? 'bg-purple-600 hover:bg-purple-700 text-white' 
+              ? 'bg-purple-600 hover:bg-purple-700 text-green-400' 
               : ''
           }`}
         >

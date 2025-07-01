@@ -139,9 +139,10 @@ export function Strategy({
         <button
           onClick={() => {
             onBack();
-            // resetPools();
           }}
-          className="text-gray-600 hover:text-gray-800 transition-colors"
+          className={`transition-colors text-[20px] ml-[20px] font-mono shadow-lg
+            ${theme === 'dark' ? 'text-green-400 hover:text-green-300' : 'text-gray-600 hover:text-gray-800'}
+          `}
         >
           ← Back
         </button>

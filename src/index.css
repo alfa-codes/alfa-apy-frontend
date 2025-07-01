@@ -57,3 +57,56 @@ body {
 .Toastify__toast {
   justify-content: start !important;
 }
+
+/* Overlay для pixel-retroui Popup прозрачный */
+.Popup-module__pixelPopupOverlay___sCrPr,
+.modal-overlay,
+.pixel-modal-overlay,
+.pixel-popup-overlay {
+  background: transparent !important;
+}
+
+/* Принудительно тёмная тема для pixel-retroui Popup */
+.dark .Popup-module__pixelPopup___n--zK,
+.Popup-module__pixelPopup___n--zK {
+  background: #000 !important;
+  color: #22ff88 !important;
+  border: 2px solid #a78bfa !important;
+}
+
+/* Стили для input внутри pixel-retroui Popup в dark mode */
+.dark .Popup-module__pixelPopup___n--zK input,
+.dark .Popup-module__pixelPopup___n--zK input[type="text"],
+.dark .Popup-module__pixelPopup___n--zK input[type="number"] {
+  background: #232136 !important;
+  color: #22ff88 !important;
+  border: 2px solid #8b5cf6 !important;
+  font-family: 'Minecraft', monospace !important;
+  box-shadow: 4px 4px 0 #000 !important;
+}
+
+/* Стили для кнопки Confirm внутри pixel-retroui Popup в dark mode */
+.dark .Popup-module__pixelPopup___n--zK button,
+.dark .Popup-module__pixelPopup___n--zK .pixel-button {
+  background: #232136 !important;
+  color: #22ff88 !important;
+  border: 2px solid #8b5cf6 !important;
+  font-family: 'Minecraft', monospace !important;
+  box-shadow: 4px 4px 0 #000 !important;
+  opacity: 1 !important;
+}
+
+.dark .Popup-module__pixelPopup___n--zK button:disabled,
+.dark .Popup-module__pixelPopup___n--zK .pixel-button:disabled {
+  background: #232136 !important;
+  color: #bdbdbd !important;
+  border: 2px solid #8b5cf6 !important;
+  opacity: 0.5 !important;
+}
+
+.dark .Popup-module__pixelPopupInner___8KoDw,
+.dark .Popup-module__pixelPopupContent___ECzm3 {
+  background: #000 !important;
+  color: #22ff88 !important;
+  border: 2px solid #8b5cf6 !important;
+}

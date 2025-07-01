@@ -43,7 +43,7 @@ export function Deposit({
 
   if (isProcessing) {
     return (
-      <Popup isOpen={!!isOpen} onClose={() => {}} className={`modal ${theme === 'dark' ? 'bg-[#232136] text-green-400 border-2 border-purple-600' : ''}`}>
+      <Popup isOpen={!!isOpen} onClose={() => {}} className={`modal ${theme === 'dark' ? 'text-green-400 border-2 border-purple-600' : ''}`}>
         <div className="flex flex-col items-center justify-center py-12">
           <SquareLoader
             className="mx-auto mb-6"
@@ -62,7 +62,7 @@ export function Deposit({
 
   return (
     <>
-      <Button onClick={onClick} className={className}>
+      <Button onClick={onClick} className={className} bg={theme === 'dark' ? '#a78bfa' : undefined} textColor={theme === 'dark' ? '#22ff88' : undefined}>
         <span className="text-[20px] block mr-[5px]">📥</span> Deposit
       </Button>
       <Popup
@@ -73,7 +73,7 @@ export function Deposit({
           setInputError("");
           setShowSuccess(false);
         }}
-        className={`modal ${theme === 'dark' ? 'bg-[#232136] text-green-400 border-2 border-purple-600' : ''}`}
+        className={`modal ${theme === 'dark' ? 'text-green-400 border-2 border-purple-600' : ''}`}
       >
         {!showSuccess ? (
           <>

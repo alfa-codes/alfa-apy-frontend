@@ -80,7 +80,7 @@ export function Withdraw({
 
   return (
     <>
-      <Button onClick={onClick} className={className}>
+      <Button onClick={onClick} className={className} bg={theme === 'dark' ? '#a78bfa' : undefined} textColor={theme === 'dark' ? '#22ff88' : undefined}>
         <span className="text-[20px] block mr-[5px]">📤</span> Withdraw
       </Button>
       <Popup
