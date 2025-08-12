@@ -13,16 +13,12 @@ export type FetchAndSaveStrategiesResult = {
     'Ok' : FetchAndSaveStrategiesResponse
   } |
   { 'Err' : ResponseError };
-export type GetLatestSnapshotResult = { 'Ok' : [] | [StrategySnapshot] } |
-  { 'Err' : ResponseError };
 export interface GetStrategiesHistoryRequest {
   'from_timestamp' : [] | [bigint],
   'to_timestamp' : [] | [bigint],
   'strategy_ids' : [] | [Uint16Array | number[]],
 }
-export type GetStrategiesHistoryResult = {
-    'Ok' : Array<StrategyHistoryResponse>
-  } |
+export type GetStrategiesHistoryResult = { 'Ok' : Array<StrategyHistory> } |
   { 'Err' : ResponseError };
 export interface Pool {
   'id' : string,
@@ -45,13 +41,13 @@ export type ResponseErrorKind = { 'AccessDenied' : null } |
   { 'Validation' : null };
 export type SaveStrategySnapshotResult = { 'Ok' : null } |
   { 'Err' : ResponseError };
-export interface StrategyHistoryResponse {
+export interface StrategyHistory {
   'snapshots' : Array<StrategySnapshot>,
   'strategy_id' : number,
-  'total_count' : bigint,
 }
 export interface StrategySnapshot {
   'id' : string,
+  'apy' : number,
   'current_liquidity_updated_at' : [] | [bigint],
   'total_shares' : bigint,
   'strategy_id' : number,
@@ -64,8 +60,6 @@ export interface StrategySnapshot {
 }
 export interface _SERVICE {
   'fetch_and_save_strategies' : ActorMethod<[], FetchAndSaveStrategiesResult>,
-  'get_all_strategy_snapshots' : ActorMethod<[number], Array<StrategySnapshot>>,
-  'get_latest_snapshot' : ActorMethod<[number], GetLatestSnapshotResult>,
   'get_strategies_history' : ActorMethod<
     [GetStrategiesHistoryRequest],
     GetStrategiesHistoryResult

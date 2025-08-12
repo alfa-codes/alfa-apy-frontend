@@ -19,7 +19,7 @@
     "@dfinity/ledger-icp": "^2.6.10",
     "@dfinity/principal": "^2.3.0",
     "@dfinity/utils": "^2.10.1",
-    "@nfid/identitykit": "^1.0.10",
+    "@nfid/identitykit": "^1.0.14",
     "@reduxjs/toolkit": "^2.6.0",
     "blockies-react-svg": "^0.0.13",
     "clsx": "^2.1.1",

@@ -6,6 +6,8 @@ import { store } from "./store";
 import App from "./App.tsx";
 import { ToastContainer } from "react-toastify";
 import { VAULT_CANISTER_ID } from "./constants";
+import { NFIDW, InternetIdentity, OISY } from "@nfid/identitykit"
+
 
 import "@nfid/identitykit/react/styles.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
     <ToastContainer />
     <Provider store={store}>
       <IdentityKitProvider
+        signers={[NFIDW, InternetIdentity, OISY]}
         signerClientOptions={{ targets: [VAULT_CANISTER_ID] }}
       >
         <App />

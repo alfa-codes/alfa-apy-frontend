@@ -8,7 +8,7 @@ import {
 import { Card } from "../ui";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getTokenLogo } from "./utils";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Deposit } from "./deposit";
 import { Withdraw } from "./withdraw";
 import { useAgent, useAuth } from "@nfid/identitykit/react";
@@ -22,6 +22,7 @@ import { ConnectWallet } from "../connect-wallet";
 import { PaymentsCard } from "../payments";
 import { Strategy as StrategyResponse } from "../../services/strategies/strategy-service";
 import { useTheme } from "../../contexts/ThemeContext";
+import { strategyHistoryService, ChartDataPoint } from "../../services/strategies/strategy-history.service";
 
 export function Strategy({
   value,
@@ -79,45 +80,50 @@ export function Strategy({
   // const shares = balance?.user_shares ?? 0;
 
 
-  // Dropdown for chart label
-  const [chartType, setChartType] = useState<"APR Change" | "TVL Change">(
-    "APR Change"
-  );
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [period, setPeriod] = useState<"24h" | "1m" | "1y" | "all">("24h");
+  const [period, setPeriod] = useState<"24h" | "1w" | "1m">("24h");
 
-  // Add back the chartColor variable but with the correct colors
-  const chartColor = chartType === "TVL Change" ? "#22c55e" : "#a855f7"; // Green for TVL, Purple for APR
+  // Цвет для графика APY
+  const chartColor = "#a855f7"; // Purple for APY
 
-  // Mock data generator for chart
-  const generateMockData = (period: "24h" | "1m" | "1y" | "all") => {
-    type PeriodKey = "24h" | "1m" | "1y" | "all";
-    const now = Date.now();
-    const periods: Record<PeriodKey, { length: number; interval: number }> = {
-      "24h": { length: 24, interval: 60 * 60 * 1000 },
-      "1m": { length: 30, interval: 24 * 60 * 60 * 1000 },
-      "1y": { length: 12, interval: 30 * 24 * 60 * 60 * 1000 },
-      all: { length: 24, interval: 30 * 24 * 60 * 60 * 1000 },
-    };
-    const safePeriod: PeriodKey = period in periods ? period : "24h";
-    const { length, interval } = periods[safePeriod];
-    const icpSwap = Array.from({ length }, (_, i) => ({
-      x: now - (length - 1 - i) * interval,
-      y: 1000000 + Math.random() * 500000,
-    }));
-    const kongSwap = Array.from({ length }, (_, i) => ({
-      x: now - (length - 1 - i) * interval,
-      y: 800000 + Math.random() * 400000,
-    }));
-    return { icpSwap, kongSwap };
-  };
+  // Простой запрос данных один раз
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [isLoadingChart, setIsLoadingChart] = useState(false);
 
   // Chart data for this strategy
   const provider = value.name.toLowerCase().includes("kong")
     ? "KongSwap"
     : "IcpSwap";
-  const { icpSwap, kongSwap } = generateMockData(period);
-  const chartData = provider === "KongSwap" ? kongSwap : icpSwap;
+
+  // Загружаем данные один раз при монтировании компонента
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoadingChart(true);
+        const strategyChartData = await strategyHistoryService.getStrategyChartData(
+          [value.id],
+          period
+        );
+        
+        if (strategyChartData.length > 0) {
+          setChartData(strategyChartData[0].data);
+        }
+              } catch {
+          // Просто логируем ошибку, не устанавливаем состояние
+        } finally {
+        setIsLoadingChart(false);
+      }
+    };
+
+    loadData();
+  }, [period]); // Перезагружаем при изменении периода
+
+  const chartSeries = [
+    {
+      name: provider,
+      data: chartData,
+      color: chartColor,
+    },
+  ];
 
   // New Details Card with Tabs
   const [detailsTab, setDetailsTab] = useState<"tokens" | "providers">(
@@ -159,26 +165,11 @@ export function Strategy({
         {/* TVL Chart */}
         <Card className="overflow-hidden">
           <div className="flex flex-row items-center justify-between px-4 pt-2 pb-0 mb-0">
-            <div className="relative inline-block">
-              <select
-                value={chartType}
-                onChange={(e) =>
-                  setChartType(e.target.value as "APR Change" | "TVL Change")
-                }
-                onFocus={() => setDropdownOpen(true)}
-                onBlur={() => setDropdownOpen(false)}
-                className="bg-transparent outline-none text-lg font-mono appearance-none pr-6"
-                style={{ boxShadow: "none", border: "none" }}
-              >
-                <option value="APR Change">APR Change</option>
-                <option value="TVL Change">TVL Change</option>
-              </select>
-              <span className="pointer-events-none absolute right-1 top-1/2 transform -translate-y-1/2 text-lg select-none">
-                {dropdownOpen ? "▲" : "▼"}
-              </span>
-            </div>
+                          <div className="text-lg font-mono">
+                APY Change
+              </div>
             <div className="flex gap-4">
-              {(["24h", "1m", "1y", "all"] as const).map((p) => (
+              {(["24h", "1w", "1m"] as const).map((p) => (
                 <Button
                   key={p}
                   onClick={() => setPeriod(p)}
@@ -196,16 +187,35 @@ export function Strategy({
               ))}
             </div>
           </div>
-          <LineChart
-            period={period}
-            series={[
-              {
-                name: provider,
-                data: chartData,
-                color: chartColor,
-              },
-            ]}
-          />
+          {isLoadingChart ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+                <p className="text-gray-500">Loading chart data...</p>
+              </div>
+            </div>
+          ) : chartData.length === 0 ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <p className="text-gray-500">No chart data available</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                >
+                  Refresh
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+
+              <LineChart
+                period={period}
+                series={chartSeries}
+                key={`${value.id}-${period}`}
+              />
+            </>
+          )}
         </Card>
         {/* Right column - Deposit/Withdraw */}
         <div className="grid grid-cols-1 gap-8">

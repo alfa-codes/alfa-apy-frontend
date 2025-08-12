@@ -10,7 +10,7 @@ export interface LineChartSeries {
 }
 
 interface LineChartProps {
-  period: '24h' | '1m' | '1y' | 'all';
+  period: '24h' | '1w' | '1m';
   series: LineChartSeries[];
 }
 
@@ -27,7 +27,7 @@ function hexToRgba(hex: string, alpha: number) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-export const LineChart: React.FC<LineChartProps> = ({ series = [] }) => {
+export const LineChart: React.FC<LineChartProps> = ({ series = [], period = '24h' }) => {
   const chartSeries: Highcharts.SeriesAreaOptions[] = series.map(s => ({
     name: s.name,
     data: s.data,
@@ -48,20 +48,47 @@ export const LineChart: React.FC<LineChartProps> = ({ series = [] }) => {
     title: { text: undefined },
     chart: {
       backgroundColor: 'transparent',
-      spacing: [0, 0, 0, 0],
-      margin: [40, 0, 60, 0]
+      spacing: [10, 10, 10, 10],
+      margin: [40, 60, 60, 60],
+      borderWidth: 1,
+      borderColor: '#ddd',
+      plotBorderWidth: 1,
+      plotBorderColor: '#ddd'
     },
     xAxis: {
-      type: 'datetime',
-      labels: { enabled: false },
-      lineWidth: 0,
-      gridLineWidth: 0,
-      tickWidth: 0
+      type: 'linear',
+      labels: { 
+        enabled: true, 
+        style: { color: '#333', fontSize: '12px', fontWeight: 'bold' }
+      },
+      lineWidth: 2,
+      lineColor: '#333',
+      gridLineWidth: 1,
+      gridLineColor: '#e0e0e0',
+      tickWidth: 2,
+      tickColor: '#333',
+      title: { 
+        text: period === '24h' ? 'Hours' : 'Days', 
+        style: { color: '#333', fontSize: '14px', fontWeight: 'bold' } 
+      },
+      tickInterval: period === '24h' ? 1 : period === '1w' ? 1 : 5,
+      min: 0,
+      max: period === '24h' ? 23 : period === '1w' ? 6 : 29
     },
     yAxis: {
-      title: { text: undefined },
-      labels: { enabled: false },
-      gridLineWidth: 0
+      title: { 
+        text: 'APY (%)', 
+        style: { color: '#333', fontSize: '14px', fontWeight: 'bold' } 
+      },
+      labels: { 
+        enabled: true, 
+        style: { color: '#333', fontSize: '12px', fontWeight: 'bold' }
+      },
+      gridLineWidth: 1,
+      gridLineColor: '#e0e0e0',
+      lineWidth: 2,
+      lineColor: '#333',
+      opposite: false
     },
     series: chartSeries,
     credits: { enabled: false },
@@ -75,12 +102,26 @@ export const LineChart: React.FC<LineChartProps> = ({ series = [] }) => {
       floating: false,
       y: 10
     },
-    tooltip: { enabled: false }
+    tooltip: { 
+      enabled: true,
+      formatter: function() {
+        const timeLabel = period === '24h' ? 'Hour' : 'Day';
+        const timeUnit = period === '24h' ? 'h' : 'd';
+        return `<b>${this.series.name}</b><br/>
+                ${timeLabel}: ${this.x}${timeUnit}<br/>
+                APY: ${this.y}%`;
+      }
+    }
   };
 
+
+
   return (
-    <div className="relative w-full h-[300px] pb-8">
-      <HighchartsReact highcharts={Highcharts} options={options} />
+    <div className="relative w-full h-[400px] pb-12">
+      <HighchartsReact 
+        highcharts={Highcharts} 
+        options={options}
+      />
     </div>
   );
 }; 

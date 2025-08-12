@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export const idlFactory = ({ IDL }: { IDL: any }) => {
+export const idlFactory = ({ IDL }) => {
   const FetchAndSaveStrategiesResponse = IDL.Record({
     'errors' : IDL.Vec(IDL.Text),
     'success_count' : IDL.Nat64,
@@ -23,6 +22,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'Ok' : FetchAndSaveStrategiesResponse,
     'Err' : ResponseError,
   });
+  const GetStrategiesHistoryRequest = IDL.Record({
+    'from_timestamp' : IDL.Opt(IDL.Nat64),
+    'to_timestamp' : IDL.Opt(IDL.Nat64),
+    'strategy_ids' : IDL.Opt(IDL.Vec(IDL.Nat16)),
+  });
   const ExchangeId = IDL.Variant({
     'Sonic' : IDL.Null,
     'KongSwap' : IDL.Null,
@@ -36,6 +40,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   });
   const StrategySnapshot = IDL.Record({
     'id' : IDL.Text,
+    'apy' : IDL.Float64,
     'current_liquidity_updated_at' : IDL.Opt(IDL.Nat64),
     'total_shares' : IDL.Nat,
     'strategy_id' : IDL.Nat16,
@@ -46,22 +51,12 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'users_count' : IDL.Nat32,
     'position_id' : IDL.Opt(IDL.Nat64),
   });
-  const GetLatestSnapshotResult = IDL.Variant({
-    'Ok' : IDL.Opt(StrategySnapshot),
-    'Err' : ResponseError,
-  });
-  const GetStrategiesHistoryRequest = IDL.Record({
-    'from_timestamp' : IDL.Opt(IDL.Nat64),
-    'to_timestamp' : IDL.Opt(IDL.Nat64),
-    'strategy_ids' : IDL.Opt(IDL.Vec(IDL.Nat16)),
-  });
-  const StrategyHistoryResponse = IDL.Record({
+  const StrategyHistory = IDL.Record({
     'snapshots' : IDL.Vec(StrategySnapshot),
     'strategy_id' : IDL.Nat16,
-    'total_count' : IDL.Nat64,
   });
   const GetStrategiesHistoryResult = IDL.Variant({
-    'Ok' : IDL.Vec(StrategyHistoryResponse),
+    'Ok' : IDL.Vec(StrategyHistory),
     'Err' : ResponseError,
   });
   const SaveStrategySnapshotResult = IDL.Variant({
@@ -73,16 +68,6 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         [],
         [FetchAndSaveStrategiesResult],
         [],
-      ),
-    'get_all_strategy_snapshots' : IDL.Func(
-        [IDL.Nat16],
-        [IDL.Vec(StrategySnapshot)],
-        ['query'],
-      ),
-    'get_latest_snapshot' : IDL.Func(
-        [IDL.Nat16],
-        [GetLatestSnapshotResult],
-        ['query'],
       ),
     'get_strategies_history' : IDL.Func(
         [GetStrategiesHistoryRequest],
@@ -102,3 +87,4 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'test_delete_all_snapshots' : IDL.Func([], [], []),
   });
 };
+export const init = ({ IDL }) => { return []; };
