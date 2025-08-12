@@ -64,21 +64,17 @@ export function Strategy({
   const { deposit, isDepositing } = useDeposit();
   const { withdraw, isWithdrawing } = useWithdraw();
 
-  // const amountToWithdraw = balance
-  //   ? BigNumber(balance.user_shares)
-  //       .div(balance.total_shares)
-  //       .multipliedBy(
-  //         // BigNumber(balance.amount_1)
-  //         //   .multipliedBy(currentPool?.price ?? 0)
-  //         //   .plus(balance.amount_0)  TODO: fix this
-  //         1
-  //       )
-  //       .toFixed(token!.decimals)
-  //   : "0";
+  // Вычисляем доступную сумму для вывода на основе депозита пользователя
+  const amountToWithdraw = user && value.getUserInitialDeposit 
+    ? value.getUserInitialDeposit(user.principal).toString()
+    : "0";
 
-  const amountToWithdraw =  "0";
-  // const shares = balance?.user_shares ?? 0;
-
+  // Логируем для отладки
+  console.log("amountToWithdraw calculation:", {
+    user: user?.principal.toString(),
+    getUserInitialDeposit: value.getUserInitialDeposit,
+    result: amountToWithdraw
+  });
 
   const [period, setPeriod] = useState<"24h" | "1w" | "1m">("24h");
 
@@ -314,6 +310,7 @@ export function Strategy({
                       available={amountToWithdraw}
                       tokenSymbol={token?.symbol ?? ""}
                       loading={isWithdrawing}
+                      disabled={Number(amountToWithdraw) === 0}
                     />
                     {/* <Button
                       className="md:w-[150px]"

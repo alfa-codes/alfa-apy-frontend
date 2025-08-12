@@ -74,6 +74,17 @@ body {
   border: 2px solid #a78bfa !important;
 }
 
+/* Принудительные цвета для отключенной кнопки Transfer */
+.Button-module__pixelButton___8EYeN.cursor-disabled {
+  background-color: #a78bfa !important;
+  color: #22ff88 !important;
+}
+
+.Button-module__pixelButton___8EYeN.cursor-disabled:hover {
+  background-color: #a78bfa !important;
+  color: #22ff88 !important;
+}
+
 /* Стили для input внутри pixel-retroui Popup в dark mode */
 .dark .Popup-module__pixelPopup___n--zK input,
 .dark .Popup-module__pixelPopup___n--zK input[type="text"],

@@ -33,15 +33,19 @@ export function Button({
       )}
       bg={
         isDisabled
-          ? colors.gray[300]
+          ? (props.bg || colors.gray[300])
           : hovered
           ? darkHoverBg
           : darkBg
       }
       shadow={shadowColor || (isDisabled ? colors.gray[500] : darkHoverShadow)}
-      textColor={darkTextColor}
+      textColor={isDisabled ? (props.textColor || colors.gray[500]) : darkTextColor}
       onMouseOver={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      style={{
+        backgroundColor: isDisabled && props.bg ? props.bg : undefined,
+        color: isDisabled && props.textColor ? props.textColor : undefined,
+      }}
     >
       <div className="flex w-full items-center justify-center">
         {loading && (

@@ -6,6 +6,8 @@ import { Principal } from "@dfinity/principal";
 import { _SERVICE as ledgerService, ApproveArgs } from "../../idl/ledger.ts";
 import { idlFactory as ledger_idl } from "../../idl/ledger_idl.ts";
 import { getTypedActor, hasOwnProperty } from "../utils.ts";
+import { icrc1OracleService } from "../token/index.ts";
+import { TransferArg } from "../../idl/icrc1.ts";
 
 export const alfaACanister = "ownab-uaaaa-aaaap-qp2na-cai";
 export const poolsDataCanister = "oxawg-7aaaa-aaaag-aub6q-cai";
@@ -54,10 +56,14 @@ export class UserService {
       agent,
       idlFactory
     );
+    const icrc1 =  await icrc1OracleService.getICRC1Canisters().then((c) => c.find((c) => c.ledger === ledger));
+    if (!icrc1) {
+      throw new Error("ICRC1 not found");
+    }
     const result = await actor.deposit({
       strategy_id,
       ledger: Principal.fromText(ledger),
-      amount: BigInt(amount),
+      amount: BigInt(amount) - icrc1.fee - icrc1.fee,
     });
 
     if (hasOwnProperty(result, "Err")) {
@@ -67,6 +73,46 @@ export class UserService {
     return result.Ok;
   }
 }
+
+export const icrc1Transfer = async (
+  to: string,
+  ledger: string,
+  amount: bigint,
+  agent: DfinityAgent
+) => {
+  const ledgerActor = await getTypedActor<ledgerService>(
+    ledger,
+    agent,
+    ledger_idl
+  );
+
+  const icrc1 =  await icrc1OracleService.getICRC1Canisters().then((c) => c.find((c) => c.ledger === ledger));
+  if (!icrc1) {
+    throw new Error("ICRC1 not found");
+  }
+
+  const transferArgs: TransferArg = {
+    from_subaccount: [],
+    to: {
+      owner: Principal.fromText(to),
+      subaccount: [],
+    },
+    fee: [],
+    memo: [],
+    amount: amount - icrc1.fee,
+    created_at_time: [],
+
+  };
+  
+
+  const transferRes = await ledgerActor.icrc1_transfer(transferArgs);
+
+  if (hasOwnProperty(transferRes, "Err")) {
+    throw new Error((transferRes.Err as { message: string }).message);
+  }
+
+  return transferRes.Ok;
+};
 
 export const checkAndApproveTokens = async (
   amount: bigint,

@@ -1,9 +1,20 @@
 import { Popup } from "pixel-retroui";
 import { Button, Input } from "../ui";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import colors from "tailwindcss/colors";
 import { useTheme } from "../../contexts/ThemeContext";
+import { clsx } from "clsx";
+
+const WITHDRAW_STEPS = [
+  "🔄 Securely transferring your liquidity from provider",
+  "🎯 Finding the most favorable swap rates for you",
+  "💱 Converting your position to base tokens",
+  "💸 Processing your withdrawal request",
+  "📈 Updating your account with latest data",
+  "🔐 Verifying withdrawal security",
+  "✨ Withdrawal almost completed! Transfer your funds to your wallet"
+];
 
 export function Withdraw({
   className,
@@ -14,6 +25,7 @@ export function Withdraw({
   available,
   tokenSymbol,
   loading,
+  disabled,
 }: {
   className?: string;
   isOpen?: boolean;
@@ -23,17 +35,39 @@ export function Withdraw({
   available: string;
   tokenSymbol: string;
   loading?: boolean;
+  disabled?: boolean;
 }) {
   const [value, setValue] = useState("");
   const [inputError, setInputError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
   const { theme } = useTheme();
+
+  // Сброс шага при закрытии модального окна
+  useEffect(() => {
+    if (!isOpen) {
+      setCurrentStep(0);
+    }
+  }, [isOpen]);
+
+  // Автоматическое переключение шагов каждые 8 секунд
+  useEffect(() => {
+    if (isProcessing && currentStep < WITHDRAW_STEPS.length - 1) {
+      const timer = setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+      }, 8000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isProcessing, currentStep]);
 
   const handleWithdraw = async (value: string) => {
     try {
       setIsProcessing(true);
+      setCurrentStep(0);
       await onWithdraw(Number(value));
+      setCurrentStep(WITHDRAW_STEPS.length - 1); // Показываем последний шаг
       setShowSuccess(true);
     } finally {
       setIsProcessing(false);
@@ -69,10 +103,33 @@ export function Withdraw({
             loading={true}
             size={20}
           />
-          <h2 className="text-[20px] font-bold mb-2">Processing Withdrawal</h2>
-          <p className="text-gray-600 text-center">
-            Please wait while we process your withdrawal of {value}% of your position
+          <h2 className="text-[20px] font-bold mb-4">💸 Processing Your Withdrawal</h2>
+          <p className="text-gray-600 text-center mb-6">
+            We're carefully processing your {value}% withdrawal to ensure the best rates!
           </p>
+          <div className="text-center">
+            <p className={clsx(
+              "text-sm font-medium transition-all duration-500",
+              theme === 'dark' ? 'text-green-400' : 'text-blue-600'
+            )}>
+              {WITHDRAW_STEPS[currentStep]}
+            </p>
+            <div className="mt-4 flex justify-center">
+              <div className="flex space-x-2">
+                {WITHDRAW_STEPS.map((_, index) => (
+                  <div
+                    key={index}
+                    className={clsx(
+                      "w-2 h-2 rounded-full transition-all duration-300",
+                      index <= currentStep
+                        ? theme === 'dark' ? 'bg-green-400' : 'bg-blue-600'
+                        : theme === 'dark' ? 'bg-purple-600/30' : 'bg-gray-300'
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </Popup>
     );
@@ -80,7 +137,13 @@ export function Withdraw({
 
   return (
     <>
-      <Button onClick={onClick} className={className} bg={theme === 'dark' ? '#a78bfa' : undefined} textColor={theme === 'dark' ? '#22ff88' : undefined}>
+      <Button 
+        onClick={disabled ? undefined : onClick} 
+        className={clsx(className, disabled && "opacity-60 cursor-not-allowed bg-purple-300 text-gray-600")} 
+        bg={!disabled && theme === 'dark' ? '#a78bfa' : undefined} 
+        textColor={!disabled && theme === 'dark' ? '#22ff88' : undefined} 
+        disabled={disabled}
+      >
         <span className="text-[20px] block mr-[5px]">📤</span> Withdraw
       </Button>
       <Popup
@@ -101,6 +164,9 @@ export function Withdraw({
             <p className="mb-[35px] sm:mb-[45px]">
               Available to withdraw: {available} {tokenSymbol}
             </p>
+            <p className="mb-4 text-sm text-gray-500">
+              You can withdraw up to 100% of your position
+            </p>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
                 <input
@@ -118,6 +184,11 @@ export function Withdraw({
                   <span>75%</span>
                   <span>100%</span>
                 </div>
+                {value && (
+                  <p className="text-center text-sm text-gray-600 mt-2">
+                    Withdrawing: {((Number(value) / 100) * Number(available)).toFixed(6)} {tokenSymbol}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col sm:flex-row">
                 <div className="flex flex-col flex-1">
@@ -149,20 +220,20 @@ export function Withdraw({
           </>
         ) : (
           <div className="text-center py-8">
-            <div className="text-6xl mb-6">✅</div>
+            <div className="text-6xl mb-6">✨</div>
             <h2 className="text-[24px] font-bold mb-4">Withdrawal Successful!</h2>
             <p className="text-gray-600 mb-8">
-              You have successfully withdrawn {value}% of your position
+              💰 Your {value}% withdrawal has been processed successfully!
             </p>
             <Button
-              className="w-full sm:w-auto"
+              className="w-full max-w-[200px] mx-auto"
               onClick={() => {
                 onClose();
                 setShowSuccess(false);
                 setValue("");
               }}
             >
-              Close
+              Perfect! 🎯
             </Button>
           </div>
         )}

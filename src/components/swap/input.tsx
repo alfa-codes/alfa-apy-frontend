@@ -16,15 +16,16 @@ export function Input({
   usdValue: string;
   balance: string;
 }) {
-  console.log("rerender")
   return (
-    <div className={clsx("relative", className)}>
+    <div className={clsx("relative w-full", className)}>
       <InputUi
-        className="px-[5px] pt-[15px] pb-[35px] w-full text-[21px]"
+        className="px-4 pt-4 pb-16 w-full text-lg"
         {...props}
       />
-      <div className="absolute right-[20px] top-[20px]">
-        {tokens.length && (
+      
+      {/* Token Dropdown */}
+      <div className="absolute right-3 top-3">
+        {tokens.length > 0 && (
           <Dropdown
             values={tokens}
             value={token.value}
@@ -32,13 +33,17 @@ export function Input({
           />
         )}
       </div>
-      <div className="absolute bottom-[10px] px-[20px] flex justify-between w-full">
+      
+      {/* Balance and USD Info */}
+      <div className="absolute bottom-3 left-3 right-3 flex justify-between text-sm">
         {token && (
           <>
-            <p className="mb-0 text-sm">{usdValue}</p>
-            <p className="mb-0 text-sm">
+            <span className="text-gray-600 dark:text-green-400">
+              {usdValue}
+            </span>
+            <span className="text-gray-600 dark:text-green-400">
               Balance: {balance} {token.label}
-            </p>
+            </span>
           </>
         )}
       </div>
