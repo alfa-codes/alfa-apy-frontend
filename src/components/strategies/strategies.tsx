@@ -61,6 +61,13 @@ export function Strategies() {
   );
 
 
+  console.log('Strategies debug:', { 
+    strategies: !!strategies, 
+    strategiesLength: strategies?.length, 
+    tokensLength: tokens.length,
+    strategiesStatus: strategies?.status
+  });
+  
   if (!strategies || !tokens.length) {
     return (
       <SquareLoader

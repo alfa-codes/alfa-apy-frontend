@@ -8,6 +8,7 @@ import { idlFactory as IDL_ICRC1_NODE } from "./idl/node-index-idl";
 import { _SERVICE as ServiceNode } from "./idl/node-index";
 import { idlFactory as IDL_TOKEN } from "./idl/token-idl";
 import { _SERVICE as ServiceToken, PublicTokenOverview } from "./idl/Token";
+import { storageWithTtl } from "../token/icrc1/service/storage";
 
 const EXCHANGE_RATE_CANISTER = "2ixw4-taaaa-aaaag-qcpdq-cai";
 type NumberType = string | number | bigint | BigNumber;
@@ -109,9 +110,37 @@ export class ExchangeRateService {
   private async getTokenStorageCanister(
     ledger: string
   ): Promise<string | undefined> {
-    return this.exchangeTokenNodeActor.tokenStorage(ledger).then((result) => {
-      return result.length > 0 ? result[0] : undefined;
-    });
+    const cacheKey = `tokenStorage_${ledger}`;
+    const cache = await storageWithTtl.getEvenExpired(cacheKey);
+    
+    if (!cache) {
+      const result = await this.exchangeTokenNodeActor.tokenStorage(ledger);
+      const tokenStorage = result.length > 0 ? result[0] : undefined;
+      
+      if (tokenStorage) {
+        storageWithTtl.set(
+          cacheKey,
+          tokenStorage,
+          60 * 1000, // 1 минута TTL
+        );
+      }
+      return tokenStorage;
+    } else if (cache && cache.expired) {
+      // Асинхронно обновляем кеш
+      this.exchangeTokenNodeActor.tokenStorage(ledger).then((result) => {
+        const tokenStorage = result.length > 0 ? result[0] : undefined;
+        if (tokenStorage) {
+          storageWithTtl.set(
+            cacheKey,
+            tokenStorage,
+            60 * 1000,
+          );
+        }
+      });
+      return cache.value as string;
+    } else {
+      return cache.value as string;
+    }
   }
 
   private async getExchangeRate(pair: string): Promise<ExchangeRate__1> {

@@ -89,10 +89,7 @@ export function Strategy({
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [isLoadingChart, setIsLoadingChart] = useState(false);
 
-  // Chart data for this strategy
-  const provider = value.name.toLowerCase().includes("kong")
-    ? "KongSwap"
-    : "IcpSwap";
+
 
   // Загружаем данные один раз при монтировании компонента
   useEffect(() => {
@@ -119,7 +116,7 @@ export function Strategy({
 
   const chartSeries = [
     {
-      name: provider,
+      name: "",
       data: chartData,
       color: chartColor,
     },
@@ -249,17 +246,7 @@ export function Strategy({
                       </p>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600">Daily Yield</p>
-                    <p className="text-lg font-medium text-green-600">
-                      $
-                      {/* {(
-                        (balance?.usd_balance ?? 0) *
-                        (apyBreakdown.totalApy / 365 / 100)
-                      ).toFixed(2)} */}
-                      "N/A"
-                    </p>
-                  </div>
+
                 </div>
                 {/* Deposit/Withdraw Buttons */}
                 <div>
@@ -503,20 +490,12 @@ export function Strategy({
                       theme === 'dark' ? 'bg-purple-600 text-green-400' : 'bg-gray-300'
                     )}
                   >
-                    {provider.toString() === "KongSwap"
-                      ? "🦍"
-                      : provider.toString() === "ICPSwap"
-                      ? "🔄"
-                      : "❓"}
+                    🦍
                   </span>
                   <div>
                     <div className="font-bold text-lg">
                       <a
-                        href={
-                          provider.toString() === "KongSwap"
-                            ? "https://www.kongswap.io/"
-                            : "https://www.icpswap.com/"
-                        }
+                        href="https://www.kongswap.io/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={theme === 'dark' ? 'text-green-400 hover:underline' : 'text-blue-700 hover:underline'}

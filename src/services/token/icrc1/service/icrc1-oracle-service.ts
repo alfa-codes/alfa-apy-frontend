@@ -6,7 +6,9 @@ import { Principal } from "@dfinity/principal";
 import { Icrc1Pair } from "../icrc1-pair/impl/Icrc1-pair";
 import { BigNumber } from "bignumber.js";
 import { exchangeRateService } from "../../../exchange/exchange-rate";
-import { integrationCache } from "../../../cache";
+import { storageWithTtl } from "./storage";
+import { Category } from "../enum/enums";
+import { hasOwnProperty } from "../../../utils";
 
 export const icrc1OracleActor = createActor<ICRC1Oracle>(
   "zjahs-wyaaa-aaaal-qjuia-cai",
@@ -70,20 +72,79 @@ export class ICRC1OracleService {
   //TODO add cache
   async requestNetworkForCanisters(): Promise<ICRC1[]> {
     const cacheKey = 'requestNetworkForCanisters';
-    const cached = await integrationCache.getItem<ICRC1[]>(cacheKey);
-    if (cached) return cached;
+    const cache = await storageWithTtl.getEvenExpired(cacheKey)
+    if (!cache) {
+      const response = await this.requestNetworkForCanisters1()
+      storageWithTtl.set(
+        cacheKey,
+        this.serializeCanisters(response),
+        60 * 1000,
+      )
+      return response
+    } else if (cache && cache.expired) {
+      this.requestNetworkForCanisters1().then((response) => {
+        storageWithTtl.set(
+          cacheKey,
+          this.serializeCanisters(response),
+          60 * 1000,
+        )
+      })
+      return this.deserializeCanisters(cache.value as string)
+    } else {
+      return this.deserializeCanisters(cache.value as string)
+    }
+  }
 
-    const result = await icrc1OracleActor.count_icrc1_canisters().then((canisters) => {
+  async requestNetworkForCanisters1() {
+    return await icrc1OracleActor.count_icrc1_canisters().then((canisters) => {
       return Promise.all(
         Array.from({ length: Math.ceil(Number(canisters) / 25) }, (_, i) =>
-          icrc1OracleActor.get_icrc1_paginated(i * 25, 25)
-        )
-      ).then((res) => res.flat());
-    });
-
-    await integrationCache.setItem(cacheKey, result, { ttl: 300 });
-    return result;
+          icrc1OracleActor.get_icrc1_paginated((i * 25), (25)),
+        ),
+      ).then((res) => res.flat())
+    })
   }
+
+  serializeCanisters(canister: Array<ICRC1>): string {
+    return JSON.stringify(
+      canister.map((c) => {
+        return {
+          name: c.name,
+          ledger: c.ledger,
+          category: c.category,
+          index: c.index,
+          symbol: c.symbol,
+          logo: c.logo,
+          fee: Number(c.fee),
+          decimals: c.decimals,
+          // root_canister_id: c.root_canister_id,
+        }
+      }),
+    )
+  }
+
+  deserializeCanisters(canister: string): Array<ICRC1> {
+    return (JSON.parse(canister) as Array<any>).map((c) => {
+      return {
+        name: c.name,
+        ledger: c.ledger,
+        category: c.category,
+        index: c.index,
+        symbol: c.symbol,
+        logo: c.logo,
+        fee: BigInt(c.fee),
+        decimals: c.decimals,
+        root_canister_id: c.root_canister_id,
+        date_added: c.date_added,
+      }
+    }).filter((c) => !hasOwnProperty(c.category, "Spam"))
+  }
+
+
+
 }
+
+
+
 
 export const icrc1OracleService = new ICRC1OracleService();

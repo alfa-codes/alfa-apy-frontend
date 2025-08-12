@@ -1,7 +1,7 @@
 import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import colors from 'tailwindcss/colors';
+
 
 export interface LineChartSeries {
   name: string;
@@ -93,14 +93,7 @@ export const LineChart: React.FC<LineChartProps> = ({ series = [], period = '24h
     series: chartSeries,
     credits: { enabled: false },
     legend: {
-      enabled: true,
-      align: 'center',
-      verticalAlign: 'bottom',
-      layout: 'horizontal',
-      backgroundColor: '#fff',
-      itemStyle: { fontWeight: 'bold', fontSize: '14px', color: colors.gray[700] },
-      floating: false,
-      y: 10
+      enabled: false,
     },
     tooltip: { 
       enabled: true,
