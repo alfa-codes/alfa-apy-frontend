@@ -9,7 +9,6 @@ import { Strategy } from "../../services/strategies/strategy-service";
 
 interface UserStatsData {
   totalTvl: bigint;
-  avgApy: number;
   totalStrategies: number;
   deposited: number;
 }
@@ -28,8 +27,6 @@ export function UserStats() {
     if (!strategies || !balances || status !== Status.SUCCEEDED) {
       return {
         totalTvl: 0n,
-        avgApy: 0n,
-        avgApyMonth: 0n,
         totalStrategies: 0,
         deposited: 0,
       };
@@ -46,7 +43,6 @@ export function UserStats() {
           return {
             ...acc,
             totalTvl: acc.totalTvl + strategy.tvl,
-            avgApy: (acc.avgApy + strategy.apy),
             totalStrategies: acc.totalStrategies + 1,
             deposited: strategy.initialDeposit.reduce(
               (acc, [, value]) =>
@@ -59,17 +55,10 @@ export function UserStats() {
       },
       {
         totalTvl: 0n,
-        avgApy: 0,
         totalStrategies: 0,
         deposited: 0,
       }
     );
-
-    // Calculate average APY
-    if (stats.totalStrategies > 0) {
-      stats.avgApy = stats.avgApy / stats.totalStrategies;
-      console.log("Final stats after averaging:", stats);
-    }
 
     return stats;
   }, [strategies, balances, status]);
@@ -81,12 +70,6 @@ export function UserStats() {
           <h3 className="text-gray-600 text-sm">DEPOSITED</h3>
           <p className="text-2xl font-bold">
             ${(userStats.deposited).toFixed(2)}
-          </p>
-        </div>
-        <div className="text-center flex-1">
-          <h3 className="text-gray-600 text-sm">HIGHEST APY</h3>
-          <p className="text-2xl font-bold">
-            {Number(userStats.avgApy).toFixed(2)}%
           </p>
         </div>
         <div className="text-center flex-1">

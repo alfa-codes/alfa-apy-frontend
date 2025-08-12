@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { LineChart } from "../charts/line-chart";
 import { Button, Card } from "../ui";
 import { UserStats } from "./user-stats";
 import { EventRecordsCard } from "../event-records/card";
@@ -14,36 +13,9 @@ export function Profile() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [period, setPeriod] = useState<"24h" | "1m" | "1y" | "all">("24h");
 
-  // Add back the chartColor variable but with the correct colors
-  const chartColor = chartType === "TVL Change" ? "#22c55e" : "#a855f7";
 
   // Mock data generator for chart
-  const generateMockData = (period: "24h" | "1m" | "1y" | "all") => {
-    type PeriodKey = "24h" | "1m" | "1y" | "all";
-    const now = Date.now();
-    const periods: Record<PeriodKey, { length: number; interval: number }> = {
-      "24h": { length: 24, interval: 60 * 60 * 1000 },
-      "1m": { length: 30, interval: 24 * 60 * 60 * 1000 },
-      "1y": { length: 12, interval: 30 * 24 * 60 * 60 * 1000 },
-      all: { length: 24, interval: 30 * 24 * 60 * 60 * 1000 },
-    };
-    const safePeriod: PeriodKey = period in periods ? period : "24h";
-    const { length, interval } = periods[safePeriod];
-    const icpSwap = Array.from({ length }, (_, i) => ({
-      x: now - (length - 1 - i) * interval,
-      y: 1000000 + Math.random() * 500000,
-    }));
-    const kongSwap = Array.from({ length }, (_, i) => ({
-      x: now - (length - 1 - i) * interval,
-      y: 800000 + Math.random() * 400000,
-    }));
-    return { icpSwap, kongSwap };
-  };
-
-    // Chart data for this strategy
-    const provider = "KongSwap";
-    const { icpSwap, kongSwap } = generateMockData(period);
-    const chartData = provider === "KongSwap" ? kongSwap : icpSwap;
+ 
 
   return (
     <div className="grid grid-cols-1 gap-8 min-w-[800px]">
@@ -89,16 +61,11 @@ export function Profile() {
               ))}
             </div>
           </div>
-          <LineChart
-            period={period}
-            series={[
-              {
-                name: provider,
-                data: chartData,
-                color: chartColor,
-              },
-            ]}
-          />
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold">Coming soon</h3>
+            </div>
+          </div>
         </Card>
       </div>
       <EventRecordsCard />

@@ -24,7 +24,7 @@ export function useStrategies(user?: string) {
     if (!data && status === Status.IDLE) {
       dispatch(fetchStrategies());
     }
-  }, [status, data, dispatch]);
+  }, [dispatch]); // Убираем status и data из зависимостей
 
   useEffect(() => {
     if (agent) dispatch(initStrategies(agent));

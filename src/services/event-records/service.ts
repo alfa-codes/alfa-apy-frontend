@@ -22,6 +22,7 @@ export type EventRecord = {
   type: string;
   // token: string;
   userPrincipal?: Principal;
+  correlation_id: string;
   // error?: [];
   // fee?: string;
 };
@@ -62,6 +63,7 @@ export class EventRecordsService {
           type: eventToEventRecordType(event.event),
           timestamp: event.timestamp,
           userPrincipal: event.user.length > 0 ? event.user[0] : undefined,
+          correlation_id: event.correlation_id,
         };
       });
     } else {

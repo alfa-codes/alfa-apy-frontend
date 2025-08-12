@@ -44,7 +44,49 @@ export class ExchangeRateService {
     this.ICP2USD = this.parseTokenAmount(result.rate, result.decimals);
   }
 
+  
   async getAllIcpTokens() {
+    const cacheKey = 'getAllIcpTokens';
+    const cache = await storageWithTtl.getEvenExpired(cacheKey);
+    
+    if (!cache) {
+      const responseJson = await fetch("https://web2.icptokens.net/api/tokens");
+      if (!responseJson.ok) return undefined;
+      const response = await responseJson.json();
+      const tokens: Array<{
+        canister_id: string;
+        metrics: { price: { usd: string }; change: { "24h": { usd: string } } };
+      }> = Array.isArray(response) ? response : [];
+      const result = tokens.map((el) => ({
+        address: el.canister_id,
+        price: Number(el.metrics.price.usd),
+        priceDayChange: Number(el.metrics.change["24h"].usd),
+      }));
+      
+      storageWithTtl.set(
+        cacheKey,
+        JSON.stringify(result),
+        60 * 1000, // 1 минута TTL
+      );
+      return result;
+    } else if (cache && cache.expired) {
+      // Асинхронно обновляем кэш
+      this.getAllIcpTokensFresh().then((response) => {
+        if (response) {
+          storageWithTtl.set(
+            cacheKey,
+            JSON.stringify(response),
+            60 * 1000,
+          );
+        }
+      });
+      return JSON.parse(cache.value as string);
+    } else {
+      return JSON.parse(cache.value as string);
+    }
+  }
+
+  private async getAllIcpTokensFresh() {
     const responseJson = await fetch("https://web2.icptokens.net/api/tokens");
     if (!responseJson.ok) return undefined;
     const response = await responseJson.json();
@@ -59,6 +101,8 @@ export class ExchangeRateService {
     }));
   }
 
+
+
   async usdPriceForICRC1(ledger: string): Promise<
     | {
         value: BigNumber;
@@ -69,7 +113,7 @@ export class ExchangeRateService {
   > {
     try {
       const token = (await this.getAllIcpTokens())?.find(
-        (t) => t.address === ledger
+        (t: { address: string; price: number; priceDayChange: number }) => t.address === ledger
       );
 
       if (!token) {
