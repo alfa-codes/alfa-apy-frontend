@@ -3,7 +3,7 @@ import { strategyHistoryService, ChartDataPoint } from '../services/strategies/s
 
 export interface UseStrategyHistoryParams {
   strategyIds: number[];
-  period: "24h" | "1m" | "all";
+  period: "24h" | "1w" | "1m";
   autoFetch?: boolean;
 }
 

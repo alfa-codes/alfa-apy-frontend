@@ -8,7 +8,7 @@ import {
 import { Card } from "../ui";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getTokenLogo } from "./utils";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Deposit } from "./deposit";
 import { Withdraw } from "./withdraw";
 import { useAgent, useAuth } from "@nfid/identitykit/react";

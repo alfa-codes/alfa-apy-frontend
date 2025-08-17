@@ -20,12 +20,6 @@ export interface ChartPeriod {
 }
 
 export class StrategyHistoryService {
-  private readonly periods: ChartPeriod = {
-    "24h": { length: 24, interval: 60 * 60 * 1000 }, // 1 hour intervals
-    "1w": { length: 7, interval: 24 * 60 * 60 * 1000 }, // 1 day intervals
-    "1m": { length: 30, interval: 24 * 60 * 60 * 1000 }, // 1 day intervals
-  };
-
   /**
    * Получает историю стратегий для построения графика
    * @param strategyIds - массив ID стратегий
@@ -102,7 +96,7 @@ export class StrategyHistoryService {
 
     // Преобразуем в формат для графика - используем реальное поле APY
     // Генерируем данные в зависимости от периода
-    let chartData: ChartDataPoint[] = [];
+    const chartData: ChartDataPoint[] = [];
     
     if (period === "24h") {
       // 24 часа - 24 точки
@@ -145,32 +139,6 @@ export class StrategyHistoryService {
 
     console.log("Processed chart data:", chartData);
     return chartData;
-  }
-
-  /**
-   * Получает последний снэпшот стратегии
-   * @param strategyId - ID стратегии
-   * @returns последний снэпшот или null
-   */
-  public async getLatestSnapshot(strategyId: number): Promise<unknown | null> {
-    try {
-      const anonymousActor = await getAnonActor<_SERVICE>(
-        STRATEGY_HISTORY_CANISTER_ID,
-        idlFactory
-      );
-
-      const result = await anonymousActor.get_latest_snapshot(strategyId);
-
-      if ("Ok" in result) {
-        return result.Ok[0] || null;
-      } else {
-        console.error("Error fetching latest snapshot:", result.Err);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error in getLatestSnapshot:", error);
-      return null;
-    }
   }
 
   /**

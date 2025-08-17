@@ -24,7 +24,7 @@ export class PoolStatsService {
       
       storageWithTtl.set(
         cacheKey,
-        JSON.stringify(result.Ok, (key, value) => 
+        JSON.stringify(result.Ok, (_, value) => 
           typeof value === 'bigint' ? value.toString() : value
         ),
         60 * 1000, // 1 минута TTL
@@ -35,7 +35,7 @@ export class PoolStatsService {
       this.get_pools_fresh().then((response) => {
         storageWithTtl.set(
           cacheKey,
-          JSON.stringify(response, (key, value) => 
+          JSON.stringify(response, (_, value) => 
             typeof value === 'bigint' ? value.toString() : value
           ),
           60 * 1000,
@@ -83,7 +83,7 @@ export class PoolStatsService {
       
       storageWithTtl.set(
         cacheKey,
-        JSON.stringify(result, (key, value) => 
+        JSON.stringify(result, (_, value) => 
           typeof value === 'bigint' ? value.toString() : value
         ),
         60 * 1000, // 1 минута TTL
@@ -94,7 +94,7 @@ export class PoolStatsService {
       this.get_pool_metrics_fresh(metricsRequest).then((response) => {
         storageWithTtl.set(
           cacheKey,
-          JSON.stringify(response, (key, value) => 
+          JSON.stringify(response, (_, value) => 
             typeof value === 'bigint' ? value.toString() : value
           ),
           60 * 1000,

@@ -44,7 +44,6 @@ export function useDeposit() {
 
   useEffect(() => {
     if (status === Status.SUCCEEDED) {
-      toaster.success("Successfully deposited");
       dispatch(fetchStrategies());
       // Update token balances
       if (tokens?.length) {
@@ -76,7 +75,6 @@ export function useWithdraw() {
 
   useEffect(() => {
     if (status === Status.SUCCEEDED) {
-      toaster.success("Successfully withdrawed");
       dispatch(fetchStrategies());
       // Update token balances
       if (tokens?.length) {

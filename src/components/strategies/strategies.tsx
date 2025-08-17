@@ -11,6 +11,7 @@ import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
 import { useStrategies } from "../../hooks/strategies";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useBalances } from "../../hooks/balances";
 
 interface PlatformStats {
   totalTvl: bigint;
@@ -21,17 +22,17 @@ interface PlatformStats {
 }
 
 export function Strategies() {
-  const { user } = useAuth();
-  const { strategies, balances } = useStrategies(user?.principal.toString());
+  const { strategies } = useStrategies();
   const { tokens } = useTokens();
-  const [selectedStrategy, setSelectedStrategy] = useState<number | undefined>();
+  const { balances } = useBalances();
+  const { user } = useAuth();
+  const { theme } = useTheme();
+  const [selectedStrategy, setSelectedStrategy] = useState<number>();
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserStrategies, setShowUserStrategies] = useState(false);
-  const { theme } = useTheme();
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
-    //TODO: hui poimi chto
     (acc, strategy) => {
       const currentPool = strategy.currentPool;
       if (currentPool) {
@@ -44,7 +45,7 @@ export function Strategies() {
             (acc, [, value]) =>
               acc + Number(value) / 10 ** strategy.pools[0].token0.decimals * (strategy.pools[0].price0 ?? 0),
             0
-          ), // These would come from actual user data
+          ),
           totalUsers: acc.totalUsers + strategy.userShares.length,
         };
       }
@@ -59,14 +60,6 @@ export function Strategies() {
       totalUsers: 0,
     }
   );
-
-
-  console.log('Strategies debug:', { 
-    strategies: !!strategies, 
-    strategiesLength: strategies?.length, 
-    tokensLength: tokens.length,
-    strategiesStatus: strategies?.status
-  });
   
   if (!strategies || !tokens.length) {
     return (
@@ -88,7 +81,6 @@ export function Strategies() {
       <Strategy
         value={strategy}
         onBack={() => setSelectedStrategy(undefined)}
-        balance={balances?.[strategy.id]}
       />
     );
   }

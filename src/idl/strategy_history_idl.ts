@@ -1,4 +1,4 @@
-export const idlFactory = ({ IDL }) => {
+export const idlFactory = ({ IDL }: { IDL: any }) => {
   const FetchAndSaveStrategiesResponse = IDL.Record({
     'errors' : IDL.Vec(IDL.Text),
     'success_count' : IDL.Nat64,
@@ -87,4 +87,4 @@ export const idlFactory = ({ IDL }) => {
     'test_delete_all_snapshots' : IDL.Func([], [], []),
   });
 };
-export const init = ({ IDL }) => { return []; };
+export const init = () => { return []; };

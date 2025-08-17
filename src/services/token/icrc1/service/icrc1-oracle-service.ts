@@ -7,7 +7,6 @@ import { Icrc1Pair } from "../icrc1-pair/impl/Icrc1-pair";
 import { BigNumber } from "bignumber.js";
 import { exchangeRateService } from "../../../exchange/exchange-rate";
 import { storageWithTtl } from "./storage";
-import { Category } from "../enum/enums";
 import { hasOwnProperty } from "../../../utils";
 
 export const icrc1OracleActor = createActor<ICRC1Oracle>(

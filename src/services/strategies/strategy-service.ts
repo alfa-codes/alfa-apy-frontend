@@ -73,7 +73,7 @@ export class StrategiesService {
     const [icrc1Tokens , poolIds, prices] = await Promise.all([
       icrc1OracleService.getICRC1Canisters(),
       strategies.flatMap((strategy) =>
-        strategy.pools.map((pool) => pool.id)
+        strategy.pools.map((pool: StrategyPool) => pool.id)
       ),
       price
      ]);
