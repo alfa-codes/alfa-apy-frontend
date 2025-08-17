@@ -7,16 +7,14 @@ import { useMemo, useState } from "react";
 import { EventRecord } from "../../services/event-records/service";
 import { useTheme } from "../../contexts/ThemeContext";
 import { clsx } from "clsx";
-
-const formatPrincipal = (principal: string | undefined): string => {
-  if (!principal) return "N/A";
-  if (principal.length <= 14) return principal;
-  return `${principal.slice(0, 7)}...${principal.slice(-7)}`;
-};
+import { eventDetailsService, EventDetails } from "../../services/event-records/event-details.service";
 
 export function PaymentsCard() {
   const { eventRecords } = useEventRecords();
   const [selectedCorrelationId, setSelectedCorrelationId] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
+  const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
+  const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
   const { theme } = useTheme();
 
   // Группируем события по correlation_id
@@ -37,10 +35,51 @@ export function PaymentsCard() {
       .map(([correlationId, events]) => ({
         correlationId,
         events: events.sort((a, b) => Number(b.id) - Number(a.id)),
-        firstEvent: events[0] // Первое событие для названия группы
+        firstEvent: events[0], // Первое событие для названия группы
+        firstEventSummary: eventDetailsService.extractEventDetails(events[0].event).summary
       }))
       .sort((a, b) => Number(b.firstEvent.id) - Number(a.firstEvent.id));
   }, [eventRecords]);
+
+  // Функция для отображения деталей события
+  const renderEventDetails = (event: EventRecord) => {
+    return (
+      <div className={clsx(
+        "border rounded-lg p-4 cursor-pointer transition-colors",
+        theme === 'dark'
+          ? 'border-purple-600 bg-[#1a1a2e] text-green-400 hover:bg-[#2d2b3d]'
+          : 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50'
+      )}>
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-semibold">#{event.id.toString()}</span>
+          <span className={`text-sm ${
+            theme === 'dark' ? 'text-green-300' : 'text-gray-500'
+          }`}>
+            {formatTimestamp(event.timestamp)}
+          </span>
+        </div>
+        <div className={theme === 'dark' ? 'text-green-400' : 'text-gray-700'}>
+          {eventDetailsService.extractEventDetails(event.event).summary}
+        </div>
+        <button
+          onClick={() => {
+            setSelectedEvent(event);
+            // Извлекаем детали события
+            const details = eventDetailsService.extractEventDetails(event.event);
+            setEventDetails(details);
+            setIsEventDetailsOpen(true);
+          }}
+          className={`mt-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            theme === 'dark'
+              ? 'bg-purple-600 text-green-400 hover:bg-purple-700'
+              : 'bg-amber-500 text-white hover:bg-amber-600'
+          }`}
+        >
+          🔍 View Event Details
+        </button>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -67,10 +106,7 @@ export function PaymentsCard() {
                     ID
                   </th>
                   <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    Type
-                  </th>
-                  <th className="text-left py-2 px-2 text-gray-600 font-medium">
-                    Principal
+                    Summary
                   </th>
                   <th className="text-left py-2 px-2 text-gray-600 font-medium">
                     Date
@@ -93,8 +129,7 @@ export function PaymentsCard() {
                     onClick={() => setSelectedCorrelationId(group.correlationId)}
                   >
                     <td className="py-2 px-2">#{group.firstEvent.id}</td>
-                    <td className="py-2 px-2">{group.firstEvent.type}</td>
-                    <td className="py-2 px-2">{formatPrincipal(group.firstEvent.userPrincipal?.toString())}</td>
+                    <td className="py-2 px-2">{group.firstEventSummary}</td>
                     <td className="py-2 px-2">{formatTimestamp(group.firstEvent.timestamp)}</td>
                     <td className="py-2 px-2">
                       {group.events.length > 1 && (
@@ -126,7 +161,7 @@ export function PaymentsCard() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold">
-                  Events Group: {groupedEvents.find(g => g.correlationId === selectedCorrelationId)?.firstEvent.type}
+                  Events Group: {groupedEvents.find(g => g.correlationId === selectedCorrelationId)?.firstEventSummary}
                 </h3>
                 <button
                   onClick={() => setSelectedCorrelationId(null)}
@@ -139,40 +174,113 @@ export function PaymentsCard() {
                 </button>
               </div>
               
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className={clsx(
-                      "border-b",
-                      theme === 'dark' ? "border-purple-600/40" : "border-gray-200"
-                    )}>
-                      <th className="text-left py-3 px-4 font-medium">ID</th>
-                      <th className="text-left py-3 px-4 font-medium">Type</th>
-                      <th className="text-left py-3 px-4 font-medium">Principal</th>
-                      <th className="text-left py-3 px-4 font-medium">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {groupedEvents
-                      .find(g => g.correlationId === selectedCorrelationId)
-                      ?.events.map((event, index) => (
-                        <tr 
-                          key={index}
-                          className={clsx(
-                            "border-b cursor-pointer transition-colors",
-                            theme === 'dark' 
-                              ? "border-purple-600/20 hover:bg-[#2d2b3d]" 
-                              : "border-gray-100 hover:bg-gray-50"
-                          )}
-                        >
-                          <td className="py-3 px-4">#{event.id}</td>
-                          <td className="py-3 px-4">{event.type}</td>
-                          <td className="py-3 px-4">{formatPrincipal(event.userPrincipal?.toString())}</td>
-                          <td className="py-3 px-4">{formatTimestamp(event.timestamp)}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+              <div className="space-y-3">
+                {groupedEvents
+                  .find(g => g.correlationId === selectedCorrelationId)
+                  ?.events.map((event, index) => (
+                    <div key={index}>
+                      {renderEventDetails(event)}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модалка для отображения деталей конкретного события */}
+      {isEventDetailsOpen && selectedEvent && eventDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className={`rounded-lg p-6 max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto ${
+            theme === 'dark' 
+              ? 'bg-[#232136] text-green-400 border-2 border-purple-600' 
+              : 'bg-white text-gray-900'
+          }`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">
+                🔍 Event Details: #{selectedEvent.id.toString()}
+              </h3>
+              <button
+                onClick={() => setIsEventDetailsOpen(false)}
+                className={`text-xl ${
+                  theme === 'dark' 
+                    ? 'text-green-400 hover:text-green-300' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className={`p-4 rounded-lg ${
+                theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
+              }`}>
+                <h4 className="font-semibold mb-3 text-lg">📋 Event Summary</h4>
+                <p className={`text-sm ${
+                  theme === 'dark' ? 'text-green-300' : 'text-gray-600'
+                }`}>
+                  {eventDetails.summary}
+                </p>
+              </div>
+
+              <div className={`p-4 rounded-lg ${
+                theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
+              }`}>
+                <h4 className="font-semibold mb-3 text-lg">🔧 Event Parameters</h4>
+                <div className="space-y-3">
+                  {eventDetails.fields.map((field, index) => (
+                    <div key={index} className="flex justify-between items-start py-2 border-b border-gray-600/20">
+                      <div className="flex-1">
+                        <span className="font-medium">{field.name}</span>
+                        {field.description && (
+                          <div className={`text-xs mt-1 ${
+                            theme === 'dark' ? 'text-green-300' : 'text-gray-500'
+                          }`}>
+                            {field.description}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <span className={`font-mono text-sm px-2 py-1 rounded ${
+                          theme === 'dark' ? 'bg-purple-600/20 text-green-400' : 'bg-gray-200 text-gray-700'
+                        }`}>
+                          {field.value}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={`p-4 rounded-lg ${
+                theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
+              }`}>
+                <h4 className="font-semibold mb-3 text-lg">📊 Basic Information</h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="flex justify-between">
+                    <span className="font-medium">Event ID:</span>
+                    <span className="font-mono">#{selectedEvent.id.toString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Summary:</span>
+                    <span className="font-mono text-sm">{eventDetails.summary}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Timestamp:</span>
+                    <span className="font-mono">{formatTimestamp(selectedEvent.timestamp)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium">Correlation ID:</span>
+                    <span className="font-mono text-xs break-all">{selectedEvent.correlation_id}</span>
+                  </div>
+                  {selectedEvent.userPrincipal && (
+                    <div className="flex justify-between">
+                      <span className="font-medium">User Principal:</span>
+                      <span className="font-mono text-xs break-all">{selectedEvent.userPrincipal.toString()}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
