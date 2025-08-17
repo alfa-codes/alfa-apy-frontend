@@ -5,6 +5,7 @@ import {
   ListItemsPaginationRequest,
   _SERVICE as VaultType,
   EventRecord as EventRecordIdl,
+  Event as EventIdl,
 } from "../../idl/vault";
 import { idlFactory } from "../../idl/vault_idl";
 import { eventToEventRecordType } from "./event-type";
@@ -15,16 +16,11 @@ export type EventRecordType = "Rebalance" | "Withdrawal" | "Deposit";
 export type EventRecord = {
   id: bigint;
   timestamp: bigint;
-  // amount: string;
-  // date: string;
-  // from: string;
-  // to: string;
   type: string;
-  // token: string;
   userPrincipal?: Principal;
   correlation_id: string;
-  // error?: [];
-  // fee?: string;
+  // Добавляем полную информацию о событии
+  event: EventIdl;
 };
 
 export class EventRecordsService {
@@ -64,6 +60,8 @@ export class EventRecordsService {
           timestamp: event.timestamp,
           userPrincipal: event.user.length > 0 ? event.user[0] : undefined,
           correlation_id: event.correlation_id,
+          // Передаем полную информацию о событии
+          event: event.event,
         };
       });
     } else {
