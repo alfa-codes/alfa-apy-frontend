@@ -181,12 +181,18 @@ export function EventRecordsCard() {
       
       {/* Модалка для отображения всех событий с одним correlation_id */}
       {isModalOpen && selectedCorrelationId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto ${
-            theme === 'dark' 
-              ? 'bg-[#232136] text-green-400 border-2 border-purple-600' 
-              : 'bg-white text-gray-900'
-          }`}>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className={`rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto ${
+              theme === 'dark' 
+                ? 'bg-[#232136] text-green-400 border-2 border-purple-600' 
+                : 'bg-white text-gray-900'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">
                 Events Group: {groupedEvents.find(g => g.correlationId === selectedCorrelationId)?.firstEventSummary}
@@ -218,12 +224,18 @@ export function EventRecordsCard() {
 
       {/* Модалка для отображения деталей конкретного события */}
       {isEventDetailsOpen && selectedEvent && eventDetails && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`rounded-lg p-6 max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto ${
-            theme === 'dark' 
-              ? 'bg-[#232136] text-green-400 border-2 border-purple-600' 
-              : 'bg-white text-gray-900'
-          }`}>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setIsEventDetailsOpen(false)}
+        >
+          <div 
+            className={`rounded-lg p-6 max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto ${
+              theme === 'dark' 
+                ? 'bg-[#232136] text-green-400 border-2 border-purple-600' 
+                : 'bg-white text-gray-900'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">
                 🔍 Event Details: #{selectedEvent.id.toString()}
@@ -321,12 +333,18 @@ export function EventRecordsCard() {
 
       {/* Модалка Retry для failed событий */}
       {isRetryModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`rounded-lg p-6 max-w-md w-full mx-4 ${
-            theme === 'dark' 
-              ? 'bg-[#232136] text-green-400 border-2 border-red-600' 
-              : 'bg-white text-gray-900 border-2 border-red-500'
-          }`}>
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setIsRetryModalOpen(false)}
+        >
+          <div 
+            className={`rounded-lg p-6 max-w-md w-full mx-4 ${
+              theme === 'dark' 
+                ? 'bg-[#232136] text-green-400 border-2 border-red-600' 
+                : 'bg-white text-gray-900 border-2 border-red-500'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="text-center">
               <div className="text-4xl mb-4">🔄</div>
               <h3 className="text-lg font-semibold mb-4">Retry Feature</h3>
