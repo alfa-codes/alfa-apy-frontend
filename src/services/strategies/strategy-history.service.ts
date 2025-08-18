@@ -37,8 +37,8 @@ export class StrategyHistoryService {
       );
 
       // Всегда запрашиваем данные за месяц
-      const now = BigInt(Date.now());
-      const monthAgo = now - BigInt(30 * 24 * 60 * 60 * 1000); // 30 дней назад
+      const now = BigInt(Math.floor(Date.now() / 1000)); // current timestamp in seconds
+      const monthAgo = now - BigInt(30 * 24 * 60 * 60); // 30 days ago in seconds
       const fromTimestamp = monthAgo;
       const toTimestamp = now;
 
