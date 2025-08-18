@@ -5,14 +5,6 @@ import type { IDL } from '@dfinity/candid';
 export type ExchangeId = { 'Sonic' : null } |
   { 'KongSwap' : null } |
   { 'ICPSwap' : null };
-export interface FetchAndSaveStrategiesResponse {
-  'errors' : Array<string>,
-  'success_count' : bigint,
-}
-export type FetchAndSaveStrategiesResult = {
-    'Ok' : FetchAndSaveStrategiesResponse
-  } |
-  { 'Err' : ResponseError };
 export interface GetStrategiesHistoryRequest {
   'from_timestamp' : [] | [bigint],
   'to_timestamp' : [] | [bigint],
@@ -20,6 +12,21 @@ export interface GetStrategiesHistoryRequest {
 }
 export type GetStrategiesHistoryResult = { 'Ok' : Array<StrategyHistory> } |
   { 'Err' : ResponseError };
+export interface InitializeStrategyStatesAndCreateSnapshotsResponse {
+  'errors' : Array<InternalError>,
+  'success_count' : bigint,
+}
+export type InitializeStrategyStatesAndCreateSnapshotsResult = {
+    'Ok' : InitializeStrategyStatesAndCreateSnapshotsResponse
+  } |
+  { 'Err' : ResponseError };
+export interface InternalError {
+  'context' : string,
+  'code' : number,
+  'kind' : ResponseErrorKind,
+  'extra' : [] | [Array<[string, string]>],
+  'message' : string,
+}
 export interface Pool {
   'id' : string,
   'provider' : ExchangeId,
@@ -48,6 +55,7 @@ export interface StrategyHistory {
 export interface StrategySnapshot {
   'id' : string,
   'apy' : number,
+  'test_liquidity_amount' : [] | [bigint],
   'current_liquidity_updated_at' : [] | [bigint],
   'total_shares' : bigint,
   'strategy_id' : number,
@@ -58,18 +66,38 @@ export interface StrategySnapshot {
   'users_count' : number,
   'position_id' : [] | [bigint],
 }
+export interface StrategyState {
+  'last_error' : [] | [string],
+  'initialize_attempts' : number,
+  'snapshot_cadence_secs' : [] | [bigint],
+  'initialized_at' : [] | [bigint],
+  'test_liquidity_data' : [] | [TestLiquidityData],
+  'last_snapshot_at' : [] | [bigint],
+}
+export interface TestLiquidityData {
+  'tx_id' : bigint,
+  'shares' : bigint,
+  'amount' : bigint,
+  'position_id' : bigint,
+}
 export interface _SERVICE {
-  'fetch_and_save_strategies' : ActorMethod<[], FetchAndSaveStrategiesResult>,
+  'get_all_strategy_states' : ActorMethod<[], Array<[number, StrategyState]>>,
   'get_strategies_history' : ActorMethod<
     [GetStrategiesHistoryRequest],
     GetStrategiesHistoryResult
   >,
   'get_strategy_snapshots_count' : ActorMethod<[number], bigint>,
-  'save_strategy_snapshot' : ActorMethod<
+  'get_strategy_state' : ActorMethod<[number], [] | [StrategyState]>,
+  'test_delete_all_snapshots' : ActorMethod<[], undefined>,
+  'test_delete_strategy_state' : ActorMethod<[number], undefined>,
+  'test_initialize_strategy_states_and_create_snapshots' : ActorMethod<
+    [],
+    InitializeStrategyStatesAndCreateSnapshotsResult
+  >,
+  'test_save_strategy_snapshot' : ActorMethod<
     [StrategySnapshot],
     SaveStrategySnapshotResult
   >,
-  'test_delete_all_snapshots' : ActorMethod<[], undefined>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];
