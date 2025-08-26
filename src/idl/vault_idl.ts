@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const idlFactory = ({ IDL }: { IDL: any }) => {
   const Conf = IDL.Record({ 'controllers' : IDL.Opt(IDL.Vec(IDL.Principal)) });
+  const Environment = IDL.Variant({
+    'Dev' : IDL.Null,
+    'Production' : IDL.Null,
+    'Test' : IDL.Null,
+    'Staging' : IDL.Null,
+  });
+  const RuntimeConfig = IDL.Record({ 'environment' : Environment });
   const StrategyDepositArgs = IDL.Record({
     'strategy_id' : IDL.Nat16,
     'ledger' : IDL.Principal,
@@ -12,8 +19,9 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'amount' : IDL.Nat,
     'position_id' : IDL.Nat64,
   });
-  const InternalErrorKind = IDL.Variant({
+  const ResponseErrorKind = IDL.Variant({
     'AccessDenied' : IDL.Null,
+    'Infrastructure' : IDL.Null,
     'NotFound' : IDL.Null,
     'Timeout' : IDL.Null,
     'Unknown' : IDL.Null,
@@ -22,8 +30,8 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'Validation' : IDL.Null,
   });
   const ResponseError = IDL.Record({
-    'code' : IDL.Nat32,
-    'kind' : InternalErrorKind,
+    'code' : IDL.Nat64,
+    'kind' : ResponseErrorKind,
     'message' : IDL.Text,
     'details' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))),
   });
@@ -49,9 +57,19 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'strategy_id' : IDL.Text,
     'pool_id' : IDL.Opt(IDL.Text),
   });
+  const InternalErrorKind = IDL.Variant({
+    'AccessDenied' : IDL.Null,
+    'Infrastructure' : IDL.Null,
+    'NotFound' : IDL.Null,
+    'Timeout' : IDL.Null,
+    'Unknown' : IDL.Null,
+    'BusinessLogic' : IDL.Null,
+    'ExternalService' : IDL.Null,
+    'Validation' : IDL.Null,
+  });
   const InternalError = IDL.Record({
     'context' : IDL.Text,
-    'code' : IDL.Nat32,
+    'code' : IDL.Nat64,
     'kind' : InternalErrorKind,
     'extra' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))),
     'message' : IDL.Text,
@@ -170,6 +188,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'id' : IDL.Nat64,
     'user' : IDL.Opt(IDL.Principal),
     'event' : Event,
+    'strategy_id' : IDL.Opt(IDL.Nat16),
     'timestamp' : IDL.Nat64,
     'correlation_id' : IDL.Text,
   });
@@ -200,20 +219,28 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'name' : IDL.Text,
     'description' : IDL.Text,
     'total_shares' : IDL.Nat,
+    'enabled' : IDL.Bool,
     'initial_deposit' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat)),
     'user_shares' : IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Nat)),
     'current_liquidity' : IDL.Opt(IDL.Nat),
     'current_pool' : IDL.Opt(Pool),
+    'base_token' : IDL.Principal,
     'total_balance' : IDL.Nat,
     'pools' : IDL.Vec(Pool),
     'users_count' : IDL.Nat32,
+    'position_id' : IDL.Opt(IDL.Nat64),
   });
   const SupportedStandard = IDL.Record({ 'url' : IDL.Text, 'name' : IDL.Text });
   const Icrc28TrustedOriginsResponse = IDL.Record({
     'trusted_origins' : IDL.Vec(IDL.Text),
   });
-  const StrategyLiquidityResult = IDL.Variant({
-    'Ok' : IDL.Nat,
+  const StrategyRebalanceResponse = IDL.Record({
+    'previous_pool' : Pool,
+    'current_pool' : Pool,
+    'is_rebalanced' : IDL.Bool,
+  });
+  const StrategyRebalanceResult = IDL.Variant({
+    'Ok' : StrategyRebalanceResponse,
     'Err' : ResponseError,
   });
   const UserStrategyResponse = IDL.Record({
@@ -246,6 +273,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         [GetEventRecordsResult],
         [],
       ),
+    'get_runtime_config' : IDL.Func([], [RuntimeConfig], ['query']),
     'get_strategies' : IDL.Func([], [IDL.Vec(StrategyResponse)], ['query']),
     'icrc10_supported_standards' : IDL.Func(
         [],
@@ -253,13 +281,14 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         ['query'],
       ),
     'icrc28_trusted_origins' : IDL.Func([], [Icrc28TrustedOriginsResponse], []),
-    'strategy_liquidity' : IDL.Func([IDL.Nat16], [StrategyLiquidityResult], []),
+    'rebalance_strategy' : IDL.Func([IDL.Nat16], [StrategyRebalanceResult], []),
     'test_icpswap_withdraw' : IDL.Func(
         [IDL.Principal, IDL.Nat, IDL.Nat],
         [IDL.Nat],
         [],
       ),
     'test_reset_strategy' : IDL.Func([IDL.Nat16], [], []),
+    'test_set_strategy_enabled' : IDL.Func([IDL.Nat16, IDL.Bool], [], []),
     'test_update_strategy_stats' : IDL.Func([], [], []),
     'user_strategies' : IDL.Func(
         [IDL.Principal],
@@ -268,4 +297,15 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
       ),
     'withdraw' : IDL.Func([StrategyWithdrawArgs], [StrategyWithdrawResult], []),
   });
+};
+export const init = ({ IDL }: { IDL: any }) => {
+  const Conf = IDL.Record({ 'controllers' : IDL.Opt(IDL.Vec(IDL.Principal)) });
+  const Environment = IDL.Variant({
+    'Dev' : IDL.Null,
+    'Production' : IDL.Null,
+    'Test' : IDL.Null,
+    'Staging' : IDL.Null,
+  });
+  const RuntimeConfig = IDL.Record({ 'environment' : Environment });
+  return [IDL.Opt(Conf), IDL.Opt(RuntimeConfig)];
 };

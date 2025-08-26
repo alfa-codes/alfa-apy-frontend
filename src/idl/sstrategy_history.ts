@@ -2,6 +2,29 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
+export interface CreateTestSnapshotsRequest {
+  'from_timestamp' : bigint,
+  'min_apy' : number,
+  'strategy_id' : number,
+  'to_timestamp' : bigint,
+  'max_apy' : number,
+  'snapshot_interval_secs' : bigint,
+}
+export interface CreateTestSnapshotsResponse {
+  'from_timestamp' : bigint,
+  'snapshots_created' : bigint,
+  'min_apy' : number,
+  'actual_apy_range' : [number, number],
+  'strategy_id' : number,
+  'to_timestamp' : bigint,
+  'max_apy' : number,
+}
+export type CreateTestSnapshotsResult = { 'Ok' : CreateTestSnapshotsResponse } |
+  { 'Err' : ResponseError };
+export type Environment = { 'Dev' : null } |
+  { 'Production' : null } |
+  { 'Test' : null } |
+  { 'Staging' : null };
 export type ExchangeId = { 'Sonic' : null } |
   { 'KongSwap' : null } |
   { 'ICPSwap' : null };
@@ -22,7 +45,7 @@ export type InitializeStrategyStatesAndCreateSnapshotsResult = {
   { 'Err' : ResponseError };
 export interface InternalError {
   'context' : string,
-  'code' : number,
+  'code' : bigint,
   'kind' : ResponseErrorKind,
   'extra' : [] | [Array<[string, string]>],
   'message' : string,
@@ -34,18 +57,20 @@ export interface Pool {
   'token1' : Principal,
 }
 export interface ResponseError {
-  'code' : number,
+  'code' : bigint,
   'kind' : ResponseErrorKind,
   'message' : string,
   'details' : [] | [Array<[string, string]>],
 }
 export type ResponseErrorKind = { 'AccessDenied' : null } |
+  { 'Infrastructure' : null } |
   { 'NotFound' : null } |
   { 'Timeout' : null } |
   { 'Unknown' : null } |
   { 'BusinessLogic' : null } |
   { 'ExternalService' : null } |
   { 'Validation' : null };
+export interface RuntimeConfig { 'environment' : Environment }
 export type SaveStrategySnapshotResult = { 'Ok' : null } |
   { 'Err' : ResponseError };
 export interface StrategyHistory {
@@ -82,16 +107,21 @@ export interface TestLiquidityData {
 }
 export interface _SERVICE {
   'get_all_strategy_states' : ActorMethod<[], Array<[number, StrategyState]>>,
+  'get_runtime_config' : ActorMethod<[], RuntimeConfig>,
   'get_strategies_history' : ActorMethod<
     [GetStrategiesHistoryRequest],
     GetStrategiesHistoryResult
   >,
   'get_strategy_snapshots_count' : ActorMethod<[number], bigint>,
   'get_strategy_state' : ActorMethod<[number], [] | [StrategyState]>,
+  'test_create_snapshots' : ActorMethod<
+    [CreateTestSnapshotsRequest],
+    CreateTestSnapshotsResult
+  >,
   'test_delete_all_snapshots' : ActorMethod<[], undefined>,
   'test_delete_strategy_state' : ActorMethod<[number], undefined>,
   'test_initialize_strategy_states_and_create_snapshots' : ActorMethod<
-    [],
+    [[] | [Uint16Array | number[]]],
     InitializeStrategyStatesAndCreateSnapshotsResult
   >,
   'test_save_strategy_snapshot' : ActorMethod<

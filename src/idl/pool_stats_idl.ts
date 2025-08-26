@@ -3,10 +3,12 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   const AddLiquidityResponse = IDL.Record({
     'token_0_amount' : IDL.Nat,
     'token_1_amount' : IDL.Nat,
+    'token0_equivalent_total' : IDL.Nat,
     'position_id' : IDL.Nat64,
   });
-  const InternalErrorKind = IDL.Variant({
+  const ResponseErrorKind = IDL.Variant({
     'AccessDenied' : IDL.Null,
+    'Infrastructure' : IDL.Null,
     'NotFound' : IDL.Null,
     'Timeout' : IDL.Null,
     'Unknown' : IDL.Null,
@@ -15,8 +17,8 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'Validation' : IDL.Null,
   });
   const ResponseError = IDL.Record({
-    'code' : IDL.Nat32,
-    'kind' : InternalErrorKind,
+    'code' : IDL.Nat64,
+    'kind' : ResponseErrorKind,
     'message' : IDL.Text,
     'details' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))),
   });
@@ -36,8 +38,8 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   });
   const InternalError = IDL.Record({
     'context' : IDL.Text,
-    'code' : IDL.Nat32,
-    'kind' : InternalErrorKind,
+    'code' : IDL.Nat64,
+    'kind' : ResponseErrorKind,
     'extra' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))),
     'message' : IDL.Text,
   });
@@ -86,6 +88,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'id' : IDL.Nat64,
     'user' : IDL.Opt(IDL.Principal),
     'event' : Event,
+    'strategy_id' : IDL.Opt(IDL.Nat16),
     'timestamp' : IDL.Nat64,
     'correlation_id' : IDL.Text,
   });
@@ -189,4 +192,14 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         [],
       ),
   });
+};
+export const init = ({ IDL }: { IDL: any }) => {
+  const Environment = IDL.Variant({
+    'Dev' : IDL.Null,
+    'Production' : IDL.Null,
+    'Test' : IDL.Null,
+    'Staging' : IDL.Null,
+  });
+  const RuntimeConfig = IDL.Record({ 'environment' : Environment });
+  return [IDL.Opt(RuntimeConfig)];
 };

@@ -1,4 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const idlFactory = ({ IDL }: { IDL: any }) => {
+  const Environment = IDL.Variant({
+    'Dev' : IDL.Null,
+    'Production' : IDL.Null,
+    'Test' : IDL.Null,
+    'Staging' : IDL.Null,
+  });
+  const RuntimeConfig = IDL.Record({ 'environment' : Environment });
   const TestLiquidityData = IDL.Record({
     'tx_id' : IDL.Nat64,
     'shares' : IDL.Nat,
@@ -49,6 +57,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   });
   const ResponseErrorKind = IDL.Variant({
     'AccessDenied' : IDL.Null,
+    'Infrastructure' : IDL.Null,
     'NotFound' : IDL.Null,
     'Timeout' : IDL.Null,
     'Unknown' : IDL.Null,
@@ -57,7 +66,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'Validation' : IDL.Null,
   });
   const ResponseError = IDL.Record({
-    'code' : IDL.Nat32,
+    'code' : IDL.Nat64,
     'kind' : ResponseErrorKind,
     'message' : IDL.Text,
     'details' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))),
@@ -66,9 +75,30 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'Ok' : IDL.Vec(StrategyHistory),
     'Err' : ResponseError,
   });
+  const CreateTestSnapshotsRequest = IDL.Record({
+    'from_timestamp' : IDL.Nat64,
+    'min_apy' : IDL.Float64,
+    'strategy_id' : IDL.Nat16,
+    'to_timestamp' : IDL.Nat64,
+    'max_apy' : IDL.Float64,
+    'snapshot_interval_secs' : IDL.Nat64,
+  });
+  const CreateTestSnapshotsResponse = IDL.Record({
+    'from_timestamp' : IDL.Nat64,
+    'snapshots_created' : IDL.Nat64,
+    'min_apy' : IDL.Float64,
+    'actual_apy_range' : IDL.Tuple(IDL.Float64, IDL.Float64),
+    'strategy_id' : IDL.Nat16,
+    'to_timestamp' : IDL.Nat64,
+    'max_apy' : IDL.Float64,
+  });
+  const CreateTestSnapshotsResult = IDL.Variant({
+    'Ok' : CreateTestSnapshotsResponse,
+    'Err' : ResponseError,
+  });
   const InternalError = IDL.Record({
     'context' : IDL.Text,
-    'code' : IDL.Nat32,
+    'code' : IDL.Nat64,
     'kind' : ResponseErrorKind,
     'extra' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))),
     'message' : IDL.Text,
@@ -91,6 +121,7 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         [IDL.Vec(IDL.Tuple(IDL.Nat16, StrategyState))],
         ['query'],
       ),
+    'get_runtime_config' : IDL.Func([], [RuntimeConfig], ['query']),
     'get_strategies_history' : IDL.Func(
         [GetStrategiesHistoryRequest],
         [GetStrategiesHistoryResult],
@@ -106,10 +137,15 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         [IDL.Opt(StrategyState)],
         ['query'],
       ),
+    'test_create_snapshots' : IDL.Func(
+        [CreateTestSnapshotsRequest],
+        [CreateTestSnapshotsResult],
+        [],
+      ),
     'test_delete_all_snapshots' : IDL.Func([], [], []),
     'test_delete_strategy_state' : IDL.Func([IDL.Nat16], [], []),
     'test_initialize_strategy_states_and_create_snapshots' : IDL.Func(
-        [],
+        [IDL.Opt(IDL.Vec(IDL.Nat16))],
         [InitializeStrategyStatesAndCreateSnapshotsResult],
         [],
       ),
@@ -120,4 +156,13 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
       ),
   });
 };
-export const init = () => { return []; };
+export const init = ({ IDL }: { IDL: any }) => {
+  const Environment = IDL.Variant({
+    'Dev' : IDL.Null,
+    'Production' : IDL.Null,
+    'Test' : IDL.Null,
+    'Staging' : IDL.Null,
+  });
+  const RuntimeConfig = IDL.Record({ 'environment' : Environment });
+  return [IDL.Opt(RuntimeConfig)];
+};

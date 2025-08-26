@@ -5,6 +5,7 @@ import type { IDL } from '@dfinity/candid';
 export interface AddLiquidityResponse {
   'token_0_amount' : bigint,
   'token_1_amount' : bigint,
+  'token0_equivalent_total' : bigint,
   'position_id' : bigint,
 }
 export type AddLiquidityResult = { 'Ok' : AddLiquidityResponse } |
@@ -29,6 +30,10 @@ export type AddPoolResult = { 'Ok' : string } |
 export interface ApyValue { 'tokens_apy' : number, 'usd_apy' : number }
 export type DeletePoolResult = { 'Ok' : null } |
   { 'Err' : ResponseError };
+export type Environment = { 'Dev' : null } |
+  { 'Production' : null } |
+  { 'Test' : null } |
+  { 'Staging' : null };
 export type Event = { 'AddLiquidityToPoolFailed' : AddLiquidityToPoolFailed } |
   { 'AddLiquidityToPoolCompleted' : AddLiquidityToPoolCompleted } |
   { 'WithdrawLiquidityFromPoolStarted' : WithdrawLiquidityFromPoolStarted } |
@@ -41,6 +46,7 @@ export interface EventRecord {
   'id' : bigint,
   'user' : [] | [Principal],
   'event' : Event,
+  'strategy_id' : [] | [number],
   'timestamp' : bigint,
   'correlation_id' : string,
 }
@@ -55,8 +61,8 @@ export type GetPoolsResult = { 'Ok' : Array<Pool> } |
   { 'Err' : ResponseError };
 export interface InternalError {
   'context' : string,
-  'code' : number,
-  'kind' : InternalErrorKind,
+  'code' : bigint,
+  'kind' : ResponseErrorKind,
   'extra' : [] | [Array<[string, string]>],
   'message' : string,
 }
@@ -97,11 +103,20 @@ export interface PositionData {
   'amount1' : bigint,
 }
 export interface ResponseError {
-  'code' : number,
-  'kind' : InternalErrorKind,
+  'code' : bigint,
+  'kind' : ResponseErrorKind,
   'message' : string,
   'details' : [] | [Array<[string, string]>],
 }
+export type ResponseErrorKind = { 'AccessDenied' : null } |
+  { 'Infrastructure' : null } |
+  { 'NotFound' : null } |
+  { 'Timeout' : null } |
+  { 'Unknown' : null } |
+  { 'BusinessLogic' : null } |
+  { 'ExternalService' : null } |
+  { 'Validation' : null };
+export interface RuntimeConfig { 'environment' : Environment }
 export type TestCreatePoolSnapshotResult = { 'Ok' : PoolSnapshot } |
   { 'Err' : ResponseError };
 export interface WithdrawLiquidityFromPoolCompleted {
