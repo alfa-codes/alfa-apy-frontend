@@ -158,7 +158,7 @@ export const refreshStrategyEvents = createAsyncThunk(
 export const initStrategies = createAsyncThunk(
   "strategies/init",
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async (agent?: Agent) => {
+  async (_agent?: Agent) => {
     // TODO: Uncomment when KongSwap is fixed
     // const response = await StrategiesService.build(agent);
     // return response;
@@ -268,21 +268,15 @@ const strategiesSlice = createSlice({
         state.strategies.status = Status.LOADING;
         state.balances.status = Status.LOADING;
       })
-      .addCase(refreshDataAfterOperation.fulfilled, (state, action) => {
-        if (action.payload) {
-          state.strategies.status = Status.SUCCEEDED;
-          state.strategies.data = action.payload.strategies;
-          state.balances.status = Status.SUCCEEDED;
-          state.balances.data = action.payload.balances;
-        }
+      .addCase(refreshDataAfterOperation.fulfilled, () => {
+        // Обновляем состояние через dispatch
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       })
-      .addCase(refreshDataAfterOperation.rejected, (state, action) => {
-        state.strategies.status = Status.FAILED;
-        state.strategies.error = action.error.message;
-        state.balances.status = Status.FAILED;
-        state.balances.error = action.error.message;
+      .addCase(refreshDataAfterOperation.rejected, (_, action) => {
+        // Логируем ошибку
+        console.error("Failed to refresh data:", action.error.message);
       })
-      .addCase(refreshUserBalance.pending, (state) => {
+      .addCase(refreshUserBalance.pending, () => {
         // Не меняем общий статус, только локально обновляем баланс
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       })
@@ -294,22 +288,21 @@ const strategiesSlice = createSlice({
           state.balances.status = Status.SUCCEEDED;
         }
       })
-      .addCase(refreshUserBalance.rejected, (state, action) => {
+      .addCase(refreshUserBalance.rejected, (_, action) => {
         // Логируем ошибку, но не меняем общий статус
         console.error("Failed to refresh user balance:", action.error.message);
       })
-      .addCase(refreshStrategyEvents.pending, (state) => {
+      .addCase(refreshStrategyEvents.pending, () => {
         // Не меняем общий статус
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       })
-      .addCase(refreshStrategyEvents.fulfilled, (state, action) => {
+      .addCase(refreshStrategyEvents.fulfilled, () => {
         // Здесь можно обновить события стратегии
         // Пока ничего не делаем, так как события обновляются отдельно
         // Устанавливаем статус в SUCCEEDED чтобы убрать loading
-        state.balances.status = Status.SUCCEEDED;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       })
-      .addCase(refreshStrategyEvents.rejected, (state, action) => {
+      .addCase(refreshStrategyEvents.rejected, (_, action) => {
         // Логируем ошибку, но не меняем общий статус
         console.error("Failed to refresh strategy events:", action.error.message);
       });
