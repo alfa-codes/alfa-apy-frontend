@@ -273,22 +273,7 @@ export function Strategy({
                       )}
                     </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600">Available to Withdraw</p>
-                    <div className="flex items-center gap-2">
-                      <TokensLogos logos={[logos[0]]} size={24} />
-                      {isUpdatingData ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
-                          <span className="text-gray-500">Updating...</span>
-                        </div>
-                      ) : (
-                        <p className="text-lg font-medium">
-                          {amountToWithdraw} {token?.symbol}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+
 
                 </div>
                 {/* Deposit/Withdraw Buttons */}

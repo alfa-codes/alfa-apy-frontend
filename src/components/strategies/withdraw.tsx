@@ -1,5 +1,5 @@
 import { Popup } from "pixel-retroui";
-import { Button, Input } from "../ui";
+import { Button } from "../ui";
 import { useState, useEffect } from "react";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import colors from "tailwindcss/colors";
@@ -193,10 +193,10 @@ export function Withdraw({
               <div className="flex flex-col sm:flex-row">
                 <div className="flex flex-col flex-1">
                   <div className="relative">
-                    <Input
+                    <input
                       value={value ? `${value}%` : ""}
                       onChange={handleInputChange}
-                      className="flex-1 pr-8"
+                      className="flex-1 pr-8 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       type="text"
                       placeholder="Enter percentage"
                     />
