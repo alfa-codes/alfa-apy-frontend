@@ -9,7 +9,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { clsx } from "clsx";
 import { eventDetailsService, EventDetails } from "../../services/event-records/event-details.service";
 
-export function PaymentsCard() {
+export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
   const { eventRecords } = useEventRecords();
   const [selectedCorrelationId, setSelectedCorrelationId] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
@@ -85,10 +85,25 @@ export function PaymentsCard() {
     <>
       <Card className="p-6">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-4">🧾 Events</h3>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            🧾 Events
+            {isUpdating && (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                <span className="text-sm text-gray-500">Updating...</span>
+              </div>
+            )}
+          </h3>
         </div>
         <div className="max-h-[400px] overflow-y-auto">
-          {!groupedEvents.length && (
+          {isUpdating ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+                <p className="text-gray-500">Updating events...</p>
+              </div>
+            </div>
+          ) : !groupedEvents.length ? (
             <div className="flex justify-center items-center h-32">
               <SquareLoader
                 className="mx-auto"
@@ -97,8 +112,7 @@ export function PaymentsCard() {
                 size={20}
               />
             </div>
-          )}
-          {groupedEvents.length > 0 && (
+          ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr>

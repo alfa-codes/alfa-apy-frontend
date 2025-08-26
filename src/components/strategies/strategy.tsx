@@ -23,6 +23,9 @@ import { PaymentsCard } from "../payments";
 import { Strategy as StrategyResponse } from "../../services/strategies/strategy-service";
 import { useTheme } from "../../contexts/ThemeContext";
 import { strategyHistoryService, ChartDataPoint } from "../../services/strategies/strategy-history.service";
+import { useDispatch } from "react-redux";
+import { refreshUserBalance, refreshStrategyEvents } from "../../store/slices/strategies";
+import { Dispatch } from "../../store/store";
 
 export function Strategy({
   value,
@@ -44,6 +47,7 @@ export function Strategy({
   const { user } = useAuth();
   const agent = useAgent({ host: "https://ic0.app" });
   const { tokens } = useTokens();
+  const dispatch = useDispatch<Dispatch>();
   const logos = tokens ? getStrategyTokenLogos(value, tokens) : []; //TODO
   // const { resetPools } = usePools(value.pools.map((p) => p.token0.symbol));
   const currentPool = value.pools.find((p) => p.id === value.currentPool);
@@ -55,6 +59,7 @@ export function Strategy({
   const tokenBalance = token ? balances[token.ledger] : undefined;
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [isUpdatingData, setIsUpdatingData] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -180,7 +185,7 @@ export function Strategy({
               ))}
             </div>
           </div>
-          {isLoadingChart ? (
+          {isLoadingChart && !isUpdatingData && chartData.length === 0 ? (
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
@@ -214,7 +219,15 @@ export function Strategy({
         <div className="grid grid-cols-1 gap-8">
           {/* User Balance Card */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">💸 Your Position</h3>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              💸 Your Position
+              {isUpdatingData && (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                  <span className="text-sm text-gray-500">Updating...</span>
+                </div>
+              )}
+            </h3>
             {user && tokenBalance ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
@@ -222,24 +235,58 @@ export function Strategy({
                     <p className="text-gray-600">Available to Deposit</p>
                     <div className="flex items-center gap-2">
                       <TokensLogos logos={[token?.logo?.[0] ?? ""]} size={24} />
-                      <p className="text-lg font-medium">
-                        {tokenBalance?.balance ?? "0"} {token?.symbol}
-                        <span className="text-gray-500 text-sm ml-2">
-                          (${tokenBalance?.usdBalance ?? "0"})
-                        </span>
-                      </p>
+                      {isUpdatingData ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                          <span className="text-gray-500">Updating...</span>
+                        </div>
+                      ) : (
+                        <p className="text-lg font-medium">
+                          {tokenBalance?.balance ?? "0"} {token?.symbol}
+                          <span className="text-gray-500 text-sm ml-2">
+                            {isUpdatingData ? (
+                              <span className="text-gray-400">Updating...</span>
+                            ) : (
+                              `($${tokenBalance?.usdBalance ?? "0"})`
+                            )}
+                          </span>
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div>
                     <p className="text-gray-600">Your Deposit</p>
                     <div className="flex items-center gap-2">
                       <TokensLogos logos={[logos[0]]} size={24} />
-                      <p className="text-lg font-medium">
-                        {value.getUserInitialDeposit(user!.principal)}
-                        
-                        {/* ${balance?.usd_balance.toFixed(2) ?? "0.00"} */}
-                        {/* "0.00" */}
-                      </p>
+                      {isUpdatingData ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                          <span className="text-gray-500">Updating...</span>
+                        </div>
+                      ) : (
+                        <p className="text-lg font-medium">
+                          {value.getUserInitialDeposit(user!.principal)}
+                          
+                          {/* ${balance?.usd_balance.toFixed(2) ?? "0.00"} */}
+                          {/* "0.00" */}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Available to Withdraw</p>
+                    <div className="flex items-center gap-2">
+                      <TokensLogos logos={[logos[0]]} size={24} />
+                      {isUpdatingData ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                          <span className="text-gray-500">Updating...</span>
+                        </div>
+                      ) : (
+                        <p className="text-lg font-medium">
+                          {amountToWithdraw} {token?.symbol}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -249,7 +296,7 @@ export function Strategy({
                   <div className="flex flex-col gap-6 md:items-end md:content-center">
                     <Deposit
                       className="md:w-[150px]"
-                      loading={isDepositing}
+                      loading={isDepositing || isUpdatingData}
                       isOpen={depositOpen}
                       onClose={() => {
                         setDepositOpen(false);
@@ -259,6 +306,8 @@ export function Strategy({
                       }}
                       onDeposit={async (amount) => {
                         try {
+                          setIsUpdatingData(true);
+                          
                           await deposit({
                             amount: BigInt(
                               BigNumber(amount)
@@ -270,7 +319,19 @@ export function Strategy({
                             principal: user!.principal,
                             agent: agent!,
                           });
+                          
+                          // Обновляем данные после успешного депозита
+                          dispatch(refreshUserBalance({ user: user!.principal, strategyId: value.id }));
+                          
+                          // Обновляем события стратегии
+                          dispatch(refreshStrategyEvents(value.id));
+                          
+                          // Сбрасываем состояние обновления через небольшую задержку
+                          setTimeout(() => {
+                            setIsUpdatingData(false);
+                          }, 1000);
                         } catch (e: unknown) {
+                          setIsUpdatingData(false);
                           if (e instanceof Error) {
                             alert(e.message);
                           } else {
@@ -292,6 +353,8 @@ export function Strategy({
                       }}
                       onWithdraw={async (percent) => {
                         try {
+                          setIsUpdatingData(true);
+                          
                           await withdraw({
                             amount: BigInt(percent),
                             strategyId: value.id,
@@ -299,7 +362,19 @@ export function Strategy({
                             principal: user!.principal,
                             agent: agent!,
                           });
+                          
+                          // Обновляем данные после успешного вывода
+                          dispatch(refreshUserBalance({ user: user!.principal, strategyId: value.id }));
+                          
+                          // Обновляем события стратегии
+                          dispatch(refreshStrategyEvents(value.id));
+                          
+                          // Сбрасываем состояние обновления через небольшую задержку
+                          setTimeout(() => {
+                            setIsUpdatingData(false);
+                          }, 1000);
                         } catch (e: unknown) {
+                          setIsUpdatingData(false);
                           if (e instanceof Error) {
                             alert(e.message);
                           } else {
@@ -309,16 +384,9 @@ export function Strategy({
                       }}
                       available={amountToWithdraw}
                       tokenSymbol={token?.symbol ?? ""}
-                      loading={isWithdrawing}
+                      loading={isWithdrawing || isUpdatingData}
                       disabled={Number(amountToWithdraw) === 0}
                     />
-                    {/* <Button
-                      className="md:w-[150px]"
-                      onClick={() => navigate("/swap")}
-                    >
-                      <span className="text-[20px] block mr-[5px]">🔄</span>{" "}
-                      Swap
-                    </Button> */}
                   </div>
                 </div>
               </div>
@@ -513,7 +581,7 @@ export function Strategy({
             </div>
           )}
         </Card>
-        <PaymentsCard />
+        <PaymentsCard isUpdating={isUpdatingData} />
       </div>
     </motion.div>
   );
