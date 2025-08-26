@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { UserStats } from "./user-stats";
 import { PortfolioDashboard } from "./portfolio-dashboard";
 import { QuickActions } from "./quick-actions";
@@ -7,9 +7,9 @@ import { EventRecordsCard } from "../event-records/card";
 export function Profile() {
   const [currentApy, setCurrentApy] = useState(0);
 
-  const handleStatsUpdate = (stats: { currentApy: number }) => {
+  const handleStatsUpdate = useCallback((stats: { currentApy: number }) => {
     setCurrentApy(stats.currentApy);
-  };
+  }, []);
 
   return (
     <div className="grid grid-cols-1 gap-8 min-w-[800px]">

@@ -5,13 +5,14 @@ import { useTokens } from "../../hooks";
 import { useState } from "react";
 import { Strategy } from "./strategy";
 import { TokensLogos } from "./tokens-logos";
-import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
+import { getStrategyTokenLogos, getProfitLevel } from "./utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
 import { useStrategies } from "../../hooks/strategies";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useBalances } from "../../hooks/balances";
+import { useNavigate } from "react-router-dom";
 
 interface PlatformStats {
   totalTvl: bigint;
@@ -30,6 +31,7 @@ export function Strategies() {
   const [selectedStrategy, setSelectedStrategy] = useState<number>();
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserStrategies, setShowUserStrategies] = useState(false);
+  const navigate = useNavigate();
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
@@ -231,11 +233,13 @@ export function Strategies() {
                 </div>
                 <div className="flex flex-col flex-grow">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-[20px] font-semibold">{s.name}</h3>
+                    <h3 className="text-[20px] font-semibold">
+                      {s.name}
+                    </h3>
                     <span
                       className={
                         "px-2 py-0.5 rounded text-sm " +
-                        getProfitColor(getProfitLevel(s), theme)
+                        getProfitLevel(s)
                       }
                     >
                       {getProfitLevel(s).toUpperCase()}
@@ -264,7 +268,10 @@ export function Strategies() {
                 <Button
                   className="w-[120px] h-[36px] text-sm"
                   onClick={() => {
-                    if (!isDisabled) setSelectedStrategy(s.id);
+                    if (!isDisabled) {
+                      setSelectedStrategy(s.id);
+                      navigate(`/strategies/${s.id}`);
+                    }
                   }}
                   disabled={isDisabled}
                 >

@@ -1,11 +1,12 @@
 import { Card } from "../ui";
 import { useAuth } from "@nfid/identitykit/react";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import {
   useSelector,
   Status,
 } from "../../store";
 import { Strategy } from "../../services/strategies/strategy-service";
+import { useStrategies } from "../../hooks/strategies";
 
 interface UserStatsData {
   totalTvl: bigint;
@@ -18,16 +19,19 @@ interface UserStatsData {
 
 export function UserStats({ onStatsUpdate }: { onStatsUpdate?: (stats: { currentApy: number }) => void }) {
   const { user } = useAuth();
-  const strategies = useSelector((state) => state.strategies.strategies.data?.filter((strategy) => strategy.userShares.some(([principal]) => principal.toString() === user?.principal.toString())));
-  const balances = useSelector((state) => state.strategies.balances);
+  
+  // Используем useStrategies для автоматической загрузки данных
+  const { loading, strategies, balances } = useStrategies(user?.principal?.toString());
+  
   const status = useSelector((state) => state.strategies.strategies.status);
+  const prevStatsRef = useRef<UserStatsData | null>(null);
 
-  console.log("Initial data:", { user, strategies, balances, status });
+  console.log("Initial data:", { user, strategies, balances, status, loading });
 
   const userStats = useMemo(() => {
-    console.log("useMemo called", { strategies, balances, status });
+    console.log("useMemo called", { strategies, balances, status, loading });
 
-    if (!strategies || !balances || status !== Status.SUCCEEDED) {
+    if (!strategies || !balances || status !== Status.SUCCEEDED || loading) {
       return {
         totalTvl: 0n,
         currentApy: 0,
@@ -38,7 +42,25 @@ export function UserStats({ onStatsUpdate }: { onStatsUpdate?: (stats: { current
       };
     }
 
-    const stats = strategies.reduce(
+    // Фильтруем стратегии пользователя
+    const userStrategies = strategies.filter((strategy) => 
+      strategy.userShares.some(([principal]) => 
+        principal.toString() === user?.principal?.toString()
+      )
+    );
+
+    if (userStrategies.length === 0) {
+      return {
+        totalTvl: 0n,
+        currentApy: 0,
+        deposited: 0,
+        totalYield: 0,
+        portfolioValue: 0,
+        strategyApyPairs: [],
+      };
+    }
+
+    const stats = userStrategies.reduce(
       (acc: UserStatsData, strategy: Strategy) => {
         console.log("Processing strategy:", strategy);
         console.log("Current acc state:", acc);
@@ -49,7 +71,7 @@ export function UserStats({ onStatsUpdate }: { onStatsUpdate?: (stats: { current
           
           // Получаем долю пользователя в этой стратегии
           const userShare = strategy.userShares.find(
-            ([principal]) => principal.toString() === user?.principal.toString()
+            ([principal]) => principal.toString() === user?.principal?.toString()
           )?.[1] || 0n;
           
           
@@ -61,7 +83,7 @@ export function UserStats({ onStatsUpdate }: { onStatsUpdate?: (stats: { current
           
           // Рассчитываем начальную стоимость позиции из initialDeposit
           const initialDeposit = strategy.initialDeposit.find(([principal]) => 
-            principal.toString() === user?.principal.toString()
+            principal.toString() === user?.principal?.toString()
           )?.[1] || 0n;
           
           // Проверяем валидность данных перед расчетом
@@ -113,7 +135,7 @@ export function UserStats({ onStatsUpdate }: { onStatsUpdate?: (stats: { current
             initialPositionValue: initialPositionValue.toFixed(6),
             strategyYield: strategyYield.toFixed(6),
             // Добавляем дополнительную информацию для отладки
-            userPrincipal: user?.principal.toString(),
+            userPrincipal: user?.principal?.toString(),
             hasInitialDeposit: initialDeposit > 0n,
             hasUserShare: userShare > 0n,
           });
@@ -147,29 +169,26 @@ export function UserStats({ onStatsUpdate }: { onStatsUpdate?: (stats: { current
       }
     );
 
-    // Пересчитываем CURRENT APY как взвешенное среднее
-    if (stats.strategyApyPairs.length > 0) {
-      const totalValue = stats.strategyApyPairs.reduce((sum, pair) => sum + pair.value, 0);
-      if (totalValue > 0) {
-        stats.currentApy = stats.strategyApyPairs.reduce((sum, pair) => {
-          const weight = pair.value / totalValue;
-          return sum + (pair.apy * weight);
-        }, 0);
-        
-        console.log("CURRENT APY calculation:", {
-          strategyApyPairs: stats.strategyApyPairs.map(pair => ({
-            value: pair.value.toFixed(2),
-            apy: pair.apy.toFixed(2),
-            weight: (pair.value / totalValue).toFixed(4)
-          })),
-          totalValue: totalValue.toFixed(2),
-          weightedApy: stats.currentApy.toFixed(2)
-        });
-        
-        // Передаем данные вверх
-        onStatsUpdate?.({ currentApy: stats.currentApy });
-      }
-    }
+     // Пересчитываем CURRENT APY как взвешенное среднее
+     if (stats.strategyApyPairs.length > 0) {
+       const totalValue = stats.strategyApyPairs.reduce((sum, pair) => sum + pair.value, 0);
+       if (totalValue > 0) {
+         stats.currentApy = stats.strategyApyPairs.reduce((sum, pair) => {
+           const weight = pair.value / totalValue;
+           return sum + (pair.apy * weight);
+         }, 0);
+         
+         console.log("CURRENT APY calculation:", {
+           strategyApyPairs: stats.strategyApyPairs.map(pair => ({
+             value: pair.value.toFixed(2),
+             apy: pair.apy.toFixed(2),
+             weight: (pair.value / totalValue).toFixed(4)
+           })),
+           totalValue: totalValue.toFixed(2),
+           weightedApy: stats.currentApy.toFixed(2)
+         });
+       }
+     }
 
     console.log("Final userStats calculation:", {
       totalTvl: stats.totalTvl.toString(),
@@ -180,7 +199,37 @@ export function UserStats({ onStatsUpdate }: { onStatsUpdate?: (stats: { current
     });
 
     return stats;
-  }, [strategies, balances, status, user?.principal]);
+  }, [strategies, balances, status, user?.principal, loading]);
+
+  // Используем useEffect для вызова onStatsUpdate только когда данные действительно изменились
+  useEffect(() => {
+    if (onStatsUpdate && userStats && 
+        (prevStatsRef.current?.currentApy !== userStats.currentApy || 
+         prevStatsRef.current?.portfolioValue !== userStats.portfolioValue)) {
+      
+      console.log("Stats updated, calling onStatsUpdate:", {
+        prev: prevStatsRef.current?.currentApy,
+        current: userStats.currentApy
+      });
+      
+      onStatsUpdate({ currentApy: userStats.currentApy });
+      prevStatsRef.current = userStats;
+    }
+  }, [userStats, onStatsUpdate]);
+
+  // Проверяем состояние загрузки
+  if (loading || status === Status.LOADING) {
+    return (
+      <Card className="overflow-hidden">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <h3 className="text-xl font-semibold">Loading Portfolio Data...</h3>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6">
