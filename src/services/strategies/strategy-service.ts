@@ -123,10 +123,7 @@ export class StrategiesService {
           return pool[0] === currentPool.id;
         })?.[1].apy.tokens_apy ?? 0,
       tvl:
-        poolStats.find((pool: any) => {
-          const currentPool = strategy.current_pool[0]!;
-          return pool[0] === currentPool.id;
-        })?.[1].tvl ?? 0n,
+        strategy.current_liquidity[0] ?? 0n,
       usd_apy:
         poolStats.find((pool: any) => {
           const currentPool = strategy.current_pool[0]!;
@@ -140,6 +137,7 @@ export class StrategiesService {
         return Number(initDeposit) / Number(10 ** decimals);
       }
     }));
+
     const mappingEnd = performance.now();
     console.log(`🔄 [PROFILER] Data mapping took ${(mappingEnd - mappingStart).toFixed(2)}ms`);
     

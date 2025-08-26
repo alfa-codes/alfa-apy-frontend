@@ -211,25 +211,61 @@ export function PortfolioDashboard() {
                   <div className="flex justify-between items-center text-xs">
                     <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>24h Change:</span>
                     <span className={`font-semibold ${
-                      strategy.currentApy > 0 ? "text-green-500" : "text-red-500"
+                      strategy.apyData.length >= 2 ? 
+                        (strategy.apyData[strategy.apyData.length - 1]?.y || 0) - (strategy.apyData[strategy.apyData.length - 2]?.y || 0) >= 0 
+                        ? "text-green-500" 
+                        : "text-red-500"
+                      : "text-gray-500"
                     }`}>
-                      {strategy.currentApy > 0 ? "+" : ""}{strategy.currentApy.toFixed(2)}%
+                      {strategy.apyData.length >= 2 ? 
+                        (() => {
+                          const current = strategy.apyData[strategy.apyData.length - 1]?.y || 0;
+                          const previous = strategy.apyData[strategy.apyData.length - 2]?.y || 0;
+                          const change = current - previous;
+                          return change >= 0 ? `+${change.toFixed(2)}` : `${change.toFixed(2)}`;
+                        })()
+                      : "N/A"
+                      }%
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>7d Change:</span>
                     <span className={`font-semibold ${
-                      strategy.currentApy > 0 ? "text-green-500" : "text-red-500"
+                      strategy.apyData.length >= 8 ? 
+                        (strategy.apyData[strategy.apyData.length - 1]?.y || 0) - (strategy.apyData[strategy.apyData.length - 8]?.y || 0) >= 0 
+                        ? "text-green-500" 
+                        : "text-red-500"
+                      : "text-gray-500"
                     }`}>
-                      {strategy.currentApy > 0 ? "+" : ""}{(strategy.currentApy * 0.95).toFixed(2)}%
+                      {strategy.apyData.length >= 8 ? 
+                        (() => {
+                          const current = strategy.apyData[strategy.apyData.length - 1]?.y || 0;
+                          const weekAgo = strategy.apyData[strategy.apyData.length - 8]?.y || 0;
+                          const change = current - weekAgo;
+                          return change >= 0 ? `+${change.toFixed(2)}` : `${change.toFixed(2)}`;
+                        })()
+                      : "N/A"
+                      }%
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>1 month Change:</span>
                     <span className={`font-semibold ${
-                      strategy.currentApy > 0 ? "text-green-500" : "text-red-500"
+                      strategy.apyData.length >= 24 ? 
+                        (strategy.apyData[strategy.apyData.length - 1]?.y || 0) - (strategy.apyData[strategy.apyData.length - 24]?.y || 0) >= 0 
+                        ? "text-green-500" 
+                        : "text-red-500"
+                      : "text-gray-500"
                     }`}>
-                      {strategy.currentApy > 0 ? "+" : ""}{(strategy.currentApy * 0.90).toFixed(2)}%
+                      {strategy.apyData.length >= 24 ? 
+                        (() => {
+                          const current = strategy.apyData[strategy.apyData.length - 1]?.y || 0;
+                          const monthAgo = strategy.apyData[strategy.apyData.length - 24]?.y || 0;
+                          const change = current - monthAgo;
+                          return change >= 0 ? `+${change.toFixed(2)}` : `${change.toFixed(2)}`;
+                        })()
+                      : "N/A"
+                      }%
                     </span>
                   </div>
                 </div>
