@@ -99,20 +99,16 @@ export class StrategyHistoryService {
     const chartData: ChartDataPoint[] = [];
     
     if (period === "24h") {
-      // 24 часа - 24 точки
-      for (let hour = 0; hour < 24; hour++) {
-        const snapshot = sortedSnapshots.find(s => {
-          const typedS = s as { timestamp: bigint };
-          const snapshotHour = new Date(Number(typedS.timestamp)).getHours();
-          return snapshotHour === hour;
-        });
-        
-        if (snapshot) {
+      // 24 часа - снэпшоты от 0 до 23
+      for (let i = 0; i < 24; i++) {
+        if (i < sortedSnapshots.length) {
+          const snapshot = sortedSnapshots[i];
           const typedSnapshot = snapshot as { apy: number };
-          chartData.push({ x: hour, y: typedSnapshot.apy });
+          chartData.push({ x: i, y: typedSnapshot.apy });
         } else {
+          // Если снэпшотов меньше 24, заполняем оставшиеся точки последним значением
           const lastValue = chartData.length > 0 ? chartData[chartData.length - 1].y : 0;
-          chartData.push({ x: hour, y: lastValue });
+          chartData.push({ x: i, y: lastValue });
         }
       }
     } else if (period === "1w") {
