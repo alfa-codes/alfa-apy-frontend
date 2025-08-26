@@ -126,7 +126,6 @@ export function Strategies() {
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
               <h3 className={`text-sm flex items-center justify-center gap-1 ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>
-                <Icon name={Icons.boxUsd} size="sm" />
                 DEPOSITED
               </h3>
               <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
