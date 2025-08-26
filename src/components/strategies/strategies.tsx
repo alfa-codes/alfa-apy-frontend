@@ -1,6 +1,6 @@
 import colors from "tailwindcss/colors";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
-import { Button, Card, Input } from "../ui";
+import { Button, Card, Input, Icon, Icons } from "../ui";
 import { useTokens } from "../../hooks";
 import { useState } from "react";
 import { Strategy } from "./strategy";
@@ -110,16 +110,25 @@ export function Strategies() {
     >
       {user && (
         <>
-          <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>Your Stats</h3>
+          <h3 className={`text-lg font-bold flex items-center gap-2 ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
+            <Icon name={Icons.user} className="text-green-400" size="md" />
+            Your Stats
+          </h3>
           <UserStats />
         </>
       )}
       <>
-        <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>Platform Stats</h3>
+        <h3 className={`text-lg font-bold flex items-center gap-2 ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
+          <Icon name={Icons.chartLine} className="text-green-400" size="md" />
+          Platform Stats
+        </h3>
         <Card className="p-[20px]" light={!!user}>
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
-              <h3 className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>DEPOSITED</h3>
+              <h3 className={`text-sm flex items-center justify-center gap-1 ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>
+                <Icon name={Icons.boxUsd} size="sm" />
+                DEPOSITED
+              </h3>
               <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                 ${(platformStats?.deposited ?? 0 / 10 ** 8).toFixed(2) ?? "0"}
               </p>

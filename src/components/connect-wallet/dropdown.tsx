@@ -9,7 +9,7 @@ import {
 } from "@nfid/identitykit/react";
 import { ConnectedButton } from "./connected-button";
 import { ConnectButton } from "./connect-button";
-import { Card } from "../ui";
+import { Card, Icon, Icons } from "../ui";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useTokens, useBalances } from "../../hooks";
@@ -118,7 +118,8 @@ export function DropdownMenu({
               <div className="flex w-full justify-between font-bold">
                 <h2>Swap tokens</h2>
                 <h2 className="cursor-pointer">
-                  <span className="!text-[25px] mr-[4px]">🔄</span>Swap
+                  <Icon name={Icons.refresh} className="mr-1 text-green-400" size="lg" />
+                  Swap
                 </h2>
               </div>
             </ConnectWalletDropdownMenuItem>
@@ -129,7 +130,8 @@ export function DropdownMenu({
               <div className="flex w-full justify-between font-bold">
                 <h2>Transfer tokens</h2>
                 <h2 className="cursor-pointer">
-                  <span className="!text-[25px] mr-[4px]">💸</span>Transfer
+                  <Icon name={Icons.moneyWithWings} className="mr-1 text-green-400" size="lg" />
+                  Transfer
                 </h2>
               </div>
             </ConnectWalletDropdownMenuItem>
@@ -140,7 +142,7 @@ export function DropdownMenu({
               <div className="flex w-full justify-between font-bold">
                 <h2>Profile</h2>
                 <h2 className="cursor-pointer">
-                  <span className="!text-[25px] mr-[4px]">👤</span>
+                  <Icon name={Icons.user} className="mr-1 text-green-400" size="lg" />
                 </h2>
               </div>
             </ConnectWalletDropdownMenuItem>
@@ -161,15 +163,16 @@ export function DropdownMenu({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-[#232136] rounded-lg shadow-xl w-[600px] max-w-[90vw] p-6 border-2 border-purple-600">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-green-400">
-                💸 Transfer Tokens
+              <h2 className="text-xl font-bold text-gray-900 dark:text-green-400 flex items-center">
+                <Icon name={Icons.wallet} className="mr-2 text-green-400" size="lg" />
+                Transfer Tokens
               </h2>
-              <button
-                onClick={() => setIsTransferModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 dark:text-green-400/70 dark:hover:text-green-400 text-xl"
-              >
-                ✕
-              </button>
+                              <button
+                  onClick={() => setIsTransferModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:text-green-400/70 dark:hover:text-green-400 text-xl"
+                >
+                  ✕
+                </button>
             </div>
             
             <div className="space-y-4">

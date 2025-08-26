@@ -1,9 +1,10 @@
 import clsx from 'clsx';
+import React from 'react';
 
 interface Tab {
   id: string;
   label: string;
-  icon?: string;
+  icon?: string | React.ReactNode;
 }
 
 interface TabsProps {
@@ -27,7 +28,11 @@ export function Tabs({ tabs, activeTab, onTabChange, className }: TabsProps) {
               : 'text-gray-600 hover:text-amber-700 dark:text-purple-700 dark:hover:text-purple-400'
           )}
         >
-          {tab.icon && <span className="text-lg">{tab.icon}</span>}
+          {tab.icon && (
+            typeof tab.icon === 'string' 
+              ? <span className="text-lg">{tab.icon}</span>
+              : tab.icon
+          )}
           {tab.label}
         </button>
       ))}

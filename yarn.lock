@@ -435,6 +435,11 @@
   resolved "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.9.tgz"
   integrity sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==
 
+"@hackernoon/pixel-icon-library@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.npmjs.org/@hackernoon/pixel-icon-library/-/pixel-icon-library-1.0.6.tgz"
+  integrity sha512-WCkDFAJq6Xyp2rdVV7qcmx/vlixoScikEv2DpWUNtzWchDOyeTFrU3GTvd0jD/DGYJomLy2tKwkl13wycaO3Ng==
+
 "@headlessui/react@2.2.0":
   version "2.2.0"
   resolved "https://registry.npmjs.org/@headlessui/react/-/react-2.2.0.tgz"

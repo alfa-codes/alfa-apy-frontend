@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { EventRecord } from "../../services/event-records/service";
 import { useTheme } from "../../contexts/ThemeContext";
 import { eventDetailsService, EventDetails } from "../../services/event-records/event-details.service";
+import { Icon, Icons } from "../ui";
 
 export function EventRecordsCard() {
   const [selectedCorrelationId, setSelectedCorrelationId] = useState<string | null>(null);
@@ -94,7 +95,10 @@ export function EventRecordsCard() {
   return (
     <Card className="p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-4">🧾 Events</h3>
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <Icon name={Icons.clock} className="mr-2 text-green-400" size="lg" />
+          Events
+        </h3>
       </div>
       <div className="max-h-[400px] overflow-y-auto">
         <table className="w-full text-sm">

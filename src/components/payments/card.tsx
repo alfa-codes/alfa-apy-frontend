@@ -1,5 +1,5 @@
 import colors from "tailwindcss/colors";
-import { Card } from "../ui/card";
+import { Card, Icon, Icons } from "../ui";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { useEventRecords } from "../../hooks/event-records";
 import { formatTimestamp } from "../../utils/date";
@@ -75,7 +75,8 @@ export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
               : 'bg-amber-500 text-white hover:bg-amber-600'
           }`}
         >
-          🔍 View Event Details
+          <Icon name={Icons.clock} className="mr-2" size="sm" />
+          View Event Details
         </button>
       </div>
     );
@@ -86,7 +87,8 @@ export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
       <Card className="p-6">
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            🧾 Events
+            <Icon name={Icons.clock} className="text-green-400" size="md" />
+            Events
             {isUpdating && (
               <div className="flex items-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
@@ -223,8 +225,9 @@ export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">
-                🔍 Event Details: #{selectedEvent.id.toString()}
+              <h3 className="text-lg font-semibold flex items-center">
+                <Icon name={Icons.clock} className="mr-2 text-green-400" size="md" />
+                Event Details: #{selectedEvent.id.toString()}
               </h3>
               <button
                 onClick={() => setIsEventDetailsOpen(false)}
@@ -242,7 +245,10 @@ export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
               <div className={`p-4 rounded-lg ${
                 theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
               }`}>
-                <h4 className="font-semibold mb-3 text-lg">📋 Event Summary</h4>
+                <h4 className="font-semibold mb-3 text-lg flex items-center">
+                  <Icon name={Icons.clock} className="mr-2 text-green-400" size="sm" />
+                  Event Summary
+                </h4>
                 <p className={`text-sm ${
                   theme === 'dark' ? 'text-green-300' : 'text-gray-600'
                 }`}>
@@ -253,7 +259,10 @@ export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
               <div className={`p-4 rounded-lg ${
                 theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
               }`}>
-                <h4 className="font-semibold mb-3 text-lg">🔧 Event Parameters</h4>
+                <h4 className="font-semibold mb-3 text-lg flex items-center">
+                  <Icon name={Icons.viewblocks} className="mr-2 text-green-400" size="sm" />
+                  Event Parameters
+                </h4>
                 <div className="space-y-3">
                   {eventDetails.fields.map((field, index) => (
                     <div key={index} className="flex justify-between items-start py-2 border-b border-gray-600/20">
@@ -282,7 +291,10 @@ export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
               <div className={`p-4 rounded-lg ${
                 theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
               }`}>
-                <h4 className="font-semibold mb-3 text-lg">📊 Basic Information</h4>
+                <h4 className="font-semibold mb-3 text-lg flex items-center">
+                  <Icon name={Icons.chartLine} className="mr-2 text-green-400" size="sm" />
+                  Basic Information
+                </h4>
                 <div className="grid grid-cols-1 gap-3">
                   <div className="flex justify-between">
                     <span className="font-medium">Event ID:</span>

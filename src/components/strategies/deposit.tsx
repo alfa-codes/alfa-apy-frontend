@@ -1,5 +1,5 @@
 import { Popup } from "pixel-retroui";
-import { Button, Input } from "../ui";
+import { Button, Input, Icon, Icons } from "../ui";
 import { useState, useEffect } from "react";
 import BigNumber from "bignumber.js";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
@@ -8,13 +8,13 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { clsx } from "clsx";
 
 const DEPOSIT_STEPS = [
-  "🚀 Transferring your funds to our secure canister",
-  "🔍 Finding the most profitable liquidity provider",
-  "💎 Executing optimal swap for maximum returns",
-  "🌟 Allocating your funds to the best strategy pool",
-  "📊 Updating your portfolio with fresh data",
-  "🔐 Verifying transaction security",
-  "🎉 Deposit almost completed! One more step to go"
+  "Transferring your funds to our secure canister",
+  "Finding the most profitable liquidity provider",
+  "Executing optimal swap for maximum returns",
+  "Allocating your funds to the best strategy pool",
+  "Updating your portfolio with fresh data",
+  "Verifying transaction security",
+  "Deposit almost completed! One more step to go"
 ];
 
 export function Deposit({
@@ -83,7 +83,10 @@ export function Deposit({
             loading={true}
             size={20}
           />
-          <h2 className="text-[20px] font-bold mb-4">🚀 Processing Your Deposit</h2>
+          <h2 className="text-[20px] font-bold mb-4 flex items-center justify-center">
+            <Icon name={Icons.boxUsd} className="mr-2 text-green-400" size="lg" />
+            Processing Your Deposit
+          </h2>
           <p className="text-gray-600 text-center mb-6">
             We're working hard to get your {value} {tokenSymbol} earning maximum returns!
           </p>
@@ -118,7 +121,8 @@ export function Deposit({
   return (
     <>
       <Button onClick={onClick} className={className} bg={theme === 'dark' ? '#a78bfa' : undefined} textColor={theme === 'dark' ? '#22ff88' : undefined}>
-        <span className="text-[20px] block mr-[5px]">📥</span> Deposit
+        <Icon name={Icons.boxUsd} className="mr-2 text-green-400" size="md" />
+        Deposit
       </Button>
       <Popup
         isOpen={!!isOpen}
@@ -174,10 +178,11 @@ export function Deposit({
           </>
         ) : (
           <div className="text-center py-8">
-            <div className="text-6xl mb-6">🎉</div>
+            <Icon name={Icons.checkCircle} className="text-6xl mb-6 text-green-400" size="xl" />
             <h2 className="text-[24px] font-bold mb-4">Deposit Successful!</h2>
-            <p className="text-gray-600 mb-8">
-              🚀 Your {value} {tokenSymbol} is now actively earning in our strategy!
+            <p className="text-gray-600 mb-8 flex items-center justify-center">
+              <Icon name={Icons.boxUsd} className="mr-2 text-green-400" size="md" />
+              Your {value} {tokenSymbol} is now actively earning in our strategy!
             </p>
             <Button
               className="w-full max-w-[200px] mx-auto"
@@ -187,7 +192,8 @@ export function Deposit({
                 setValue("");
               }}
             >
-              Awesome! 🎯
+              <Icon name={Icons.check} className="mr-2" size="sm" />
+              Awesome!
             </Button>
           </div>
         )}

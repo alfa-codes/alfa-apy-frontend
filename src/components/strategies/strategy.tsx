@@ -5,7 +5,7 @@ import {
   useTokens,
   useWithdraw,
 } from "../../hooks";
-import { Card } from "../ui";
+import { Card, Icon, Icons } from "../ui";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getTokenLogo } from "./utils";
 import { useEffect, useState } from "react";
@@ -220,7 +220,8 @@ export function Strategy({
           {/* User Balance Card */}
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              💸 Your Position
+              <Icon name={Icons.moneyWithWings} className="text-green-400" size="md" />
+              Your Position
               {isUpdatingData && (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
@@ -389,7 +390,10 @@ export function Strategy({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-3">
         {/* Combined Stats Card */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">🔢 Strategy Stats</h3>
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <Icon name={Icons.chartLine} className="mr-2 text-green-400" size="md" />
+            Strategy Stats
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <div>
               <p className="text-gray-600">Users in Pool</p>
@@ -412,7 +416,10 @@ export function Strategy({
 
         {/* Pools Table */}
         <Card>
-          <h3 className="text-lg font-semibold mb-4 px-6 pt-6">🏊 Pools</h3>
+          <h3 className="text-lg font-semibold mb-4 px-6 pt-6 flex items-center">
+            <Icon name={Icons.chartNetwork} className="mr-2 text-green-400" size="md" />
+            Pools
+          </h3>
           <div className="overflow-x-auto pb-6">
             <table className="w-full">
               <thead>
@@ -480,11 +487,14 @@ export function Strategy({
       <div className="grid grid-cols-1 md:grid-cols-[minmax(300px,_1fr)_2fr] gap-8">
         {/* New Details Card with Tabs */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">ℹ️ Details</h3>
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <Icon name={Icons.viewblocks} className="mr-2 text-green-400" size="md" />
+            Details
+          </h3>
           <Tabs
             tabs={[
-              { id: "tokens", label: "Tokens", icon: "💰" },
-              { id: "providers", label: "Providers", icon: "🏦" },
+              { id: "tokens", label: "Tokens", icon: <Icon name={Icons.boxUsd} className="text-green-400" size="sm" /> },
+              { id: "providers", label: "Providers", icon: <Icon name={Icons.bank} className="text-green-400" size="sm" /> },
             ]}
             activeTab={detailsTab}
             onTabChange={(tabId) =>
@@ -540,7 +550,7 @@ export function Strategy({
                       theme === 'dark' ? 'bg-purple-600 text-green-400' : 'bg-gray-300'
                     )}
                   >
-                    🦍
+                    <Icon name={Icons.bank} className="text-green-400" size="lg" />
                   </span>
                   <div>
                     <div className="font-bold text-lg">

@@ -1,5 +1,5 @@
 import { Popup } from "pixel-retroui";
-import { Button } from "../ui";
+import { Button, Icon, Icons } from "../ui";
 import { useState, useEffect } from "react";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import colors from "tailwindcss/colors";
@@ -7,13 +7,13 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { clsx } from "clsx";
 
 const WITHDRAW_STEPS = [
-  "🔄 Securely transferring your liquidity from provider",
-  "🎯 Finding the most favorable swap rates for you",
-  "💱 Converting your position to base tokens",
-  "💸 Processing your withdrawal request",
-  "📈 Updating your account with latest data",
-  "🔐 Verifying withdrawal security",
-  "✨ Withdrawal almost completed! Transfer your funds to your wallet"
+  "Securely transferring your liquidity from provider",
+  "Finding the most favorable swap rates for you",
+  "Converting your position to base tokens",
+  "Processing your withdrawal request",
+  "Updating your account with latest data",
+  "Verifying withdrawal security",
+  "Withdrawal almost completed! Transfer your funds to your wallet"
 ];
 
 export function Withdraw({
@@ -103,7 +103,10 @@ export function Withdraw({
             loading={true}
             size={20}
           />
-          <h2 className="text-[20px] font-bold mb-4">💸 Processing Your Withdrawal</h2>
+          <h2 className="text-[20px] font-bold mb-4 flex items-center justify-center">
+            <Icon name={Icons.moneyWithWings} className="mr-2 text-green-400" size="lg" />
+            Processing Your Withdrawal
+          </h2>
           <p className="text-gray-600 text-center mb-6">
             We're carefully processing your {value}% withdrawal to ensure the best rates!
           </p>
@@ -144,7 +147,8 @@ export function Withdraw({
         textColor={!disabled && theme === 'dark' ? '#22ff88' : undefined} 
         disabled={disabled}
       >
-        <span className="text-[20px] block mr-[5px]">📤</span> Withdraw
+        <Icon name={Icons.moneyWithWings} className="mr-2 text-green-400" size="md" />
+        Withdraw
       </Button>
       <Popup
         isOpen={!!isOpen}
@@ -220,10 +224,11 @@ export function Withdraw({
           </>
         ) : (
           <div className="text-center py-8">
-            <div className="text-6xl mb-6">✨</div>
+            <Icon name={Icons.checkCircle} className="text-6xl mb-6 text-green-400" size="xl" />
             <h2 className="text-[24px] font-bold mb-4">Withdrawal Successful!</h2>
-            <p className="text-gray-600 mb-8">
-              💰 Your {value}% withdrawal has been processed successfully!
+            <p className="text-gray-600 mb-8 flex items-center justify-center">
+              <Icon name={Icons.moneyWithWings} className="mr-2 text-green-400" size="md" />
+              Your {value}% withdrawal has been processed successfully!
             </p>
             <Button
               className="w-full max-w-[200px] mx-auto"
@@ -233,7 +238,8 @@ export function Withdraw({
                 setValue("");
               }}
             >
-              Perfect! 🎯
+              <Icon name={Icons.check} className="mr-2" size="sm" />
+              Perfect!
             </Button>
           </div>
         )}
