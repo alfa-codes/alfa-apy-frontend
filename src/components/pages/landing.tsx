@@ -316,7 +316,7 @@ export function Landing() {
             </p>
             <div className="flex justify-center">
               <Button
-                onClick={() => window.open("https://github.com/olsemeno/alfaAPY/blob/main/README.md", "_blank")}
+                onClick={() => window.open("https://alfa-codes.github.io/alfa-apy-icp-canisters/", "_blank")}
                 className={`px-8 py-4 text-lg font-semibold ${
                   theme === 'dark'
                     ? 'bg-purple-600 text-white hover:bg-purple-700'
