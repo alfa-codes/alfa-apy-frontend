@@ -9,8 +9,8 @@ import { getTypedActor, hasOwnProperty } from "../utils.ts";
 import { icrc1OracleService } from "../token/index.ts";
 import { TransferArg } from "../../idl/icrc1.ts";
 
-export const alfaACanister = "ownab-uaaaa-aaaap-qp2na-cai";
-export const poolsDataCanister = "oxawg-7aaaa-aaaag-aub6q-cai";
+export const alfaACanister = import.meta.env.VITE_VAULT_CANISTER_ID;
+export const poolsDataCanister = import.meta.env.VITE_POOL_STATS_CANISTER_ID;
 
 export class UserService {
   public async withdraw(
