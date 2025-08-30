@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite --port=3001",
     "build": "tsc -b && vite build",
-    "build:dev": "cp .env.dev .env && npm run build && mv .env .env.dev",
-    "build:staging": "cp .env.staging .env && npm run build && mv .env .env.staging",
-    "build:prod": "cp .env.prod .env && npm run build && mv .env .env.prod",
+    "build:dev": "vite build --mode development",
+    "build:staging": "vite build --mode staging",
+    "build:prod": "vite build --mode production",
     "deploy:dev": "npm run build:dev && export DFX_WARNING=-mainnet_plaintext_identity && echo 'yes' | dfx deploy frontend --network dev --mode reinstall",
     "deploy:staging": "npm run build:staging && export DFX_WARNING=-mainnet_plaintext_identity && echo 'yes' | dfx deploy frontend --network staging --mode reinstall",
     "deploy:ic": "npm run build:prod && export DFX_WARNING=-mainnet_plaintext_identity && echo 'yes' | dfx deploy frontend --network ic --mode reinstall",
