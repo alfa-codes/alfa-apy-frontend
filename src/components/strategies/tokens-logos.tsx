@@ -14,7 +14,7 @@ export function TokensLogos({
   
   return (
     <div 
-      className="relative inline-flex" 
+      className="relative inline-flex flex-shrink-0" 
       style={{ 
         width: logos.length > 1 ? size + ((logos.length - 1) * (size / 1.7)) : size,
         height: size 
@@ -32,16 +32,16 @@ export function TokensLogos({
           }}
         >
           <img
-          className={clsx(
+            className={clsx(
               "w-full h-full rounded-full border-2 object-cover",
               theme === 'dark' 
                 ? 'border-purple-600 bg-gray-800' 
                 : 'border-black bg-white',
-            className
-          )}
+              className
+            )}
             src={logo}
             alt={`Token logo ${i + 1}`}
-        />
+          />
         </div>
       ))}
     </div>

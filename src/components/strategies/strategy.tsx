@@ -484,11 +484,11 @@ export function Strategy({
           </div>
         </Card>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(300px,_1fr)_2fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(300px,_1fr)_2fr] gap-4 sm:gap-6 lg:gap-8">
         {/* New Details Card with Tabs */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Icon name={Icons.viewblocks} className="mr-2 text-green-400" size="md" />
+        <Card className="p-3 sm:p-4 lg:p-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center">
+            <Icon name={Icons.viewblocks} className="mr-2 text-green-400" size="sm" />
             Details
           </h3>
           <Tabs
@@ -500,10 +500,10 @@ export function Strategy({
             onTabChange={(tabId) =>
               setDetailsTab(tabId as "tokens" | "providers")
             }
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           />
           {detailsTab === "tokens" && (
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex flex-col gap-6">
               {logos.slice(0, 2).map((logo, idx) => {
                 const token =  idx === 0 ? currentPool?.token0 : currentPool?.token1;
                 const price = idx === 0 ? currentPool?.price0 : currentPool?.price1;
