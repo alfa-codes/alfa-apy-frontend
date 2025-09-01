@@ -154,9 +154,9 @@ export function PortfolioDashboard() {
   }
 
   return (
-    <Card className="overflow-hidden h-[360px]">
+    <Card className="p-4 h-[360px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-500">
       {/* Header with period selector */}
-      <div className="flex flex-row items-center justify-between px-4 pt-2 pb-0 mb-0">
+      <div className="flex flex-row items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <h3 className="text-lg font-semibold">Portfolio Performance</h3>
         </div>

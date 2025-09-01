@@ -436,12 +436,12 @@ export function Strategy({
                 {Number(value.apy).toFixed(2)}%
               </p>
             </div>
-            <div>
+            {/* <div>
               <p className="text-gray-600">USD APY</p>
               <p className="text-lg font-medium">
                 {Number(value.usd_apy).toFixed(2)}%
               </p>
-            </div>
+            </div> */}
           </div>
         </Card>
 
