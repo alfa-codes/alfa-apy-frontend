@@ -162,7 +162,7 @@ export function Strategy({
             <span className={`text-sm sm:text-base ${
               theme === 'dark' ? 'text-yellow-300' : 'text-yellow-600'
             }`}>
-              Data collection in progress. Statistics in strategies will be updating.
+              Data collection and testing in progress. Statistics in strategies will be updating.
             </span>
           </div>
         </div>

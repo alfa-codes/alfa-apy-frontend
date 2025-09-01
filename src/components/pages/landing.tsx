@@ -8,8 +8,8 @@ export function Landing() {
   const { theme } = useTheme();
 
   const stats = [
-    { label: "Total Value Locked", value: "$2.5M+", change: "+15%" },
-    { label: "Active Users", value: "1,200+", change: "+25%" },
+    { label: "Total Value Locked", value: "$48", change: "+15%" },
+    { label: "Active Users", value: "12", change: "+25%" },
     { label: "Average APY", value: "45.2%", change: "+8%" },
     { label: "Strategies", value: "12", change: "+3" },
   ];
@@ -84,7 +84,7 @@ export function Landing() {
               <span className={`text-sm sm:text-base ${
                 theme === 'dark' ? 'text-yellow-300' : 'text-yellow-600'
               }`}>
-                Data collection in progress. Statistics in strategies will be updating.
+                Data collection and testing in progress. Statistics in strategies will be updating.
               </span>
             </div>
           </div>
