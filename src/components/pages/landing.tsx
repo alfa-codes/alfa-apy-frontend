@@ -57,6 +57,40 @@ export function Landing() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
+      {/* Pre-Production Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`w-full py-4 px-4 text-center shadow-sm ${
+          theme === 'dark' 
+            ? 'bg-gradient-to-r from-yellow-600/30 to-orange-600/30 border-b border-yellow-500/50' 
+            : 'bg-gradient-to-r from-yellow-100 to-orange-100 border-b border-yellow-300'
+        }`}
+      >
+        <div className="container mx-auto">
+          <div className="flex items-center justify-center gap-3">
+            <div className={`p-2 rounded-full ${
+              theme === 'dark' ? 'bg-yellow-500/20' : 'bg-yellow-200'
+            }`}>
+              <span className="text-xl">⚠️</span>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+              <span className={`font-bold text-lg ${
+                theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'
+              }`}>
+                Pre-Production Stage
+              </span>
+              <span className={`text-sm sm:text-base ${
+                theme === 'dark' ? 'text-yellow-300' : 'text-yellow-600'
+              }`}>
+                Data collection in progress. Statistics in strategies will be updating.
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Hero Section */}
       <section className={`relative overflow-hidden py-20 ${
         theme === 'dark' 
