@@ -7,3 +7,4 @@ export * from "./input";
 export * from "./toast";
 export * from "./tabs";
 export * from "./theme-toggle";
+export * from "./icon";

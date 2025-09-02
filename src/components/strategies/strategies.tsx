@@ -1,17 +1,18 @@
 import colors from "tailwindcss/colors";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
-import { Button, Card, Input } from "../ui";
+import { Button, Card, Input, Icon, Icons } from "../ui";
 import { useTokens } from "../../hooks";
 import { useState } from "react";
 import { Strategy } from "./strategy";
 import { TokensLogos } from "./tokens-logos";
-import { getStrategyTokenLogos, getProfitLevel, getProfitColor } from "./utils";
+import { getStrategyTokenLogos, getProfitLevel } from "./utils";
 import { motion } from "framer-motion";
 import { useAuth } from "@nfid/identitykit/react";
 import { UserStats } from "../profile";
 import { useStrategies } from "../../hooks/strategies";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useBalances } from "../../hooks/balances";
+import { useNavigate } from "react-router-dom";
 
 interface PlatformStats {
   totalTvl: bigint;
@@ -30,6 +31,7 @@ export function Strategies() {
   const [selectedStrategy, setSelectedStrategy] = useState<number>();
   const [searchTerm, setSearchTerm] = useState("");
   const [showUserStrategies, setShowUserStrategies] = useState(false);
+  const navigate = useNavigate();
 
   // Calculate platform stats
   const platformStats: PlatformStats | undefined = strategies?.reduce(
@@ -106,18 +108,57 @@ export function Strategies() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Pre-Production Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`w-full py-4 px-4 text-center shadow-sm rounded-lg ${
+          theme === 'dark' 
+            ? 'bg-gradient-to-r from-yellow-600/30 to-orange-600/30 border border-yellow-500/50' 
+            : 'bg-gradient-to-r from-yellow-100 to-orange-100 border border-yellow-300'
+        }`}
+      >
+        <div className="flex items-center justify-center gap-3">
+          <div className={`p-2 rounded-full ${
+            theme === 'dark' ? 'bg-yellow-500/20' : 'bg-yellow-200'
+          }`}>
+            <span className="text-xl">⚠️</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <span className={`font-bold text-lg ${
+              theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'
+            }`}>
+              Pre-Production Stage
+            </span>
+            <span className={`text-sm sm:text-base ${
+              theme === 'dark' ? 'text-yellow-300' : 'text-yellow-600'
+            }`}>
+              Data collection and testing in progress. Statistics in strategies will be updating.
+            </span>
+          </div>
+        </div>
+      </motion.div>
       {user && (
         <>
-          <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>Your Stats</h3>
+          <h3 className={`text-lg font-bold flex items-center gap-2 ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
+            <Icon name={Icons.user} className="text-green-400" size="md" />
+            Your Stats
+          </h3>
           <UserStats />
         </>
       )}
       <>
-        <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>Platform Stats</h3>
+        <h3 className={`text-lg font-bold flex items-center gap-2 ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
+          <Icon name={Icons.chartLine} className="text-green-400" size="md" />
+          Platform Stats
+        </h3>
         <Card className="p-[20px]" light={!!user}>
           <div className="flex justify-between items-center">
             <div className="text-center flex-1">
-              <h3 className={`text-sm ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>DEPOSITED</h3>
+              <h3 className={`text-sm flex items-center justify-center gap-1 ${theme === 'dark' ? 'text-green-300' : 'text-gray-600'}`}>
+                DEPOSITED
+              </h3>
               <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-green-400' : 'text-gray-900'}`}>
                 ${(platformStats?.deposited ?? 0 / 10 ** 8).toFixed(2) ?? "0"}
               </p>
@@ -231,11 +272,13 @@ export function Strategies() {
                 </div>
                 <div className="flex flex-col flex-grow">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-[20px] font-semibold">{s.name}</h3>
+                    <h3 className="text-[20px] font-semibold">
+                      {s.name}
+                    </h3>
                     <span
                       className={
                         "px-2 py-0.5 rounded text-sm " +
-                        getProfitColor(getProfitLevel(s), theme)
+                        getProfitLevel(s)
                       }
                     >
                       {getProfitLevel(s).toUpperCase()}
@@ -264,7 +307,10 @@ export function Strategies() {
                 <Button
                   className="w-[120px] h-[36px] text-sm"
                   onClick={() => {
-                    if (!isDisabled) setSelectedStrategy(s.id);
+                    if (!isDisabled) {
+                      setSelectedStrategy(s.id);
+                      navigate(`/strategies/${s.id}`);
+                    }
                   }}
                   disabled={isDisabled}
                 >

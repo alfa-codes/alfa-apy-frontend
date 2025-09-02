@@ -6,7 +6,7 @@ import { useSelector, Status } from "../../store";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
-export function QuickActions() {
+export function QuickActions({ currentApy }: { currentApy: number }) {
   const { theme } = useTheme();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -98,7 +98,7 @@ export function QuickActions() {
       <h3 className="text-lg font-semibold mb-4">Portfolio Insights</h3>
       
       <div className="space-y-4">
-        {/* Top Performing Strategy */}
+        {/* Top Performing Strategy
         <div className={`p-3 rounded-lg ${
           theme === 'dark' ? 'bg-gray-800' : 'bg-green-50'
         }`}>
@@ -119,7 +119,7 @@ export function QuickActions() {
           >
             View Strategy
           </Button>
-        </div>
+        </div> */}
 
         {/* Risk Assessment */}
         <div className={`p-3 rounded-lg ${
@@ -188,19 +188,19 @@ export function QuickActions() {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium">Yield Analysis</span>
             <span className="text-sm font-bold text-blue-600">
-              {portfolioAnalysis.averageApy.toFixed(2)}% APY
+              {currentApy.toFixed(2)}% APY
             </span>
           </div>
           <div className="text-xs text-gray-500 mb-2">
             Portfolio weighted average yield
           </div>
           <div className="space-y-1">
-            <div className="flex justify-between text-xs">
+            {/* <div className="flex justify-between text-xs">
               <span>vs Market:</span>
-              <span className={portfolioAnalysis.averageApy > 12 ? 'text-green-600' : 'text-yellow-600'}>
-                {portfolioAnalysis.averageApy > 12 ? 'Above average' : 'Below average'}
+              <span className={currentApy > 12 ? 'text-green-600' : 'text-yellow-600'}>
+                {currentApy > 12 ? 'Above average' : 'Below average'}
               </span>
-            </div>
+            </div> */}
             <div className="flex justify-between text-xs">
               <span>Best Strategy:</span>
               <span className="font-medium text-green-600">

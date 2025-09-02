@@ -70,7 +70,7 @@ export class EventDetailsService {
         { name: "Amount 0", value: event.amount0?.[0]?.toString() || "N/A", type: "bigint", description: "Amount of token 0 withdrawn" },
         { name: "Pool ID", value: event.pool_id?.[0] || "N/A", type: "string" }
       ],
-      summary: `Successfully withdrew ${event.shares?.[0]?.toString() || "0"} shares from strategy ${event.strategy_id}`
+      summary: `Successfully withdraw ${event.shares?.[0]?.toString() || "0"} shares from strategy ${event.strategy_id}`
     };
   }
 

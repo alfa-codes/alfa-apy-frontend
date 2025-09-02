@@ -5,8 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AlphaAPY</title>
+    <script>
+      // Prevent flash of unstyled content by setting theme before React loads
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const theme = savedTheme || 'dark';
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.body.className = theme === 'dark' ? 'bg-gray-900' : 'bg-orange-50';
+      })();
+    </script>
   </head>
-  <body class="bg-orange-50">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

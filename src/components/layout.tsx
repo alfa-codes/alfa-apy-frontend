@@ -15,7 +15,7 @@ export function Layout({ children }: PropsWithChildren) {
         theme === 'dark' ? 'text-green-400' : 'text-gray-900'
       }`}>
         <Header />
-        <h1 className={`text-center text-[36px] ${
+        <h1 className={`text-center text-[36px] flex items-center justify-center gap-3 ${
           theme === 'dark' ? 'text-green-400' : 'text-gray-900'
         }`}>
           Dominate DeFi with highest APY

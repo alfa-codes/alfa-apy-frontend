@@ -5,7 +5,7 @@ import {
   useTokens,
   useWithdraw,
 } from "../../hooks";
-import { Card } from "../ui";
+import { Card, Icon, Icons } from "../ui";
 import { TokensLogos } from "./tokens-logos";
 import { getStrategyTokenLogos, getTokenLogo } from "./utils";
 import { useEffect, useState } from "react";
@@ -23,6 +23,9 @@ import { PaymentsCard } from "../payments";
 import { Strategy as StrategyResponse } from "../../services/strategies/strategy-service";
 import { useTheme } from "../../contexts/ThemeContext";
 import { strategyHistoryService, ChartDataPoint } from "../../services/strategies/strategy-history.service";
+import { useDispatch } from "react-redux";
+import { refreshUserBalance, refreshStrategyEvents } from "../../store/slices/strategies";
+import { Dispatch } from "../../store/store";
 
 export function Strategy({
   value,
@@ -44,6 +47,7 @@ export function Strategy({
   const { user } = useAuth();
   const agent = useAgent({ host: "https://ic0.app" });
   const { tokens } = useTokens();
+  const dispatch = useDispatch<Dispatch>();
   const logos = tokens ? getStrategyTokenLogos(value, tokens) : []; //TODO
   // const { resetPools } = usePools(value.pools.map((p) => p.token0.symbol));
   const currentPool = value.pools.find((p) => p.id === value.currentPool);
@@ -55,6 +59,7 @@ export function Strategy({
   const tokenBalance = token ? balances[token.ledger] : undefined;
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [isUpdatingData, setIsUpdatingData] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -131,6 +136,37 @@ export function Strategy({
       transition={{ duration: 0.3 }}
       className="grid grid-cols-1 gap-y-[25px] max-w-[1400px] mx-auto"
     >
+      {/* Pre-Production Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`w-full py-4 px-4 text-center shadow-sm rounded-lg ${
+          theme === 'dark' 
+            ? 'bg-gradient-to-r from-yellow-600/30 to-orange-600/30 border border-yellow-500/50' 
+            : 'bg-gradient-to-r from-yellow-100 to-orange-100 border border-yellow-300'
+        }`}
+      >
+        <div className="flex items-center justify-center gap-3">
+          <div className={`p-2 rounded-full ${
+            theme === 'dark' ? 'bg-yellow-500/20' : 'bg-yellow-200'
+          }`}>
+            <span className="text-xl">⚠️</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <span className={`font-bold text-lg ${
+              theme === 'dark' ? 'text-yellow-400' : 'text-yellow-700'
+            }`}>
+              Pre-Production Stage
+            </span>
+            <span className={`text-sm sm:text-base ${
+              theme === 'dark' ? 'text-yellow-300' : 'text-yellow-600'
+            }`}>
+              Data collection and testing in progress. Statistics in strategies will be updating.
+            </span>
+          </div>
+        </div>
+      </motion.div>
       {/* Back button row */}
       <div>
         <button
@@ -180,7 +216,7 @@ export function Strategy({
               ))}
             </div>
           </div>
-          {isLoadingChart ? (
+          {isLoadingChart && !isUpdatingData && chartData.length === 0 ? (
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
@@ -214,7 +250,16 @@ export function Strategy({
         <div className="grid grid-cols-1 gap-8">
           {/* User Balance Card */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">💸 Your Position</h3>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Icon name={Icons.moneyWithWings} className="text-green-400" size="md" />
+              Your Position
+              {isUpdatingData && (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                  <span className="text-sm text-gray-500">Updating...</span>
+                </div>
+              )}
+            </h3>
             {user && tokenBalance ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
@@ -222,26 +267,45 @@ export function Strategy({
                     <p className="text-gray-600">Available to Deposit</p>
                     <div className="flex items-center gap-2">
                       <TokensLogos logos={[token?.logo?.[0] ?? ""]} size={24} />
-                      <p className="text-lg font-medium">
-                        {tokenBalance?.balance ?? "0"} {token?.symbol}
-                        <span className="text-gray-500 text-sm ml-2">
-                          (${tokenBalance?.usdBalance ?? "0"})
-                        </span>
-                      </p>
+                      {isUpdatingData ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                          <span className="text-gray-500">Updating...</span>
+                        </div>
+                      ) : (
+                        <p className="text-lg font-medium">
+                          {tokenBalance?.balance ?? "0"} {token?.symbol}
+                          <span className="text-gray-500 text-sm ml-2">
+                            {isUpdatingData ? (
+                              <span className="text-gray-400">Updating...</span>
+                            ) : (
+                              `($${tokenBalance?.usdBalance ?? "0"})`
+                            )}
+                          </span>
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div>
                     <p className="text-gray-600">Your Deposit</p>
                     <div className="flex items-center gap-2">
                       <TokensLogos logos={[logos[0]]} size={24} />
-                      <p className="text-lg font-medium">
-                        {value.getUserInitialDeposit(user!.principal)}
-                        
-                        {/* ${balance?.usd_balance.toFixed(2) ?? "0.00"} */}
-                        {/* "0.00" */}
-                      </p>
+                      {isUpdatingData ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                          <span className="text-gray-500">Updating...</span>
+                        </div>
+                      ) : (
+                        <p className="text-lg font-medium">
+                          {value.getUserInitialDeposit(user!.principal)}
+                          
+                          {/* ${balance?.usd_balance.toFixed(2) ?? "0.00"} */}
+                          {/* "0.00" */}
+                        </p>
+                      )}
                     </div>
                   </div>
+
 
                 </div>
                 {/* Deposit/Withdraw Buttons */}
@@ -249,7 +313,7 @@ export function Strategy({
                   <div className="flex flex-col gap-6 md:items-end md:content-center">
                     <Deposit
                       className="md:w-[150px]"
-                      loading={isDepositing}
+                      loading={isDepositing || isUpdatingData}
                       isOpen={depositOpen}
                       onClose={() => {
                         setDepositOpen(false);
@@ -259,6 +323,8 @@ export function Strategy({
                       }}
                       onDeposit={async (amount) => {
                         try {
+                          setIsUpdatingData(true);
+                          
                           await deposit({
                             amount: BigInt(
                               BigNumber(amount)
@@ -270,7 +336,19 @@ export function Strategy({
                             principal: user!.principal,
                             agent: agent!,
                           });
+                          
+                          // Обновляем данные после успешного депозита
+                          dispatch(refreshUserBalance({ user: user!.principal, strategyId: value.id }));
+                          
+                          // Обновляем события стратегии
+                          dispatch(refreshStrategyEvents(value.id));
+                          
+                          // Сбрасываем состояние обновления через небольшую задержку
+                          setTimeout(() => {
+                            setIsUpdatingData(false);
+                          }, 1000);
                         } catch (e: unknown) {
+                          setIsUpdatingData(false);
                           if (e instanceof Error) {
                             alert(e.message);
                           } else {
@@ -292,6 +370,8 @@ export function Strategy({
                       }}
                       onWithdraw={async (percent) => {
                         try {
+                          setIsUpdatingData(true);
+                          
                           await withdraw({
                             amount: BigInt(percent),
                             strategyId: value.id,
@@ -299,7 +379,19 @@ export function Strategy({
                             principal: user!.principal,
                             agent: agent!,
                           });
+                          
+                          // Обновляем данные после успешного вывода
+                          dispatch(refreshUserBalance({ user: user!.principal, strategyId: value.id }));
+                          
+                          // Обновляем события стратегии
+                          dispatch(refreshStrategyEvents(value.id));
+                          
+                          // Сбрасываем состояние обновления через небольшую задержку
+                          setTimeout(() => {
+                            setIsUpdatingData(false);
+                          }, 1000);
                         } catch (e: unknown) {
+                          setIsUpdatingData(false);
                           if (e instanceof Error) {
                             alert(e.message);
                           } else {
@@ -309,16 +401,9 @@ export function Strategy({
                       }}
                       available={amountToWithdraw}
                       tokenSymbol={token?.symbol ?? ""}
-                      loading={isWithdrawing}
+                      loading={isWithdrawing || isUpdatingData}
                       disabled={Number(amountToWithdraw) === 0}
                     />
-                    {/* <Button
-                      className="md:w-[150px]"
-                      onClick={() => navigate("/swap")}
-                    >
-                      <span className="text-[20px] block mr-[5px]">🔄</span>{" "}
-                      Swap
-                    </Button> */}
                   </div>
                 </div>
               </div>
@@ -336,7 +421,10 @@ export function Strategy({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-3">
         {/* Combined Stats Card */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">🔢 Strategy Stats</h3>
+          <h3 className="text-lg font-semibold mb-4 flex items-center">
+            <Icon name={Icons.chartLine} className="mr-2 text-green-400" size="md" />
+            Strategy Stats
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <div>
               <p className="text-gray-600">Users in Pool</p>
@@ -348,18 +436,21 @@ export function Strategy({
                 {Number(value.apy).toFixed(2)}%
               </p>
             </div>
-            <div>
+            {/* <div>
               <p className="text-gray-600">USD APY</p>
               <p className="text-lg font-medium">
                 {Number(value.usd_apy).toFixed(2)}%
               </p>
-            </div>
+            </div> */}
           </div>
         </Card>
 
         {/* Pools Table */}
         <Card>
-          <h3 className="text-lg font-semibold mb-4 px-6 pt-6">🏊 Pools</h3>
+          <h3 className="text-lg font-semibold mb-4 px-6 pt-6 flex items-center">
+            <Icon name={Icons.chartNetwork} className="mr-2 text-green-400" size="md" />
+            Pools
+          </h3>
           <div className="overflow-x-auto pb-6">
             <table className="w-full">
               <thead>
@@ -424,23 +515,26 @@ export function Strategy({
           </div>
         </Card>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(300px,_1fr)_2fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(300px,_1fr)_2fr] gap-4 sm:gap-6 lg:gap-8">
         {/* New Details Card with Tabs */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">ℹ️ Details</h3>
+        <Card className="p-3 sm:p-4 lg:p-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center">
+            <Icon name={Icons.viewblocks} className="mr-2 text-green-400" size="sm" />
+            Details
+          </h3>
           <Tabs
             tabs={[
-              { id: "tokens", label: "Tokens", icon: "💰" },
-              { id: "providers", label: "Providers", icon: "🏦" },
+              { id: "tokens", label: "Tokens", icon: <Icon name={Icons.boxUsd} className="text-green-400" size="sm" /> },
+              { id: "providers", label: "Providers", icon: <Icon name={Icons.bank} className="text-green-400" size="sm" /> },
             ]}
             activeTab={detailsTab}
             onTabChange={(tabId) =>
               setDetailsTab(tabId as "tokens" | "providers")
             }
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           />
           {detailsTab === "tokens" && (
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex flex-col gap-6">
               {logos.slice(0, 2).map((logo, idx) => {
                 const token =  idx === 0 ? currentPool?.token0 : currentPool?.token1;
                 const price = idx === 0 ? currentPool?.price0 : currentPool?.price1;
@@ -487,7 +581,7 @@ export function Strategy({
                       theme === 'dark' ? 'bg-purple-600 text-green-400' : 'bg-gray-300'
                     )}
                   >
-                    🦍
+                    <Icon name={Icons.bank} className="text-green-400" size="lg" />
                   </span>
                   <div>
                     <div className="font-bold text-lg">
@@ -513,7 +607,7 @@ export function Strategy({
             </div>
           )}
         </Card>
-        <PaymentsCard />
+        <PaymentsCard isUpdating={isUpdatingData} />
       </div>
     </motion.div>
   );

@@ -1,5 +1,5 @@
 import colors from "tailwindcss/colors";
-import { Card } from "../ui/card";
+import { Card, Icon, Icons } from "../ui";
 import SquareLoader from "react-spinners/ClimbingBoxLoader";
 import { useEventRecords } from "../../hooks/event-records";
 import { formatTimestamp } from "../../utils/date";
@@ -9,7 +9,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { clsx } from "clsx";
 import { eventDetailsService, EventDetails } from "../../services/event-records/event-details.service";
 
-export function PaymentsCard() {
+export function PaymentsCard({ isUpdating }: { isUpdating?: boolean }) {
   const { eventRecords } = useEventRecords();
   const [selectedCorrelationId, setSelectedCorrelationId] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
@@ -75,7 +75,8 @@ export function PaymentsCard() {
               : 'bg-amber-500 text-white hover:bg-amber-600'
           }`}
         >
-          🔍 View Event Details
+          <Icon name={Icons.clock} className="mr-2" size="sm" />
+          View Event Details
         </button>
       </div>
     );
@@ -85,10 +86,26 @@ export function PaymentsCard() {
     <>
       <Card className="p-6">
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-4">🧾 Events</h3>
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Icon name={Icons.clock} className="text-green-400" size="md" />
+            Events
+            {isUpdating && (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                <span className="text-sm text-gray-500">Updating...</span>
+              </div>
+            )}
+          </h3>
         </div>
         <div className="max-h-[400px] overflow-y-auto">
-          {!groupedEvents.length && (
+          {isUpdating ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+                <p className="text-gray-500">Updating events...</p>
+              </div>
+            </div>
+          ) : !groupedEvents.length ? (
             <div className="flex justify-center items-center h-32">
               <SquareLoader
                 className="mx-auto"
@@ -97,8 +114,7 @@ export function PaymentsCard() {
                 size={20}
               />
             </div>
-          )}
-          {groupedEvents.length > 0 && (
+          ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr>
@@ -209,8 +225,9 @@ export function PaymentsCard() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">
-                🔍 Event Details: #{selectedEvent.id.toString()}
+              <h3 className="text-lg font-semibold flex items-center">
+                <Icon name={Icons.clock} className="mr-2 text-green-400" size="md" />
+                Event Details: #{selectedEvent.id.toString()}
               </h3>
               <button
                 onClick={() => setIsEventDetailsOpen(false)}
@@ -228,7 +245,10 @@ export function PaymentsCard() {
               <div className={`p-4 rounded-lg ${
                 theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
               }`}>
-                <h4 className="font-semibold mb-3 text-lg">📋 Event Summary</h4>
+                <h4 className="font-semibold mb-3 text-lg flex items-center">
+                  <Icon name={Icons.clock} className="mr-2 text-green-400" size="sm" />
+                  Event Summary
+                </h4>
                 <p className={`text-sm ${
                   theme === 'dark' ? 'text-green-300' : 'text-gray-600'
                 }`}>
@@ -239,7 +259,10 @@ export function PaymentsCard() {
               <div className={`p-4 rounded-lg ${
                 theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
               }`}>
-                <h4 className="font-semibold mb-3 text-lg">🔧 Event Parameters</h4>
+                <h4 className="font-semibold mb-3 text-lg flex items-center">
+                  <Icon name={Icons.viewblocks} className="mr-2 text-green-400" size="sm" />
+                  Event Parameters
+                </h4>
                 <div className="space-y-3">
                   {eventDetails.fields.map((field, index) => (
                     <div key={index} className="flex justify-between items-start py-2 border-b border-gray-600/20">
@@ -268,7 +291,10 @@ export function PaymentsCard() {
               <div className={`p-4 rounded-lg ${
                 theme === 'dark' ? 'bg-[#1a1a2e]' : 'bg-gray-50'
               }`}>
-                <h4 className="font-semibold mb-3 text-lg">📊 Basic Information</h4>
+                <h4 className="font-semibold mb-3 text-lg flex items-center">
+                  <Icon name={Icons.chartLine} className="mr-2 text-green-400" size="sm" />
+                  Basic Information
+                </h4>
                 <div className="grid grid-cols-1 gap-3">
                   <div className="flex justify-between">
                     <span className="font-medium">Event ID:</span>

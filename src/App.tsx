@@ -1,4 +1,5 @@
-import { Lending, Strategies, Layout, Swap, Profile, Landing } from "./components";
+import { Lending, Layout, Swap, Profile, Landing } from "./components";
+import { Strategies, StrategyDetail } from "./components/strategies";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -28,7 +29,7 @@ function App() {
                 path="/strategies"
                 element={
                   <motion.div
-                    key="1"
+                    key="strategies"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -39,10 +40,24 @@ function App() {
                 }
               />
               <Route
+                path="/strategies/:id"
+                element={
+                  <motion.div
+                    key="strategy-detail"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <StrategyDetail />
+                  </motion.div>
+                }
+              />
+              <Route
                 path="/swap"
                 element={
                   <motion.div
-                    key="1"
+                    key="swap"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -56,7 +71,7 @@ function App() {
                 path="/profile"
                 element={
                   <motion.div
-                    key="1"
+                    key="profile"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -70,7 +85,7 @@ function App() {
                 path="/lending"
                 element={
                   <motion.div
-                    key="2"
+                    key="lending"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

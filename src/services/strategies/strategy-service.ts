@@ -12,6 +12,7 @@ import { ExchangeId } from "./enum";
 import { icrc1OracleService } from "../token";
 import { ICRC1 } from "../../idl/icrc1_oracle";
 import { exchangeRateService } from "../exchange/exchange-rate";
+import { strategyHistoryService } from "./strategy-history.service";
 
 export interface Strategy  {
   id : number,
@@ -68,14 +69,18 @@ export class StrategiesService {
     const pricesEnd = performance.now();
     console.log(`💰 [PROFILER] Token prices fetch took ${(pricesEnd - pricesStart).toFixed(2)}ms`);
 
+
+    const graphsPromise = await strategyHistoryService.getStrategyChartData(strategies.map((strategy) => strategy.id), "24h");
+
     // Параллельное получение данных
     const parallelStart = performance.now();
-    const [icrc1Tokens , poolIds, prices] = await Promise.all([
+    const [icrc1Tokens , poolIds, prices, graphs] = await Promise.all([
       icrc1OracleService.getICRC1Canisters(),
       strategies.flatMap((strategy) =>
         strategy.pools.map((pool: StrategyPool) => pool.id)
       ),
-      price
+      price,
+      graphsPromise
      ]);
     const parallelEnd = performance.now();
     console.log(`⚡ [PROFILER] Parallel data fetch took ${(parallelEnd - parallelStart).toFixed(2)}ms`);
@@ -87,9 +92,24 @@ export class StrategiesService {
     const poolStats: [string, PoolMetrics][] =
       await poolStatsService.get_pool_metrics(poolIds);
     const poolStatsEnd = performance.now();
+
+    console.log("graphs", graphs);
     console.log(`📈 [PROFILER] Pool stats fetch took ${(poolStatsEnd - poolStatsStart).toFixed(2)}ms`);
     
     console.log("poolStats", poolStats);
+
+    const apyByStrategy = new Map<number, number>();
+    
+    graphs.forEach((graph) => {
+      if (graph.data && graph.data.length > 0) {
+        const yValues = graph.data.map(point => point.y).filter(y => y !== undefined && !isNaN(y));
+        
+        if (yValues.length > 0) {
+          const averageAPY = yValues.reduce((sum, y) => sum + y, 0) / yValues.length;
+          apyByStrategy.set(graph.strategyId, averageAPY);
+        }
+      }
+    });
     
     // Маппинг данных
     const mappingStart = performance.now();
@@ -118,15 +138,9 @@ export class StrategiesService {
         })?.[1].apy.tokens_apy ?? 0,
       })),
       apy:
-        poolStats.find((pool: any) => {
-          const currentPool = strategy.current_pool[0]!;
-          return pool[0] === currentPool.id;
-        })?.[1].apy.tokens_apy ?? 0,
+        apyByStrategy.get(strategy.id) ?? 0,
       tvl:
-        poolStats.find((pool: any) => {
-          const currentPool = strategy.current_pool[0]!;
-          return pool[0] === currentPool.id;
-        })?.[1].tvl ?? 0n,
+        strategy.current_liquidity[0] ?? 0n,
       usd_apy:
         poolStats.find((pool: any) => {
           const currentPool = strategy.current_pool[0]!;
@@ -140,6 +154,7 @@ export class StrategiesService {
         return Number(initDeposit) / Number(10 ** decimals);
       }
     }));
+
     const mappingEnd = performance.now();
 
     console.log(`🔄 [PROFILER] Data mapping took ${(mappingEnd - mappingStart).toFixed(2)}ms`);

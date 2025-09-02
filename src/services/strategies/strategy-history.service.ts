@@ -85,7 +85,6 @@ export class StrategyHistoryService {
       return [];
     }
 
-    console.log("Processing snapshots:", snapshots);
 
     // Сортируем снэпшоты по времени
     const sortedSnapshots = snapshots.sort((a, b) => {
@@ -133,7 +132,6 @@ export class StrategyHistoryService {
       }
     }
 
-    console.log("Processed chart data:", chartData);
     return chartData;
   }
 

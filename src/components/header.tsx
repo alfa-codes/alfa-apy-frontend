@@ -2,7 +2,7 @@ import { ConnectWallet } from "./connect-wallet";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@nfid/identitykit/react";
-import { Button, ThemeToggle } from "./ui";
+import { Button, ThemeToggle, Icon, Icons } from "./ui";
 import { useTheme } from "../contexts/ThemeContext";
 
 export function Header() {
@@ -31,7 +31,8 @@ export function Header() {
               : ''
           }`}
         >
-          <span className="mr-2">📈</span>Strategies
+          <Icon name={Icons.chartLine} className="mr-2" />
+          Strategies
         </Button>
         <Button
           onClick={() => navigate("/swap")}
@@ -41,7 +42,8 @@ export function Header() {
               : ''
           }`}
         >
-          <span className="mr-2">🔄</span>Swap
+          <Icon name={Icons.refresh} className="mr-2" />
+          Swap
         </Button>
         {user && (
           <Button
@@ -52,7 +54,8 @@ export function Header() {
                 : ''
             }`}
           >
-            <span className="mr-2">👤</span>Profile
+            <Icon name={Icons.user} className="mr-2" />
+            Profile
           </Button>
         )}
         <ConnectWallet />

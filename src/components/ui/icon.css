@@ -1,0 +1,53 @@
+/* Переопределяем цвета пиксельных иконок */
+.hn {
+  color: inherit !important;
+}
+
+/* Специфичные цвета для иконок */
+.hn.text-green-400 {
+  color: #4ade80 !important;
+}
+
+.hn.text-green-300 {
+  color: #86efac !important;
+}
+
+.hn.text-purple-600 {
+  color: #9333ea !important;
+}
+
+.hn.text-purple-500 {
+  color: #a855f7 !important;
+}
+
+.hn.text-blue-600 {
+  color: #2563eb !important;
+}
+
+.hn.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.hn.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.hn.text-gray-400 {
+  color: #9ca3af !important;
+}
+
+.hn.text-gray-300 {
+  color: #d1d5db !important;
+}
+
+.hn.text-gray-900 {
+  color: #111827 !important;
+}
+
+.hn.text-white {
+  color: #ffffff !important;
+}
+
+.hn.text-black {
+  color: #000000 !important;
+}

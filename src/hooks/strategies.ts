@@ -40,7 +40,8 @@ export function useStrategies(user?: string) {
   }, [data, user, dispatch, balancesStatus]);
 
   return {
-    loading: status === Status.IDLE || status === Status.LOADING,
+    loading: (status === Status.IDLE || status === Status.LOADING) && 
+             (balancesStatus === Status.IDLE || balancesStatus === Status.LOADING),
     strategies: data,
     balances,
     service: service.data,
