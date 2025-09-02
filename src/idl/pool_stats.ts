@@ -57,16 +57,26 @@ export type GetEventRecordsResult = { 'Ok' : Array<EventRecord> } |
   { 'Err' : ResponseError };
 export type GetPoolByIdResult = { 'Ok' : Pool } |
   { 'Err' : ResponseError };
+export type GetPoolMetricsResult = { 'Ok' : Array<[string, PoolMetrics]> } |
+  { 'Err' : ResponseError };
+export interface GetPoolsHistoryRequest {
+  'from_timestamp' : [] | [bigint],
+  'to_timestamp' : [] | [bigint],
+  'pool_ids' : [] | [Array<string>],
+}
+export type GetPoolsHistoryResult = { 'Ok' : Array<PoolHistory> } |
+  { 'Err' : ResponseError };
 export type GetPoolsResult = { 'Ok' : Array<Pool> } |
   { 'Err' : ResponseError };
 export interface InternalError {
   'context' : string,
   'code' : bigint,
-  'kind' : ResponseErrorKind,
+  'kind' : InternalErrorKind,
   'extra' : [] | [Array<[string, string]>],
   'message' : string,
 }
 export type InternalErrorKind = { 'AccessDenied' : null } |
+  { 'Infrastructure' : null } |
   { 'NotFound' : null } |
   { 'Timeout' : null } |
   { 'Unknown' : null } |
@@ -81,6 +91,10 @@ export interface Pool {
   'position_id' : [] | [bigint],
 }
 export interface PoolData { 'tvl' : bigint }
+export interface PoolHistory {
+  'snapshots' : Array<PoolSnapshotResponse>,
+  'pool_id' : string,
+}
 export interface PoolMetrics { 'apy' : ApyValue, 'tvl' : bigint }
 export interface PoolSnapshot {
   'id' : string,
@@ -90,6 +104,14 @@ export interface PoolSnapshot {
   'position_data' : [] | [PositionData],
 }
 export interface PoolSnapshotArgs {
+  'pool_data' : [] | [PoolData],
+  'timestamp' : bigint,
+  'pool_id' : string,
+  'position_data' : [] | [PositionData],
+}
+export interface PoolSnapshotResponse {
+  'id' : string,
+  'apy' : ApyValue,
   'pool_data' : [] | [PoolData],
   'timestamp' : bigint,
   'pool_id' : string,
@@ -118,6 +140,8 @@ export type ResponseErrorKind = { 'AccessDenied' : null } |
   { 'Validation' : null };
 export interface RuntimeConfig { 'environment' : Environment }
 export type TestCreatePoolSnapshotResult = { 'Ok' : PoolSnapshot } |
+  { 'Err' : ResponseError };
+export type TestCreateTestSnapshotsResult = { 'Ok' : null } |
   { 'Err' : ResponseError };
 export interface WithdrawLiquidityFromPoolCompleted {
   'shares' : bigint,
@@ -150,24 +174,32 @@ export interface _SERVICE {
   >,
   'add_pool' : ActorMethod<[Principal, Principal, ExchangeId], AddPoolResult>,
   'delete_pool' : ActorMethod<[string], DeletePoolResult>,
+  'deposit_test_liquidity_to_pool' : ActorMethod<[string], AddLiquidityResult>,
   'get_event_records' : ActorMethod<[bigint, bigint], GetEventRecordsResult>,
   'get_pool_by_id' : ActorMethod<[string], GetPoolByIdResult>,
-  'get_pool_metrics' : ActorMethod<
-    [Array<string>],
-    Array<[string, PoolMetrics]>
-  >,
+  'get_pool_metrics' : ActorMethod<[Array<string>], GetPoolMetricsResult>,
   'get_pools' : ActorMethod<[], GetPoolsResult>,
+  'get_pools_history' : ActorMethod<
+    [GetPoolsHistoryRequest],
+    GetPoolsHistoryResult
+  >,
   'get_pools_snapshots' : ActorMethod<
     [Array<string>],
     Array<[string, Array<PoolSnapshot>]>
   >,
+  'get_runtime_config' : ActorMethod<[], RuntimeConfig>,
   'set_operator' : ActorMethod<[Principal], undefined>,
   'test_add_pool_snapshot' : ActorMethod<[PoolSnapshotArgs], undefined>,
   'test_create_pool_snapshot' : ActorMethod<
     [string],
     TestCreatePoolSnapshotResult
   >,
+  'test_create_test_snapshots' : ActorMethod<
+    [string, bigint, number],
+    TestCreateTestSnapshotsResult
+  >,
   'test_delete_all_pools_and_snapshots' : ActorMethod<[], undefined>,
+  'test_delete_all_snapshots' : ActorMethod<[], undefined>,
   'test_delete_pool_snapshot' : ActorMethod<[string, string], undefined>,
   'test_delete_pool_snapshots' : ActorMethod<[string], undefined>,
   'test_update_pool_ids' : ActorMethod<[], undefined>,

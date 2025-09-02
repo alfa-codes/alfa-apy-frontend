@@ -141,6 +141,7 @@ export class StrategiesService {
       }
     }));
     const mappingEnd = performance.now();
+
     console.log(`🔄 [PROFILER] Data mapping took ${(mappingEnd - mappingStart).toFixed(2)}ms`);
     
     const totalTime = performance.now() - startTime;

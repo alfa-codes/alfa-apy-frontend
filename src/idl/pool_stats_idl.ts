@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const idlFactory = ({ IDL }: { IDL: any }) => {
+  const Environment = IDL.Variant({
+    'Dev' : IDL.Null,
+    'Production' : IDL.Null,
+    'Test' : IDL.Null,
+    'Staging' : IDL.Null,
+  });
+  const RuntimeConfig = IDL.Record({ 'environment' : Environment });
   const AddLiquidityResponse = IDL.Record({
     'token_0_amount' : IDL.Nat,
     'token_1_amount' : IDL.Nat,
@@ -36,10 +43,20 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'Ok' : IDL.Null,
     'Err' : ResponseError,
   });
+  const InternalErrorKind = IDL.Variant({
+    'AccessDenied' : IDL.Null,
+    'Infrastructure' : IDL.Null,
+    'NotFound' : IDL.Null,
+    'Timeout' : IDL.Null,
+    'Unknown' : IDL.Null,
+    'BusinessLogic' : IDL.Null,
+    'ExternalService' : IDL.Null,
+    'Validation' : IDL.Null,
+  });
   const InternalError = IDL.Record({
     'context' : IDL.Text,
     'code' : IDL.Nat64,
-    'kind' : ResponseErrorKind,
+    'kind' : InternalErrorKind,
     'extra' : IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))),
     'message' : IDL.Text,
   });
@@ -109,9 +126,18 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'usd_apy' : IDL.Float64,
   });
   const PoolMetrics = IDL.Record({ 'apy' : ApyValue, 'tvl' : IDL.Nat });
+  const GetPoolMetricsResult = IDL.Variant({
+    'Ok' : IDL.Vec(IDL.Tuple(IDL.Text, PoolMetrics)),
+    'Err' : ResponseError,
+  });
   const GetPoolsResult = IDL.Variant({
     'Ok' : IDL.Vec(Pool),
     'Err' : ResponseError,
+  });
+  const GetPoolsHistoryRequest = IDL.Record({
+    'from_timestamp' : IDL.Opt(IDL.Nat64),
+    'to_timestamp' : IDL.Opt(IDL.Nat64),
+    'pool_ids' : IDL.Opt(IDL.Vec(IDL.Text)),
   });
   const PoolData = IDL.Record({ 'tvl' : IDL.Nat });
   const PositionData = IDL.Record({
@@ -120,6 +146,22 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'usd_amount1' : IDL.Nat,
     'amount0' : IDL.Nat,
     'amount1' : IDL.Nat,
+  });
+  const PoolSnapshotResponse = IDL.Record({
+    'id' : IDL.Text,
+    'apy' : ApyValue,
+    'pool_data' : IDL.Opt(PoolData),
+    'timestamp' : IDL.Nat64,
+    'pool_id' : IDL.Text,
+    'position_data' : IDL.Opt(PositionData),
+  });
+  const PoolHistory = IDL.Record({
+    'snapshots' : IDL.Vec(PoolSnapshotResponse),
+    'pool_id' : IDL.Text,
+  });
+  const GetPoolsHistoryResult = IDL.Variant({
+    'Ok' : IDL.Vec(PoolHistory),
+    'Err' : ResponseError,
   });
   const PoolSnapshot = IDL.Record({
     'id' : IDL.Text,
@@ -136,6 +178,10 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
   });
   const TestCreatePoolSnapshotResult = IDL.Variant({
     'Ok' : PoolSnapshot,
+    'Err' : ResponseError,
+  });
+  const TestCreateTestSnapshotsResult = IDL.Variant({
+    'Ok' : IDL.Null,
     'Err' : ResponseError,
   });
   const WithdrawLiquidityResponse = IDL.Record({
@@ -158,6 +204,11 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         [],
       ),
     'delete_pool' : IDL.Func([IDL.Text], [DeletePoolResult], []),
+    'deposit_test_liquidity_to_pool' : IDL.Func(
+        [IDL.Text],
+        [AddLiquidityResult],
+        [],
+      ),
     'get_event_records' : IDL.Func(
         [IDL.Nat64, IDL.Nat64],
         [GetEventRecordsResult],
@@ -166,15 +217,21 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
     'get_pool_by_id' : IDL.Func([IDL.Text], [GetPoolByIdResult], []),
     'get_pool_metrics' : IDL.Func(
         [IDL.Vec(IDL.Text)],
-        [IDL.Vec(IDL.Tuple(IDL.Text, PoolMetrics))],
+        [GetPoolMetricsResult],
         [],
       ),
     'get_pools' : IDL.Func([], [GetPoolsResult], []),
+    'get_pools_history' : IDL.Func(
+        [GetPoolsHistoryRequest],
+        [GetPoolsHistoryResult],
+        [],
+      ),
     'get_pools_snapshots' : IDL.Func(
         [IDL.Vec(IDL.Text)],
         [IDL.Vec(IDL.Tuple(IDL.Text, IDL.Vec(PoolSnapshot)))],
         [],
       ),
+    'get_runtime_config' : IDL.Func([], [RuntimeConfig], ['query']),
     'set_operator' : IDL.Func([IDL.Principal], [], []),
     'test_add_pool_snapshot' : IDL.Func([PoolSnapshotArgs], [], []),
     'test_create_pool_snapshot' : IDL.Func(
@@ -182,7 +239,13 @@ export const idlFactory = ({ IDL }: { IDL: any }) => {
         [TestCreatePoolSnapshotResult],
         [],
       ),
+    'test_create_test_snapshots' : IDL.Func(
+        [IDL.Text, IDL.Nat, IDL.Float64],
+        [TestCreateTestSnapshotsResult],
+        [],
+      ),
     'test_delete_all_pools_and_snapshots' : IDL.Func([], [], []),
+    'test_delete_all_snapshots' : IDL.Func([], [], []),
     'test_delete_pool_snapshot' : IDL.Func([IDL.Text, IDL.Text], [], []),
     'test_delete_pool_snapshots' : IDL.Func([IDL.Text], [], []),
     'test_update_pool_ids' : IDL.Func([], [], []),
@@ -201,5 +264,5 @@ export const init = ({ IDL }: { IDL: any }) => {
     'Staging' : IDL.Null,
   });
   const RuntimeConfig = IDL.Record({ 'environment' : Environment });
-  return [IDL.Opt(RuntimeConfig)];
+  return [RuntimeConfig];
 };
