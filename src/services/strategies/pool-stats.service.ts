@@ -2,6 +2,8 @@ import {
   _SERVICE,
   Pool,
   PoolMetrics,
+  GetPoolsHistoryRequest,
+  PoolHistory,
 } from "../../idl/pool_stats";
 import { idlFactory } from "../../idl/pool_stats_idl";
 import { getAnonActor, hasOwnProperty } from "../utils";
@@ -80,7 +82,9 @@ export class PoolStatsService {
         idlFactory
       );
       const result = await anonymousActor.get_pool_metrics(metricsRequest);
-      
+      if (hasOwnProperty(result, "Err")) {
+        throw new Error((result.Err as { message: string }).message);
+      }
       storageWithTtl.set(
         cacheKey,
         JSON.stringify(result, (_, value) => 
@@ -88,7 +92,7 @@ export class PoolStatsService {
         ),
         60 * 1000, // 1 минута TTL
       );
-      return result;
+      return result.Ok;
     } else if (cache && cache.expired) {
       // Асинхронно обновляем кеш
       this.get_pool_metrics_fresh(metricsRequest).then((response) => {
@@ -113,7 +117,23 @@ export class PoolStatsService {
       POOL_STATS_CANISTER_ID,
       idlFactory
     );
-    return await anonymousActor.get_pool_metrics(metricsRequest);
+    const result = await anonymousActor.get_pool_metrics(metricsRequest);
+    if (hasOwnProperty(result, "Err")) {
+      throw new Error((result.Err as { message: string }).message);
+    }
+    return result.Ok;
+  }
+
+  public async get_pools_history(request: GetPoolsHistoryRequest): Promise<Array<PoolHistory>> {
+    const anonymousActor = await getAnonActor<_SERVICE>(
+      POOL_STATS_CANISTER_ID,
+      idlFactory
+    );
+    const result = await anonymousActor.get_pools_history(request);
+    if (hasOwnProperty(result, "Err")) {
+      throw new Error((result.Err as { message: string }).message);
+    }
+    return result.Ok;
   }
 }
 

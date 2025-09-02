@@ -11,6 +11,7 @@ import { getStrategyTokenLogos, getTokenLogo } from "./utils";
 import { useEffect, useState } from "react";
 import { Deposit } from "./deposit";
 import { Withdraw } from "./withdraw";
+import { PoolChartModal } from "./pool-chart-modal";
 import { useAgent, useAuth } from "@nfid/identitykit/react";
 import { motion } from "framer-motion";
 import BigNumber from "bignumber.js";
@@ -60,6 +61,8 @@ export function Strategy({
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [isUpdatingData, setIsUpdatingData] = useState(false);
+  const [poolChartOpen, setPoolChartOpen] = useState(false);
+  const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -113,7 +116,7 @@ export function Strategy({
     };
 
     loadData();
-  }, [period]); // Перезагружаем при изменении периода
+  }, [period, value.id]); // Перезагружаем при изменении периода или стратегии
 
   const chartSeries = [
     {
@@ -468,6 +471,9 @@ export function Strategy({
                   <th className="text-left py-2 text-gray-600 font-medium">
                     APY
                   </th>
+                  <th className="text-left py-2 text-gray-600 font-medium">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -501,12 +507,24 @@ export function Strategy({
                       <span className="font-medium">{(p).provider}</span>
                     </td>
                     <td className="py-4">${Number(p.tvl).toLocaleString()}</td>
+                    <td className="py-4 font-medium">
+                      {Number(p.apy).toFixed(2)}%
+                    </td>
                     <td
-                      className={clsx("py-4 font-medium", {
+                      className={clsx("py-4", {
                         ["rounded-r-lg"]: p.isActive,
                       })}
                     >
-                      {Number(p.apy).toFixed(2)}%
+                      <Button
+                        onClick={() => {
+                          setSelectedPoolId(p.id);
+                          setPoolChartOpen(true);
+                        }}
+                        className="!h-8 !min-w-[80px] !px-3 text-xs"
+                        bg={theme === 'dark' ? '#a78bfa' : '#fbbf24'}
+                      >
+                        Data
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -609,6 +627,17 @@ export function Strategy({
         </Card>
         <PaymentsCard isUpdating={isUpdatingData} />
       </div>
+
+      {/* Pool Chart Modal */}
+      <PoolChartModal
+        isOpen={poolChartOpen}
+        onClose={() => {
+          setPoolChartOpen(false);
+          setSelectedPoolId(null);
+        }}
+        poolId={selectedPoolId}
+        poolName={selectedPoolId ? value.pools.find(p => p.id === selectedPoolId)?.token0.symbol + "/" + value.pools.find(p => p.id === selectedPoolId)?.token1.symbol : undefined}
+      />
     </motion.div>
   );
 }
